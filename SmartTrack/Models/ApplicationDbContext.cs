@@ -32,6 +32,7 @@ namespace SmartTrack.Models
 
         public DbSet<HouseHoldDetails> HouseHoldDetails { get; set; }
         public DbSet<UserHouseHoldDetails> UserHouseHoldDetails { get; set; }
+        public DbSet<PasswordResetOtp> PasswordResetOtps { get; set; }
 
     }
 }
