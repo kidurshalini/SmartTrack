@@ -1,0 +1,998 @@
+﻿:root {
+    --primary-green: #198754;
+    --dark-green: #146c43;
+    --primary-blue: #0d6efd;
+    --dark-blue: #084298;
+    --primary-yellow: #ffc107;
+    --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.10);
+    --shadow-md: 0 12px 40px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 25px 70px rgba(0, 0, 0, 0.20);
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Global Reset & Body (Medium Teal Gradient) ─── */
+* {
+    box-sizing: border-box;
+}
+
+.input-box select {
+    appearance: none;
+    cursor: pointer;
+    padding-right: 36px;
+}
+
+.input-box .select-arrow {
+    position: absolute;
+    right: 14px;
+    color: #8aa0b8;
+    pointer-events: none;
+    font-size: 14px;
+}
+
+/* Make the select options more readable */
+.input-box select option {
+    padding: 8px 12px;
+    background: #fff;
+    color: #1a2a3a;
+}
+
+    .input-box select option:hover {
+        background: #e9f0f7;
+    }
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    background: linear-gradient(145deg, #4a7c8c, #6a9a8c);
+    position: relative;
+}
+
+/* ─── Containers ─── */
+.register-container,
+.login-container {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    animation: fadeSlideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.register-container {
+    max-width: 1100px;
+}
+
+.login-container {
+    max-width: 450px;
+}
+
+/* ─── Cards (Glass Morphism) ─── */
+.register-card,
+.login-card {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.register-card {
+    padding: 40px 45px 45px;
+}
+
+.login-card {
+    padding: 28px 32px 36px;
+}
+
+    /* Top accent bar */
+    .register-card::before,
+    .login-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary-blue), var(--primary-green), var(--primary-yellow));
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        z-index: 2;
+    }
+
+/* ─── Logo Section ─── */
+.logo-section {
+    text-align: center;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.smart-logo {
+    width: 160px;
+    max-width: 75%;
+    height: auto;
+    object-fit: contain;
+    background: transparent;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    transition: var(--transition);
+    margin-bottom: 4px;
+    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.10));
+}
+
+    .smart-logo:hover {
+        transform: scale(1.04) rotate(-1deg);
+        filter: drop-shadow(0 8px 32px rgba(13, 110, 253, 0.15));
+    }
+
+.brand-tag {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    margin: 0;
+    color: #1a2a3a;
+    opacity: 0.7;
+}
+
+/* ─── Progress Steps (Register only) ─── */
+.progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 32px;
+    padding: 0 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #5a6e85;
+    transition: var(--transition);
+}
+
+    .step-item .step-num {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(233, 237, 242, 0.7);
+        color: #5a6e85;
+        font-size: 14px;
+        font-weight: 700;
+        transition: var(--transition);
+        flex-shrink: 0;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .step-item.active .step-num {
+        background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(13, 110, 253, 0.35);
+        border-color: transparent;
+    }
+
+    .step-item.active {
+        color: var(--primary-blue);
+    }
+
+    .step-item.done .step-num {
+        background: var(--primary-green);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(25, 135, 84, 0.25);
+        border-color: transparent;
+    }
+
+    .step-item.done {
+        color: var(--primary-green);
+    }
+
+.step-line {
+    width: 48px;
+    height: 2px;
+    background: var(--primary-blue);
+    border-radius: 2px;
+    transition: var(--primary-green);
+    flex-shrink: 0;
+}
+
+    .step-line.done {
+        background: var(--primary-green);
+    }
+
+/* ─── Section Titles (Register only) ─── */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 28px;
+    margin-bottom: 20px;
+    font-weight: 700;
+    font-size: 19px;
+    color: #1a2a3a;
+    letter-spacing: -0.2px;
+    position: relative;
+    z-index: 1;
+}
+
+    .section-title .title-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: #fff;
+        font-size: 17px;
+        flex-shrink: 0;
+        box-shadow: 0 6px 16px rgba(25, 135, 84, 0.20);
+    }
+
+    .section-title .title-line {
+        flex: 1;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(25, 135, 84, 0.25), transparent);
+        border-radius: 2px;
+        margin-left: 6px;
+    }
+
+    .section-title .title-badge {
+        font-size: 11px;
+        font-weight: 600;
+        color: #fff;
+        background: var(--primary-green);
+        padding: 2px 14px;
+        border-radius: 30px;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+    }
+
+/* ─── Form Rows ─── */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+    .form-group .field-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1a2a3a;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 2px;
+    }
+
+        .form-group .field-label .label-icon {
+            color: var(--primary-green);
+            font-size: 14px;
+        }
+
+        .form-group .field-label .required {
+            color: #dc3545;
+            font-size: 16px;
+        }
+
+/* ─── Input Box ─── */
+.input-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(248, 250, 252, 0.85);
+    border-radius: var(--radius-sm);
+    border: 1.5px solid rgba(226, 232, 240, 0.7);
+    transition: var(--transition);
+    backdrop-filter: blur(4px);
+}
+
+    .input-box:hover {
+        border-color: #b8c9dd;
+        background: rgba(250, 252, 255, 0.95);
+    }
+
+    .input-box:focus-within {
+        border-color: var(--primary-blue);
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.10);
+    }
+
+    .input-box .input-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        flex-shrink: 0;
+        color: #6c859e;
+        font-size: 17px;
+        transition: var(--transition);
+    }
+
+    .input-box:focus-within .input-icon {
+        color: var(--primary-blue);
+    }
+
+    .input-box input,
+    .input-box select {
+        width: 100%;
+        height: 46px;
+        border: none;
+        background: transparent;
+        padding: 0 14px 0 0;
+        font-size: 15px;
+        color: #1a2a3a;
+        font-weight: 500;
+        outline: none;
+        font-family: inherit;
+    }
+
+        .input-box input::placeholder {
+            color: #a8b9ce;
+            font-weight: 400;
+            font-size: 14px;
+        }
+
+    .input-box select {
+        appearance: none;
+        cursor: pointer;
+        padding-right: 36px;
+    }
+
+    .input-box .select-arrow {
+        position: absolute;
+        right: 14px;
+        color: #8aa0b8;
+        pointer-events: none;
+        font-size: 14px;
+    }
+
+    .input-box .toggle-pwd {
+        position: absolute;
+        right: 12px;
+        color: #8aa0b8;
+        cursor: pointer;
+        font-size: 20px;
+        transition: var(--transition);
+        background: none;
+        border: none;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .input-box .toggle-pwd:hover {
+            color: var(--primary-blue);
+        }
+
+    .input-box.error {
+        border-color: #dc3545;
+        background: #fff8f8;
+    }
+
+        .input-box.error:focus-within {
+            box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.08);
+        }
+
+.validation-error {
+    font-size: 12px;
+    color: #dc3545;
+    font-weight: 500;
+    padding-left: 4px;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.validation-summary-errors ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.validation-summary-errors {
+    font-size: 14px;
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.06);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 18px;
+}
+
+/* ─── Member Cards (Register only) ─── */
+.member-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(4px);
+    border: 1.5px solid rgba(232, 240, 232, 0.6);
+    border-radius: var(--radius-md);
+    padding: 24px 28px 28px;
+    margin-bottom: 18px;
+    transition: var(--transition);
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    z-index: 1;
+}
+
+    .member-card:hover {
+        border-color: #b5d5b5;
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-3px);
+    }
+
+    .member-card .member-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .member-card .member-avatar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .member-card .member-avatar .avatar-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(25, 135, 84, 0.20);
+        }
+
+        .member-card .member-avatar .member-label {
+            font-weight: 700;
+            font-size: 16px;
+            color: #1a2a3a;
+        }
+
+            .member-card .member-avatar .member-label small {
+                font-weight: 400;
+                color: #6c859e;
+                font-size: 13px;
+                margin-left: 6px;
+            }
+
+    .member-card .btn-remove-member {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(220, 53, 69, 0.06);
+        border: 1px solid rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+        padding: 6px 18px;
+        border-radius: 40px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: var(--transition);
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+        .member-card .btn-remove-member:hover {
+            background: #dc3545;
+            color: #fff;
+            border-color: #dc3545;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(220, 53, 69, 0.20);
+        }
+
+    .member-card .member-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 20px;
+    }
+
+@media (max-width: 600px) {
+    .member-card .member-form-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+/* ─── Add Member Button (Register only) ─── */
+.btn-add-member {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 30px;
+    border: 2px dashed var(--primary-green);
+    border-radius: 60px;
+    background: rgba(25, 135, 84, 0.04);
+    color: var(--primary-green);
+    font-weight: 700;
+    font-size: 15px;
+    transition: var(--transition);
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 4px;
+    backdrop-filter: blur(4px);
+    z-index: 1;
+    position: relative;
+}
+
+    .btn-add-member:hover {
+        background: var(--primary-green);
+        color: #fff;
+        border-style: solid;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 32px rgba(25, 135, 84, 0.20);
+    }
+
+    .btn-add-member i {
+        font-size: 18px;
+    }
+
+/* ─── Action Buttons ─── */
+.action-buttons,
+.login-btn-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 38px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+/* Login button – used in login page */
+.btn-login {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px;
+    border-radius: 60px;
+    font-weight: 700;
+    font-size: 16px;
+    border: none;
+    transition: var(--transition);
+    cursor: pointer;
+    font-family: inherit;
+    background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+    color: #fff;
+    box-shadow: 0 6px 24px rgba(25, 135, 84, 0.30);
+    margin-top: 6px;
+}
+
+    .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(25, 135, 84, 0.35);
+    }
+
+    .btn-login:active {
+        transform: translateY(0);
+    }
+
+/* Primary action buttons (Register) */
+.btn-primary-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 44px;
+    border-radius: 60px;
+    font-weight: 700;
+    font-size: 16px;
+    border: none;
+    transition: var(--transition);
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+}
+
+    .btn-primary-action.btn-submit {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: #fff;
+        box-shadow: 0 6px 24px rgba(25, 135, 84, 0.30);
+    }
+
+        .btn-primary-action.btn-submit:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(25, 135, 84, 0.35);
+        }
+
+    .btn-primary-action.btn-reset {
+        background: rgba(108, 117, 125, 0.08);
+        color: #2d4055;
+        border: 1.5px solid rgba(221, 227, 233, 0.5);
+        backdrop-filter: blur(4px);
+    }
+
+        .btn-primary-action.btn-reset:hover {
+            background: rgba(108, 117, 125, 0.16);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+        }
+
+/* ─── Utility Links (Login) ─── */
+.utility-links {
+    text-align: center;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+    .utility-links a {
+        color: #2d4055;
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
+    }
+
+        .utility-links a:hover {
+            color: var(--primary-blue);
+            transform: translateX(4px);
+        }
+
+    .utility-links .create-account {
+        color: var(--primary-green);
+        font-weight: 700;
+    }
+
+        .utility-links .create-account:hover {
+            color: var(--dark-green);
+            transform: translateX(6px);
+        }
+
+/* ─── Keyframes ─── */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.member-card {
+    animation: fadeSlideUp 0.4s ease forwards;
+}
+
+/* ─── Responsive Media Queries ─── */
+@media (max-width: 1200px) {
+    .register-card {
+        padding: 35px 38px;
+    }
+}
+
+@media (max-width: 992px) {
+    .register-card {
+        padding: 30px 28px;
+    }
+
+    .login-card {
+        padding: 24px 28px;
+    }
+
+    .smart-logo {
+        width: 140px;
+    }
+
+    .bg-scatter i {
+        font-size: 2rem !important;
+        opacity: 0.4 !important;
+    }
+
+        .bg-scatter i:nth-child(5) {
+            font-size: 6rem !important;
+            opacity: 0.15 !important;
+        }
+
+        .bg-scatter i:nth-child(3) {
+            font-size: 3.5rem !important;
+        }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
+    }
+
+    .register-card {
+        padding: 24px 18px;
+        border-radius: var(--radius-md);
+        background: rgba(255, 255, 255, 0.88);
+    }
+
+    .login-card {
+        padding: 20px 18px 24px;
+        border-radius: var(--radius-md);
+        background: rgba(255, 255, 255, 0.88);
+    }
+
+    .smart-logo {
+        width: 120px;
+    }
+
+    .brand-tag {
+        font-size: 12px;
+    }
+
+    .section-title {
+        font-size: 17px;
+        margin-top: 24px;
+        margin-bottom: 16px;
+    }
+
+        .section-title .title-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 15px;
+        }
+
+    .progress-steps {
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .step-item {
+        font-size: 11px;
+        gap: 4px;
+    }
+
+        .step-item .step-num {
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+        }
+
+    .step-line {
+        width: 28px;
+    }
+
+    .input-box input,
+    .input-box select {
+        height: 42px;
+        font-size: 14px;
+    }
+
+    .input-box .input-icon {
+        width: 36px;
+        font-size: 15px;
+    }
+
+    .member-card {
+        padding: 16px 16px 18px;
+    }
+
+        .member-card .member-avatar .avatar-circle {
+            width: 36px;
+            height: 36px;
+            font-size: 14px;
+        }
+
+        .member-card .member-avatar .member-label {
+            font-size: 15px;
+        }
+
+        .member-card .btn-remove-member {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+
+    .btn-add-member {
+        padding: 10px 22px;
+        font-size: 14px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .action-buttons,
+    .login-btn-wrapper {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-primary-action {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+
+    .btn-login {
+        padding: 12px;
+        font-size: 15px;
+    }
+
+    .bg-scatter i {
+        font-size: 1.6rem !important;
+        opacity: 0.35 !important;
+    }
+
+        .bg-scatter i:nth-child(5) {
+            font-size: 3.1rem !important;
+            opacity: 0.12 !important;
+        }
+
+        .bg-scatter i:nth-child(3) {
+            font-size: 2.8rem !important;
+        }
+
+        .bg-scatter i:nth-child(1) {
+            font-size: 2.2rem !important;
+        }
+
+        .bg-scatter i:nth-child(4) {
+            font-size: 2rem !important;
+        }
+}
+
+@media (max-width: 480px) {
+    .register-card {
+        padding: 16px 12px;
+        background: rgba(255, 255, 255, 0.92);
+    }
+
+    .login-card {
+        padding: 16px 14px 20px;
+        background: rgba(255, 255, 255, 0.92);
+    }
+
+    .smart-logo {
+        width: 100px;
+    }
+
+    .brand-tag {
+        font-size: 11px;
+    }
+
+    .section-title {
+        font-size: 15px;
+    }
+
+        .section-title .title-badge {
+            font-size: 9px;
+            padding: 2px 10px;
+        }
+
+    .input-box input,
+    .input-box select {
+        height: 38px;
+        font-size: 13px;
+        padding-right: 10px;
+    }
+
+    .input-box .input-icon {
+        width: 30px;
+        font-size: 14px;
+    }
+
+    .member-card .member-form-grid {
+        gap: 10px;
+    }
+
+    .member-card .member-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .member-card .btn-remove-member {
+        align-self: flex-start;
+    }
+
+    .validation-error {
+        font-size: 11px;
+    }
+
+    .btn-login {
+        padding: 11px;
+        font-size: 14px;
+    }
+
+    .utility-links {
+        font-size: 13px;
+    }
+
+    .bg-scatter i {
+        font-size: 1.2rem !important;
+        opacity: 0.3 !important;
+    }
+
+        .bg-scatter i:nth-child(5) {
+            font-size: 3rem !important;
+            opacity: 0.10 !important;
+        }
+
+        .bg-scatter i:nth-child(3) {
+            font-size: 2rem !important;
+        }
+
+        .bg-scatter i:nth-child(1) {
+            font-size: 1.8rem !important;
+        }
+
+        .bg-scatter i:nth-child(4) {
+            font-size: 1.6rem !important;
+        }
+
+        .bg-scatter i:nth-child(2),
+        .bg-scatter i:nth-child(6),
+        .bg-scatter i:nth-child(7),
+        .bg-scatter i:nth-child(8),
+        .bg-scatter i:nth-child(9),
+        .bg-scatter i:nth-child(10) {
+            display: none !important;
+        }
+}
+
+
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #8aaec9;
+    border-radius: 10px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #6c8aa8;
+    }
+
