@@ -11,7 +11,7 @@
 
     <div class="login-card">
 
-        <!-- Logo -->
+     
         <div class="logo-section">
             <img src="~/image/logo1.png" class="smart-logo" alt="SmartTrack Logo" />
             <p class="brand-tag mt-2">Smart Household Inventory Management</p>
@@ -21,19 +21,17 @@
 
             <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
-            <!-- ─── Email ─── -->
             <div class="form-group">
                 <label class="field-label" asp-for="Email">
                     Email Address   
                 </label>
                 <div class="input-box">
                     <span class="input-icon"><i class="bi bi-envelope"></i></span>
-                    <input asp-for="Email" placeholder="you@example.com" />
+                    <input asp-for="Email" placeholder="you@example.com" autocomplete="off" />
                 </div>
                 <span asp-validation-for="Email" class="validation-error"></span>
             </div>
 
-            <!-- ─── Password ─── -->
             <div class="form-group">
                 <label class="field-label" asp-for="Password">
                     Password   
@@ -48,7 +46,6 @@
                 <span asp-validation-for="Password" class="validation-error"></span>
             </div>
 
-            <!-- ─── Utility Links ─── -->
             <div class="utility-links">
                 <a asp-controller="Account" asp-action="ForgotPassword">
                     <i class="bi bi-key"></i> Forgot Password?
@@ -62,7 +59,6 @@
                 </div>
             </div>
 
-            <!-- ─── Login Button ─── -->
             <button type="submit" class="btn-login">
                 <i class="bi bi-box-arrow-in-right"></i>
                 Login

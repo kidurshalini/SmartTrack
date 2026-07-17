@@ -11,12 +11,15 @@
     --radius-md: 20px;
     --radius-lg: 28px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+
 }
 
-/* ─── Global Reset & Body (Medium Teal Gradient) ─── */
+ ─── Global Reset & Body (Medium Teal Gradient) ─── 
 * {
     box-sizing: border-box;
 }
+
 
 .input-box select {
     appearance: none;
@@ -996,3 +999,18 @@ body {
         background: #6c8aa8;
     }
 
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+    -webkit-text-fill-color: #000000 !important;
+    background-color: #ffffff !important;
+    background-clip: content-box !important;
+}
+
+input:autofill {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}

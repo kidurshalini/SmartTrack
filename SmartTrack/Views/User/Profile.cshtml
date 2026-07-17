@@ -1,0 +1,886 @@
+﻿@model SmartTrack.ViewModel.ProfileViewModel
+@{
+    ViewData["Title"] = "Profile Information";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var currentUserId = Context.Session.GetString("UserId");
+    var currentUserName = Context.Session.GetString("UserName") ?? "Guest";
+    var currentUserRole = Context.Session.GetString("UserRole") ?? "User";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet" />
+
+<style>
+    /* ---------- global ---------- */
+    .text-muted-soft {
+        color: #8b9eb0;
+    }
+
+    .fw-500 {
+        font-weight: 500;
+    }
+
+    /* ---------- cards ---------- */
+    .dashboard-card {
+        background: #fff;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        transition: box-shadow .25s ease, transform .25s ease;
+        overflow: hidden;
+    }
+
+        .dashboard-card:hover {
+            box-shadow: 0 12px 40px rgba(0,20,40,0.10);
+            transform: translateY(-3px);
+        }
+
+    .card-header-clean {
+        background: transparent;
+        border-bottom: 1px solid #f0f3f7;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+        .card-header-clean .bi {
+            font-size: 1.2rem;
+            opacity: .7;
+        }
+
+    .card-body-clean {
+        padding: 1.5rem;
+    }
+
+    /* ---------- household stats ---------- */
+    .household-stat {
+        background: #f8fafc;
+        border-radius: 14px;
+        padding: .75rem 1rem;
+        text-align: center;
+        height: 100%;
+        min-height: 70px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .household-stat .number {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0b1e33;
+            line-height: 1.2;
+        }
+
+        .household-stat .label {
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: #8b9eb0;
+            font-weight: 500;
+        }
+
+    /* ---------- profile details ---------- */
+    .profile-detail {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .5rem 0;
+        border-bottom: 1px solid #f0f3f7;
+    }
+
+        .profile-detail:last-of-type {
+            border-bottom: none;
+        }
+
+        .profile-detail .icon {
+            width: 24px;
+            color: #8b9eb0;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .profile-detail .label {
+            font-size: .8rem;
+            color: #8b9eb0;
+            font-weight: 500;
+            min-width: 70px;
+        }
+
+        .profile-detail .value {
+            font-weight: 500;
+            color: #0b1e33;
+            word-break: break-word;
+        }
+
+    /* ---------- badges ---------- */
+    .badge-soft-success {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .badge-soft-warning {
+        background: #fff8e1;
+        color: #b7651a;
+    }
+
+    .badge-soft-secondary {
+        background: #f0f3f7;
+        color: #5a6b7c;
+    }
+
+    .badge-soft-info {
+        background: #e3f0ff;
+        color: #1a5fb4;
+    }
+
+    .badge-soft-success, .badge-soft-warning, .badge-soft-secondary, .badge-soft-info {
+        font-weight: 500;
+        padding: .3rem .9rem;
+        border-radius: 40px;
+        font-size: .7rem;
+        letter-spacing: .02em;
+    }
+
+    /* ---------- buttons ---------- */
+    .btn-soft {
+        border-radius: 40px;
+        font-weight: 500;
+        font-size: .85rem;
+        padding: .4rem 1.2rem;
+        transition: all .2s;
+        border: 1px solid transparent;
+    }
+
+    .btn-soft-primary {
+        background: #eef4ff;
+        color: #1a5fb4;
+        border-color: #d6e4ff;
+        align-items: baseline;
+    }
+
+        .btn-soft-primary:hover {
+            background: #d6e4ff;
+            color: #0d4a8a;
+            transform: scale(1.02);
+        }
+
+    .btn-soft-success {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-color: #c8e6c9;
+    }
+
+        .btn-soft-success:hover {
+            background: #c8e6c9;
+            color: #1b5e20;
+            transform: scale(1.02);
+        }
+
+    .btn-soft-danger {
+        background: #fde8e8;
+        color: #b33636;
+        border-color: #f5d0d0;
+    }
+
+        .btn-soft-danger:hover {
+            background: #f5d0d0;
+            color: #8f2a2a;
+            transform: scale(1.02);
+        }
+
+    .btn-add-member {
+        background: #2e7d32;
+        color: #fff;
+        border: none;
+        border-radius: 40px;
+        padding: .3rem 1.2rem;
+        font-weight: 500;
+        font-size: .85rem;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        white-space: nowrap;
+    }
+
+        .btn-add-member:hover {
+            background: #1b5e20;
+            color: #fff;
+            transform: scale(1.02);
+        }
+
+    /* ---------- modern table ---------- */
+    .table-modern {
+        font-size: .9rem;
+    }
+
+        .table-modern thead th {
+            background: #f8fafc;
+            color: #5a6b7c;
+            font-weight: 600;
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            padding: .9rem 1rem;
+            border-bottom: 1px solid #e9edf2;
+        }
+
+        .table-modern tbody td {
+            padding: .9rem 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0f3f7;
+            color: #1a2a3a;
+        }
+
+        .table-modern tbody tr:hover {
+            background: #fafcff;
+        }
+
+        .table-modern tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+    /* ---------- modals ---------- */
+    .modal-content-soft {
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+        overflow: hidden;
+    }
+
+    .modal-header-soft {
+        border-bottom: 1px solid #f0f3f7;
+        padding: 1.25rem 1.75rem;
+        background: #fff;
+    }
+
+        .modal-header-soft .modal-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #0b1e33;
+        }
+
+    .modal-body-soft {
+        padding: 1.75rem;
+    }
+
+    .modal-footer-soft {
+        border-top: 1px solid #f0f3f7;
+        padding: 1rem 1.75rem;
+        background: #fafcff;
+        border-radius: 0 0 24px 24px;
+    }
+
+    /* ---------- form elements ---------- */
+    .form-label-clean {
+        font-weight: 500;
+        font-size: .8rem;
+        color: #3a4a5a;
+        margin-bottom: .3rem;
+    }
+
+    .form-control-clean {
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        padding: .6rem 1rem;
+        font-size: .9rem;
+        transition: border .2s, box-shadow .2s;
+        background: #fafcff;
+    }
+
+        .form-control-clean:focus {
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 4px rgba(46,125,50,0.10);
+            background: #fff;
+        }
+    /* validation error styling */
+    .field-validation-error {
+        display: block;
+        font-size: .8rem;
+        color: #dc3545;
+        margin-top: .25rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @@media (max-width: 767.98px) {
+        /* table → cards */
+        .table-modern thead {
+            display: none;
+        }
+
+        .table-modern, .table-modern tbody, .table-modern tr, .table-modern td {
+            display: block;
+            width: 100%;
+        }
+
+            .table-modern tr {
+                margin-bottom: 1rem;
+                border: 1px solid #e9edf2;
+                border-radius: 14px;
+                padding: .5rem .75rem;
+                background: #fff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            }
+
+            .table-modern td {
+                border: none;
+                padding: .5rem 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #f0f3f7;
+            }
+
+                .table-modern td:last-child {
+                    border-bottom: none;
+                }
+
+                .table-modern td::before {
+                    content: attr(data-label);
+                    font-weight: 600;
+                    color: #5a6b7c;
+                    font-size: .7rem;
+                    text-transform: uppercase;
+                    letter-spacing: .04em;
+                    margin-right: 1rem;
+                    flex-shrink: 0;
+                }
+
+                .table-modern td:first-child::before {
+                    content: "#";
+                }
+
+                .table-modern td[data-label="Actions"] {
+                    justify-content: flex-end;
+                    gap: .5rem;
+                    flex-wrap: wrap;
+                }
+
+                    .table-modern td[data-label="Actions"] .btn {
+                        font-size: .75rem;
+                        padding: .2rem .75rem;
+                    }
+    }
+
+    @@media (max-width: 575.98px) {
+        .household-stat-col {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .household-stat {
+            min-height: auto;
+            padding: .5rem .75rem;
+        }
+
+            .household-stat .number {
+                font-size: 1.1rem;
+            }
+
+        .card-body-clean {
+            padding: 1rem;
+        }
+
+        .card-header-clean {
+            padding: .75rem 1rem;
+            font-size: .9rem;
+        }
+
+        .btn-soft {
+            width: 100%;
+        }
+
+        .btn-add-member {
+            font-size: .75rem;
+            padding: .2rem .9rem;
+        }
+
+        .modal-footer-soft {
+            flex-direction: column;
+            gap: .5rem;
+        }
+
+            .modal-footer-soft .btn {
+                width: 100%;
+            }
+
+        .modal-body-soft {
+            padding: 1.25rem;
+        }
+
+        .modal-dialog {
+            margin: .5rem;
+        }
+
+        .modal-content-soft {
+            border-radius: 16px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .profile-detail .label {
+            min-width: 60px;
+            font-size: .75rem;
+        }
+
+        .table-modern {
+            font-size: .8rem;
+        }
+
+            .table-modern thead th, .table-modern tbody td {
+                padding: .6rem .75rem;
+            }
+
+        .household-stat .number {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <!-- Success Alert -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 gap-2">
+        <div>
+            <h4 class="mb-0 fw-bold" style="color: #0b1e33; letter-spacing: -0.02em;">
+                <i class="bi bi-person-circle me-2" style="color: #2e7d32;"></i>My Profile
+            </h4>
+            <p class="text-muted-soft small mt-1 mb-0">Manage your household and personal information</p>
+        </div>
+        <a asp-action="Index" asp-controller="Home" class="btn btn-soft btn-soft-primary">
+            <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Household Card -->
+        <div class="col-lg-5">
+            <div class="dashboard-card h-100">
+                <div class="card-header-clean">
+                    <i class="bi bi-house-door"></i>
+                    Household
+                </div>
+                <div class="card-body-clean d-flex flex-column" style="gap: 1.25rem;">
+                    <div>
+                        <div class="fw-bold" style="font-size: 1.1rem; color: #0b1e33;">@Model.HouseHoldName</div>
+                        <span class="text-muted-soft small">Your primary household</span>
+                    </div>
+
+                    @{
+                        // Count members excluding the current user (to match the table)
+                        var otherMembers = Model.Members.Where(m => m.UserId != currentUserId).ToList();
+                        var otherOwnerCount = otherMembers.Count(m => m.Role == "HouseholdOwner");
+                        var otherFamilyCount = otherMembers.Count(m => m.Role == "FamilyMembers");
+                        var otherMaidCount = otherMembers.Count(m => m.Role == "HourseMaid");
+                        var otherTotal = otherMembers.Count;
+                    }
+
+                    <div class="row g-2">
+                        <div class="col-6 col-sm-6 household-stat-col">
+                            <div class="household-stat">
+                                <div class="number">@otherTotal</div>
+                                <div class="label">Other<br />Members</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-6 household-stat-col">
+                            <div class="household-stat">
+                                <div class="number">@(otherFamilyCount + otherMaidCount + otherOwnerCount)</div>
+                                <div class="label">Other Accounts</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-1">
+                        <button class="btn btn-soft btn-soft-success w-100" data-bs-toggle="modal" data-bs-target="#editHouseholdModal">
+                            <i class="bi bi-pencil me-1"></i> Edit Household
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="col-lg-7">
+            <div class="dashboard-card h-100">
+                <div class="card-header-clean">
+                    <i class="bi bi-person-badge"></i> Personal Information
+                </div>
+                <div class="card-body-clean">
+                    <div class="d-flex flex-wrap align-items-start gap-3 gap-md-4">
+                        <div class="flex-grow-1" style="min-width: 180px;">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between mb-2">
+                                <h5 class="mb-0 fw-bold" style="color: #0b1e33;">@Model.UserName</h5>
+                                @{
+                                    string roleBadge = Model.Role == "HouseholdOwner" ? "badge-soft-success" :
+                                    Model.Role == "HourseMaid" ? "badge-soft-warning" :
+                                    Model.Role == "FamilyMembers" ? "badge-soft-info" :
+                                    "badge-soft-secondary";
+                                }
+                                <span class="badge @roleBadge">
+                                    @(Model.Role == "HouseholdOwner" ? "Owner" :
+                                                                        Model.Role == "HourseMaid" ? "Maid" :
+                                                                        Model.Role == "FamilyMembers" ? "Family" :
+                                                                        Model.Role)
+                                </span>
+                            </div>
+
+                            <div class="profile-detail">
+                                <span class="icon"><i class="bi bi-envelope"></i></span>
+                                <span class="label">Email</span>
+                                <span class="value">@Model.Email</span>
+                            </div>
+                            <div class="profile-detail">
+                                <span class="icon"><i class="bi bi-phone"></i></span>
+                                <span class="label">Phone</span>
+                                <span class="value">@Model.PhoneNumber</span>
+                            </div>
+                            <div class="profile-detail">
+                                <span class="icon"><i class="bi bi-calendar3"></i></span>
+                                <span class="label">Joined</span>
+                                <span class="value">@DateTime.Now.ToString("MMM yyyy")</span>
+                            </div>
+
+                            <div class="mt-3 text-center">
+                                <button class="btn btn-soft btn-soft-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                    <i class="bi bi-pencil me-1"></i> Edit Profile
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members Table -->
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="card-header-clean d-flex flex-wrap align-items-center justify-content-between">
+                    <span><i class="bi bi-people"></i> Household Members</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="btn-add-member" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                            <i class="bi bi-plus-circle"></i> <span class="d-none d-sm-inline">Add Member</span>
+                            <span class="d-inline d-sm-none">Add</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body-clean p-0">
+                    <div class="table-responsive">
+                        <table class="table table-modern mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Role</th>
+                                    <th class="text-end" style="min-width: 120px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    var membersToShow = Model.Members.Where(m => m.UserId != currentUserId).ToList();
+                                }
+                                @if (membersToShow.Any())
+                                {
+                                    int index = 1;
+                                    foreach (var member in membersToShow)
+                                    {
+                                        string memberRoleBadge = member.Role == "HouseholdOwner" ? "badge-soft-success" :
+                                        member.Role == "HourseMaid" ? "badge-soft-warning" :
+                                        member.Role == "FamilyMembers" ? "badge-soft-info" :
+                                        "badge-soft-secondary";
+
+                                        string friendlyRole = member.Role == "HouseholdOwner" ? "Owner" :
+                                        member.Role == "HourseMaid" ? "Maid" :
+                                        member.Role == "FamilyMembers" ? "Family" :
+                                        member.Role;
+
+                                        <tr>
+                                            <td data-label="#">@index</td>
+                                            <td data-label="User">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="avatar-xs" style="width:32px;height:32px;border-radius:12px;background:#eef4ff;display:flex;align-items:center;justify-content:center;color:#1a5fb4;font-size:.9rem;">
+                                                        <i class="bi bi-person"></i>
+                                                    </span>
+                                                    <span class="fw-500">@member.UserName</span>
+                                                </div>
+                                            </td>
+                                            <td data-label="Email">@member.Email</td>
+                                            <td data-label="Phone">@member.PhoneNumber</td>
+                                            <td data-label="Role"><span class="badge @memberRoleBadge">@friendlyRole</span></td>
+                                            <td data-label="Actions" class="text-end">
+                                                <div class="d-flex gap-1 justify-content-end flex-wrap">
+                                                    <button class="btn btn-soft btn-soft-primary btn-sm px-3"
+                                                            data-bs-toggle="modal" data-bs-target="#editMemberModal"
+                                                            data-userid="@member.UserId"
+                                                            data-username="@member.UserName"
+                                                            data-email="@member.Email"
+                                                            data-phone="@member.PhoneNumber"
+                                                            data-role="@member.Role">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <form asp-action="DeleteMember" asp-controller="User" method="post" style="display:inline;">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="userId" value="@member.UserId" />
+                                                        <button type="submit" class="btn btn-soft btn-soft-danger btn-sm px-3"
+                                                                onclick="return confirm('Remove this member from the household?')">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        index++;
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5 text-muted-soft">
+                                            <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>
+                                            No other members in this household.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== MODALS ========== -->
+<!-- Edit Household Modal -->
+<div class="modal fade" id="editHouseholdModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-soft">
+            <div class="modal-header modal-header-soft">
+                <h5 class="modal-title"><i class="bi bi-house-door me-2" style="color:#2e7d32;"></i>Edit Household</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="EditHousehold" asp-controller="User" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body modal-body-soft">
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Household Name</label>
+                        <input asp-for="HouseHoldName" class="form-control form-control-clean" required />
+                        <span asp-validation-for="HouseHoldName" class="text-danger"></span>
+                    </div>
+                    <p class="text-muted-soft small mb-0"><i class="bi bi-info-circle me-1"></i> Changing the name will update it for all members.</p>
+                </div>
+                <div class="modal-footer modal-footer-soft">
+                    <button type="button" class="btn btn-light btn-sm rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-4">
+                        <i class="bi bi-check-circle me-1"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-soft">
+            <div class="modal-header modal-header-soft">
+                <h5 class="modal-title"><i class="bi bi-person-gear me-2" style="color:#1a5fb4;"></i>Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="EditProfile" asp-controller="User" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body modal-body-soft">
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Username</label>
+                        <input asp-for="UserName" class="form-control form-control-clean" required />
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Email</label>
+                        <input asp-for="Email" class="form-control form-control-clean" required />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Phone</label>
+                        <input asp-for="PhoneNumber" class="form-control form-control-clean" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-soft">
+                    <button type="button" class="btn btn-light btn-sm rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4">
+                        <i class="bi bi-check-circle me-1"></i> Update
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Add Member Modal -->
+<div class="modal fade" id="addMemberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-soft">
+            <div class="modal-header modal-header-soft">
+                <h5 class="modal-title"><i class="bi bi-person-plus me-2" style="color:#2e7d32;"></i>Add Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="AddMember" asp-controller="User" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body modal-body-soft">
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Username</label>
+                        <input asp-for="AddMemberInput.UserName" class="form-control form-control-clean" placeholder="e.g. johndoe" required />
+                        <span asp-validation-for="AddMemberInput.UserName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Email</label>
+                        <input asp-for="AddMemberInput.Email" class="form-control form-control-clean" placeholder="john@example.com" required />
+                        <span asp-validation-for="AddMemberInput.Email" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Phone</label>
+                        <input asp-for="AddMemberInput.PhoneNumber" class="form-control form-control-clean" placeholder="+1 234 567 890" />
+                        <span asp-validation-for="AddMemberInput.PhoneNumber" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Role</label>
+                        <select asp-for="AddMemberInput.Role" class="form-select form-control-clean">
+                            <option value="FamilyMembers">Family Member</option>
+                            <option value="HourseMaid">House Maid</option>
+                        </select>
+                        <span asp-validation-for="AddMemberInput.Role" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Password</label>
+                        <div class="d-flex align-items-center" style="position:relative;">
+                            <input asp-for="AddMemberInput.Password" class="form-control form-control-clean" placeholder="••••••••" required />
+                            <button type="button" class="toggle-pwd"
+                                    style="position:absolute; right:10px; background:none; border:none;"
+                                    id="addMemberEye" onclick="togglePassword('AddMemberInput_Password','addMemberEye')">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="AddMemberInput.Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-soft">
+                    <button type="button" class="btn btn-light btn-sm rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-4">
+                        <i class="bi bi-check-circle me-1"></i> Add Member
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Member Modal -->
+<div class="modal fade" id="editMemberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-soft">
+            <div class="modal-header modal-header-soft">
+                <h5 class="modal-title"><i class="bi bi-pencil-square me-2" style="color:#1a5fb4;"></i>Edit Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="EditMember" asp-controller="User" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body modal-body-soft">
+                    <input type="hidden" name="userId" id="editMemberUserId" />
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Username</label>
+                        <input type="text" class="form-control form-control-clean" name="username" id="editUsername" required />
+                        <span class="text-danger" id="editUsernameError"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Email</label>
+                        <input type="email" class="form-control form-control-clean" name="email" id="editEmail" required />
+                        <span class="text-danger" id="editEmailError"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label form-label-clean">Phone</label>
+                        <input type="tel" class="form-control form-control-clean" name="phone" id="editPhone" />
+                        <span class="text-danger" id="editPhoneError"></span>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label form-label-clean">Role</label>
+                        <select class="form-select form-control-clean" name="role" id="editRole">
+                            <option value="FamilyMembers">Family</option>
+                            <option value="HourseMaid">Maid</option>
+                            <option value="HouseholdOwner">Owner</option>
+                        </select>
+                        <span class="text-danger" id="editRoleError"></span>
+                    </div>
+                </div>
+                <div class="modal-footer modal-footer-soft">
+                    <button type="button" class="btn btn-light btn-sm rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4">
+                        <i class="bi bi-check-circle me-1"></i> Update
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========== SCRIPTS ========== -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // -------- Add Member modal: clear fields on open --------
+            // const addModal = document.getElementById('addMemberModal');
+            // if (addModal) {
+            //     addModal.addEventListener('show.bs.modal', function() {
+            //         document.getElementById('UserName').value = '';
+            //         document.getElementById('Email').value = '';
+            //         document.getElementById('PhoneNumber').value = '';
+             
+            //         document.getElementById('Role').value = 'FamilyMembers';
+            //         Clear validation messages
+            //         document.querySelectorAll('#addMemberModal .text-danger')
+            //             .forEach(el => el.textContent = '');
+            //     });
+            // }
+
+            // -------- Edit Member modal: populate fields --------
+            const editModal = document.getElementById('editMemberModal');
+            if (editModal) {
+                editModal.addEventListener('show.bs.modal', function(event) {
+                    const btn = event.relatedTarget;
+                    document.getElementById('editMemberUserId').value = btn.getAttribute('data-userid');
+                    document.getElementById('editUsername').value = btn.getAttribute('data-username');
+                    document.getElementById('editEmail').value = btn.getAttribute('data-email');
+                    document.getElementById('editPhone').value = btn.getAttribute('data-phone');
+                    document.getElementById('editRole').value = btn.getAttribute('data-role');
+                });
+            }
+
+            // -------- Toggle password visibility --------
+            window.togglePassword = function(inputId, iconId) {
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
+                if (!input || !icon) return;
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                icon.innerHTML = isPassword ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+            };
+        });
+    </script>
+}
