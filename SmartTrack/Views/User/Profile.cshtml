@@ -486,13 +486,14 @@
                         var otherFamilyCount = otherMembers.Count(m => m.Role == "FamilyMembers");
                         var otherMaidCount = otherMembers.Count(m => m.Role == "HourseMaid");
                         var otherTotal = otherMembers.Count;
+                    
                     }
 
                     <div class="row g-2">
-                        <div class="col-6 col-sm-6 household-stat-col">
+                      <div class="col-6 col-sm-6 household-stat-col">
                             <div class="household-stat">
-                                <div class="number">@otherTotal</div>
-                                <div class="label">Other<br />Members</div>
+                                <div class="number">@Model.TotalMembers</div>
+                                <div class="label">HouseHold<br />Members</div>
                             </div>
                         </div>
                         <div class="col-6 col-sm-6 household-stat-col">
