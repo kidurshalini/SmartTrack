@@ -1,0 +1,160 @@
+﻿@model SmartTrack.Models.OCRResponseModel
+
+<h2>Scan Receipt</h2>
+
+<form asp-action="Scan"
+      method="post"
+      enctype="multipart/form-data">
+
+    <input type="file"
+           name="image"
+           class="form-control" />
+
+    <br />
+
+    <button type="submit"
+            class="btn btn-success">
+        Scan Receipt
+    </button>
+
+</form>
+
+
+@if (Model != null && Model.Items != null && Model.Items.Any())
+{
+    <h3 class="mt-4">
+        Extracted Items
+    </h3>
+
+
+    <h4>
+        Purchase Date :
+        @(Model.Date.HasValue
+            ? Model.Date.Value.ToString("yyyy-MM-dd")
+            : "Not detected")
+</h4>
+
+
+    <table class="table table-bordered">
+
+        <thead>
+            <tr>
+                <th>
+                    Product Name
+                </th>
+
+                <th>
+                    Quantity
+                </th>
+
+                <th>
+                    Unit Price
+                </th>
+
+                <th>
+                    Price
+                </th>
+            </tr>
+        </thead>
+
+
+        <tbody>
+
+        @foreach (var item in Model.Items)
+            {
+                <tr>
+
+                    <td>
+                        @item.Name
+                    </td>
+
+
+                    <td>
+                        @item.Quantity @item.Unit
+                    </td>
+
+
+                    <td>
+                        Rs @item.UnitPrice.ToString("0.00")
+                    </td>
+
+
+                    <td>
+                        Rs @item.Price.ToString("0.00")
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+
+        <tfoot>
+            <tr>
+
+                <th colspan="3" class="text-end">
+                    Total Amount
+                </th>
+
+
+                <th>
+                    Rs @Model.TotalAmount.ToString("0.00")
+                </th>
+
+            </tr>
+        </tfoot>
+
+    </table>
+}
+@if (Model != null && Model.Items != null && Model.Items.Any())
+{
+    // Table
+
+
+    <form asp-action="SaveReceipt"
+          method="post"
+          onsubmit="return confirm('Are you sure to save this receipt?');">
+
+
+        @for (int i = 0; i < Model.Items.Count; i++)
+        {
+            <input type="hidden"
+                   name="Items[@i].Name"
+                   value="@Model.Items[i].Name" />
+
+
+            <input type="hidden"
+                   name="Items[@i].Quantity"
+                   value="@Model.Items[i].Quantity" />
+
+
+            <input type="hidden"
+                   name="Items[@i].Unit"
+                   value="@Model.Items[i].Unit" />
+
+
+            <input type="hidden"
+                   name="Items[@i].UnitPrice"
+                   value="@Model.Items[i].UnitPrice" />
+
+
+            <input type="hidden"
+                   name="Items[@i].Price"
+                   value="@Model.Items[i].Price" />
+        }
+
+
+        <input type="hidden"
+               name="Date"
+               value="@Model.Date" />
+
+
+        <button type="submit"
+                class="btn btn-primary mt-3">
+
+            Save Receipt
+
+        </button>
+
+    </form>
+}
