@@ -1,47 +1,80 @@
 ﻿@{
-    // Get user info from session (set in Login action)
+    // Get user information from session
     string userName = Context.Session.GetString("UserName") ?? "Guest";
-    string userRole = Context.Session.GetString("UserRole") ?? "User"; // Key is "UserRole"
-    string userInitial = userName.Length > 0 ? userName[0].ToString().ToUpper() : "?";
+    string userRole = Context.Session.GetString("UserRole") ?? "User";
+
+    string userInitial = !string.IsNullOrEmpty(userName)
+        ? userName.Substring(0, 1).ToUpper()
+        : "?";
+
+    // Current controller/action
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
 }
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SmartTrack</title>
 
-    <!-- Bootstrap 5 CSS -->
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - SmartTrack
+    </title>
+
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+
     <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com" />
 
-    <!-- Your site-wide styles (moved to site.css) -->
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SmartTrack.styles.css" asp-append-version="true" />
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin />
 
-    <!-- No inline styles needed – they are now in site.css -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet" />
+
+
+    <!-- Site CSS -->
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/SmartTrack.styles.css"
+          asp-append-version="true" />
+
 
     <style>
 
-       
         :root {
             --primary-green: #198754;
             --primary-green-hover: #157347;
             --primary-blue: #0d6efd;
             --dark-blue: #084298;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
             --radius-sm: 10px;
             --radius-md: 16px;
             --radius-lg: 24px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
             --sidebar-width: 260px;
-            --sidebar-collapsed-width: 50px;
+            --sidebar-collapsed-width: 60px;
             --sidebar-bg: #2d2d2d;
             --sidebar-text: #ffffff;
             --sidebar-muted: #a0a0a0;
@@ -50,16 +83,23 @@
             --sidebar-active-text: #ffffff;
             --logo-bg: #e8e8e8;
             --body-bg: #f5f5f5;
-            --footer-bg: rgba(160, 160, 160, 0.4);
+            --footer-bg: rgba(160,160,160,0.4);
             --header-height: 64px;
         }
 
-       
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -69,20 +109,27 @@
             min-height: 100vh;
         }
 
+
         a {
             text-decoration: none;
             color: inherit;
         }
 
-        /* ============================================================
-                                   SIDEBAR LAYOUT
-                                   ============================================================ */
+
+        /* ==========================================================
+                   MAIN APP
+                   ========================================================== */
+
         .app-wrapper {
             display: flex;
             min-height: 100vh;
         }
 
-        /* ---- SIDEBAR ---- */
+
+        /* ==========================================================
+                   SIDEBAR
+                   ========================================================== */
+
         .sidebar {
             position: fixed;
             top: 0;
@@ -90,17 +137,21 @@
             bottom: 0;
             width: var(--sidebar-width);
             background: var(--sidebar-bg);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255,255,255,0.05);
             box-shadow: var(--shadow-sm);
             z-index: 1050;
             display: flex;
             flex-direction: column;
-            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), width 0.35s cubic-bezier(0.4,0,0.2,1);
             overflow-x: hidden;
             overflow-y: auto;
         }
 
-        /* ---- LOGO SECTION with toggle button ---- */
+
+        /* ==========================================================
+                   LOGO
+                   ========================================================== */
+
         .logo-section {
             background: var(--logo-bg);
             padding: 14px 16px;
@@ -110,233 +161,244 @@
             justify-content: flex-start;
             gap: 12px;
             flex-shrink: 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-            transition: background 0.35s ease, padding 0.35s ease;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
         }
 
-            .logo-section .toggle-sidebar-btn {
-                width: 36px;
-                height: 36px;
-                border-radius: 50%;
-                border: none;
-                background: transparent;
-                color: #2d2d2d;
-                font-size: 18px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: var(--transition);
-                cursor: pointer;
-                flex-shrink: 0;
+
+        .smart-logo {
+            height: 34px;
+            width: auto;
+            display: block;
+            flex-shrink: 0;
+        }
+
+
+        .toggle-sidebar-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: #2d2d2d;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+
+            .toggle-sidebar-btn:hover {
+                background: rgba(0,0,0,0.08);
+                color: #000;
             }
 
-                .logo-section .toggle-sidebar-btn:hover {
-                    background: rgba(0, 0, 0, 0.08);
-                    color: #000000;
-                }
 
-            .logo-section .smart-logo {
-                height: 34px;
-                width: auto;
-                flex-shrink: 0;
-                display: block;
-            }
+        /* ==========================================================
+                   SIDEBAR NAVIGATION
+                   ========================================================== */
 
-        /* ---- Navigation ---- */
         .sidebar-nav {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
             padding: 16px 10px 20px;
+            background: var(--sidebar-bg);
             scrollbar-width: thin;
             scrollbar-color: #444 transparent;
-            background: var(--sidebar-bg);
         }
+
 
             .sidebar-nav::-webkit-scrollbar {
                 width: 4px;
             }
+
 
             .sidebar-nav::-webkit-scrollbar-thumb {
                 background: #555;
                 border-radius: 10px;
             }
 
-            .sidebar-nav .nav-label {
-                font-size: 11px;
-                text-transform: uppercase;
-                letter-spacing: 0.6px;
-                font-weight: 600;
+
+        .nav-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 600;
+            color: var(--sidebar-muted);
+            padding: 18px 8px 8px;
+            white-space: nowrap;
+        }
+
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+
+        .sidebar-nav .nav-item {
+            list-style: none;
+        }
+
+
+        .sidebar-nav .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            color: var(--sidebar-text);
+            font-weight: 500;
+            font-size: 14px;
+            transition: var(--transition);
+            white-space: nowrap;
+            overflow: hidden;
+            margin-bottom: 2px;
+            position: relative;
+        }
+
+
+            .sidebar-nav .nav-link i {
+                width: 20px;
+                min-width: 20px;
+                font-size: 16px;
+                text-align: center;
                 color: var(--sidebar-muted);
-                padding: 18px 8px 8px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                transition: color 0.25s ease;
+            }
+
+
+            .sidebar-nav .nav-link .link-text {
+                color: var(--sidebar-text);
+                opacity: 1;
                 transition: opacity 0.25s ease;
             }
 
-            .sidebar-nav ul {
-                list-style: none;
-                padding: 0;
-                margin: 0;
+
+            .sidebar-nav .nav-link:hover {
+                background: var(--sidebar-hover);
             }
 
-            .sidebar-nav .nav-item {
-                list-style: none;
-            }
 
-            .sidebar-nav .nav-link {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 8px 10px;
-                border-radius: var(--radius-sm);
-                color: var(--sidebar-text);
-                font-weight: 500;
-                font-size: 14px;
-                transition: var(--transition);
-                white-space: nowrap;
-                overflow: hidden;
-                cursor: pointer;
-                margin-bottom: 2px;
-                position: relative;
-            }
-
-                .sidebar-nav .nav-link i {
-                    width: 20px;
-                    min-width: 20px;
-                    font-size: 16px;
-                    text-align: center;
-                    flex-shrink: 0;
-                    color: var(--sidebar-muted);
-                    transition: color 0.25s ease;
-                }
-
-                .sidebar-nav .nav-link .link-text {
-                    opacity: 1;
-                    transition: opacity 0.25s ease;
-                    color: var(--sidebar-text);
-                }
-
-                .sidebar-nav .nav-link:hover {
-                    background: var(--sidebar-hover);
-                }
-
-                    .sidebar-nav .nav-link:hover i {
-                        color: var(--sidebar-text);
-                    }
-
-                .sidebar-nav .nav-link.active {
-                    background: var(--sidebar-active-bg);
-                    color: var(--sidebar-active-text);
-                    box-shadow: 0 4px 14px rgba(25, 135, 84, 0.30);
-                }
-
-                    .sidebar-nav .nav-link.active i {
-                        color: var(--sidebar-active-text);
-                    }
-
-                    .sidebar-nav .nav-link.active:hover {
-                        background: var(--primary-green-hover);
-                    }
-
-                .sidebar-nav .nav-link .badge-count {
-                    margin-left: auto;
-                    background: var(--primary-blue);
+                .sidebar-nav .nav-link:hover i {
                     color: #fff;
-                    font-size: 10px;
-                    font-weight: 600;
-                    padding: 1px 7px;
-                    border-radius: 20px;
-                    flex-shrink: 0;
-                    transition: opacity 0.25s ease, transform 0.25s ease;
                 }
 
-        /* ---- Sidebar footer (user) ---- */
+
+            .sidebar-nav .nav-link.active {
+                background: var(--sidebar-active-bg);
+                color: var(--sidebar-active-text);
+                box-shadow: 0 4px 14px rgba(25,135,84,0.30);
+            }
+
+
+                .sidebar-nav .nav-link.active i {
+                    color: #fff;
+                }
+
+
+                .sidebar-nav .nav-link.active:hover {
+                    background: var(--primary-green-hover);
+                }
+
+
+        /* ==========================================================
+                   SIDEBAR FOOTER
+                   ========================================================== */
+
         .sidebar-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid rgba(255,255,255,0.06);
             padding: 12px 16px;
-            flex-shrink: 0;
+            min-height: 64px;
             display: flex;
             align-items: center;
             gap: 10px;
-            min-height: 64px;
             background: var(--sidebar-bg);
+            flex-shrink: 0;
         }
 
-            .sidebar-footer .avatar {
-                width: 34px;
-                height: 34px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #fff;
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient( 135deg, var(--primary-blue), var(--dark-blue) );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+
+            .user-info .name {
                 font-weight: 600;
-                font-size: 14px;
-                flex-shrink: 0;
-                transition: all 0.25s ease;
+                font-size: 13px;
+                color: #fff;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
-            .sidebar-footer .user-info {
-                flex: 1;
-                min-width: 0;
-                transition: opacity 0.25s ease;
-            }
 
-                .sidebar-footer .user-info .name {
-                    font-weight: 600;
-                    font-size: 13px;
-                    color: var(--sidebar-text);
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-
-                .sidebar-footer .user-info .role {
-                    font-size: 11px;
-                    color: var(--sidebar-muted);
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-
-            .sidebar-footer .logout-btn {
-                width: 34px;
-                height: 34px;
-                border-radius: 50%;
-                border: none;
-                background: transparent;
+            .user-info .role {
+                font-size: 11px;
                 color: var(--sidebar-muted);
-                transition: var(--transition);
-                flex-shrink: 0;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 16px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
-                .sidebar-footer .logout-btn:hover {
-                    background: #fee2e2;
-                    color: #dc2626;
-                }
 
-        /* ============================================================
-                                   MAIN CONTENT AREA
-                                   ============================================================ */
+        .logout-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--sidebar-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+
+            .logout-btn:hover {
+                background: #fee2e2;
+                color: #dc2626;
+            }
+
+
+        /* ==========================================================
+                   MAIN CONTENT
+                   ========================================================== */
+
         .main-area {
             flex: 1;
             margin-left: var(--sidebar-width);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             background: var(--body-bg);
+            transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1);
         }
 
-        /* ---- PAGE CONTENT ---- */
+
         .page-content {
             flex: 1;
             padding: 28px 32px 40px;
@@ -344,19 +406,23 @@
             min-height: 400px;
         }
 
-        /* ---- FOOTER ---- */
+
+        /* ==========================================================
+                   FOOTER
+                   ========================================================== */
+
         .main-footer {
             background: var(--footer-bg);
             backdrop-filter: blur(2px);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            border-top: 1px solid rgba(0,0,0,0.05);
             padding: 14px 28px;
             text-align: center;
             font-size: 13px;
             color: #1e1e1e;
             flex-shrink: 0;
             width: 100%;
-            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
         }
+
 
             .main-footer a {
                 color: #0b5e7c;
@@ -364,129 +430,113 @@
                 transition: var(--transition);
             }
 
+
                 .main-footer a:hover {
                     color: #084298;
                     text-decoration: underline;
                 }
 
-            .main-footer i.fa-heart {
-                color: #dc3545 !important;
-                font-size: 12px;
+
+            .main-footer .fa-heart {
+                color: #dc3545;
             }
+
+
+        /* ==========================================================
+                   COLLAPSED DESKTOP SIDEBAR
+                   ========================================================== */
 
         .sidebar.collapsed {
             width: var(--sidebar-collapsed-width);
         }
 
+
             .sidebar.collapsed .logo-section {
-                flex-direction: column;
                 padding: 10px 0;
-                gap: 0;
-                min-height: 56px;
                 justify-content: center;
                 align-items: center;
             }
 
-                .sidebar.collapsed .logo-section .smart-logo {
-                    display: none;
-                }
 
-                .sidebar.collapsed .logo-section .toggle-sidebar-btn {
-                    margin: 0;
-                    width: 32px;
-                    height: 32px;
-                    font-size: 16px;
-                    color: #2d2d2d;
-                }
+            .sidebar.collapsed .smart-logo {
+                display: none;
+            }
 
-                    .sidebar.collapsed .logo-section .toggle-sidebar-btn:hover {
-                        background: rgba(0, 0, 0, 0.08);
-                        color: #000;
-                    }
+
+            .sidebar.collapsed .toggle-sidebar-btn {
+                margin: 0;
+                width: 32px;
+                height: 32px;
+            }
+
 
             .sidebar.collapsed .nav-label,
             .sidebar.collapsed .link-text,
-            .sidebar.collapsed .badge-count,
             .sidebar.collapsed .user-info {
-                opacity: 0 !important;
-                pointer-events: none !important;
-                transform: scale(0.9);
+                opacity: 0;
+                pointer-events: none;
                 width: 0;
-                margin: 0;
-                padding: 0;
                 overflow: hidden;
             }
 
-            .sidebar.collapsed .sidebar-nav .nav-link {
-                padding: 8px 0;
+
+            .sidebar.collapsed .nav-link {
                 justify-content: center;
                 gap: 0;
-                overflow: visible;
+                padding: 8px 0;
             }
 
-                .sidebar.collapsed .sidebar-nav .nav-link i {
-                    display: inline-flex !important;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 15px;
+
+                .sidebar.collapsed .nav-link i {
                     width: 32px;
                     min-width: 32px;
                     height: 32px;
-                    margin: 0;
-                    color: #a0a0a0;
-                    transition: color 0.25s ease, background 0.25s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     border-radius: 6px;
                 }
 
-                .sidebar.collapsed .sidebar-nav .nav-link:hover i {
-                    color: #ffffff;
-                    background: var(--sidebar-hover);
-                }
 
-                .sidebar.collapsed .sidebar-nav .nav-link.active {
+                .sidebar.collapsed .nav-link.active {
                     background: transparent;
                     box-shadow: none;
-                    padding: 8px 0;
                 }
 
-                    .sidebar.collapsed .sidebar-nav .nav-link.active i {
-                        color: var(--sidebar-active-text);
-                        background: var(--sidebar-active-bg);
-                        box-shadow: 0 4px 10px rgba(25, 135, 84, 0.30);
+
+                    .sidebar.collapsed .nav-link.active i {
+                        background: var(--primary-green);
+                        color: #fff;
+                        box-shadow: 0 4px 10px rgba(25,135,84,0.30);
                     }
 
-                    .sidebar.collapsed .sidebar-nav .nav-link.active:hover i {
-                        background: var(--primary-green-hover);
-                        color: var(--sidebar-active-text);
-                    }
 
             .sidebar.collapsed .sidebar-footer {
                 padding: 12px 0;
                 justify-content: center;
-                gap: 0;
             }
 
-                .sidebar.collapsed .sidebar-footer .avatar {
-                    display: none;
-                }
 
-                .sidebar.collapsed .sidebar-footer .logout-btn {
-                    width: 30px;
-                    height: 30px;
-                    font-size: 14px;
-                    color: #a0a0a0;
-                }
+            .sidebar.collapsed .avatar {
+                display: none;
+            }
 
-                    .sidebar.collapsed .sidebar-footer .logout-btn:hover {
-                        color: #dc2626;
-                        background: #fee2e2;
-                    }
+
+            .sidebar.collapsed .logout-btn {
+                width: 30px;
+                height: 30px;
+            }
+
 
         .main-area.expanded {
             margin-left: var(--sidebar-collapsed-width);
         }
 
-  
+
+        /* ==========================================================
+                   MOBILE
+                   ========================================================== */
+
         .floating-toggle {
             display: none;
             position: fixed;
@@ -498,398 +548,649 @@
             border-radius: 50%;
             border: none;
             background: #2d2d2d;
-            color: #ffffff;
+            color: #fff;
             font-size: 20px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-            cursor: pointer;
-            transition: var(--transition);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
+
 
             .floating-toggle:hover {
                 background: #3d3d3d;
-                transform: scale(1.04);
             }
 
-            .floating-toggle:active {
-                transform: scale(0.95);
-            }
 
         .sidebar-backdrop {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.40);
+            background: rgba(0,0,0,0.40);
             z-index: 1045;
             backdrop-filter: blur(3px);
-            opacity: 0;
-            transition: opacity 0.35s ease;
         }
+
 
             .sidebar-backdrop.show {
                 display: block;
-                opacity: 1;
             }
 
+
+        /* ==========================================================
+                   TABLET / MOBILE
+                   ========================================================== */
+
         @@media (max-width: 992px) {
-            .sidebar
 
-        {
-            transform: translateX(-100%);
-            box-shadow: var(--shadow-lg);
-            border-right: none;
-            width: 280px;
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                box-shadow: var(--shadow-lg);
+            }
+
+
+                .sidebar.mobile-open {
+                    transform: translateX(0);
+                }
+
+
+            .main-area {
+                margin-left: 0 !important;
+            }
+
+
+            .page-content {
+                padding: 20px 18px 30px;
+            }
+
+
+            .main-footer {
+                padding: 12px 20px;
+            }
+
+
+            .floating-toggle {
+                display: flex;
+            }
+
+
+            .logo-section .toggle-sidebar-btn {
+                display: none;
+            }
+
+
+            .logo-section {
+                justify-content: center;
+            }
+
+
+            .sidebar.collapsed {
+                width: 280px;
+                transform: translateX(-100%);
+            }
+
+
+                .sidebar.collapsed.mobile-open {
+                    transform: translateX(0);
+                }
         }
 
-        .sidebar.mobile-open {
-            transform: translateX(0);
-        }
 
-        .sidebar-backdrop.show {
-            display: block;
-        }
-
-        .main-area {
-            margin-left: 0 !important;
-        }
-
-        .page-content {
-            padding: 20px 18px 30px;
-        }
-
-        .main-footer {
-            padding: 12px 20px;
-        }
-   
-        .floating-toggle {
-            display: flex;
-        }
-     
-        .logo-section .toggle-sidebar-btn {
-            display: none;
-        }
- 
-        .logo-section {
-            justify-content: center;
-        }
-
-        }
+        /* ==========================================================
+                   SMALL MOBILE
+                   ========================================================== */
 
         @@media (max-width: 576px) {
-            .page-content
 
-        {
-            padding: 16px 14px 24px;
-        }
+            .page-content {
+                padding: 16px 14px 24px;
+            }
 
-        .sidebar {
-            width: 260px;
-        }
 
-        .logo-section {
-            padding: 10px 12px;
-            min-height: 56px;
-        }
+            .sidebar {
+                width: 260px;
+            }
 
-            .logo-section .smart-logo {
+
+            .logo-section {
+                padding: 10px 12px;
+                min-height: 56px;
+            }
+
+
+            .smart-logo {
                 height: 28px;
             }
 
-        .sidebar-nav {
-            padding: 10px 6px 14px;
-        }
 
-            .sidebar-nav .nav-link {
-                padding: 6px 8px;
-                font-size: 13px;
+            .sidebar-nav {
+                padding: 10px 6px 14px;
             }
 
-                .sidebar-nav .nav-link i {
-                    font-size: 15px;
-                    width: 18px;
-                    min-width: 18px;
+
+                .sidebar-nav .nav-link {
+                    padding: 7px 8px;
+                    font-size: 13px;
                 }
 
-        .sidebar-footer {
-            padding: 10px 12px;
-            min-height: 56px;
-        }
 
-            .sidebar-footer .avatar {
+            .sidebar-footer {
+                padding: 10px 12px;
+                min-height: 56px;
+            }
+
+
+            .avatar {
                 width: 30px;
                 height: 30px;
                 font-size: 12px;
             }
 
-        .main-footer {
-            padding: 10px 14px;
-            font-size: 12px;
-        }
 
-        .floating-toggle {
-            top: 10px;
-            left: 10px;
-            width: 38px;
-            height: 38px;
-            font-size: 17px;
-        }
-        /* Collapsed state on mobile (still visible) */
-        .sidebar.collapsed {
-            width: 50px;
-            transform: translateX(0);
-        }
-
-            .sidebar.collapsed .logo-section {
-                min-height: 50px;
-                padding: 8px 0;
+            .main-footer {
+                padding: 10px 14px;
+                font-size: 12px;
             }
 
-                .sidebar.collapsed .logo-section .smart-logo {
-                    display: none;
-                }
 
-                .sidebar.collapsed .logo-section .toggle-sidebar-btn {
-                    display: flex;
-                }
-
-            .sidebar.collapsed .sidebar-nav .nav-link {
-                padding: 6px 0;
+            .floating-toggle {
+                top: 10px;
+                left: 10px;
+                width: 38px;
+                height: 38px;
+                font-size: 17px;
             }
-
-                .sidebar.collapsed .sidebar-nav .nav-link i {
-                    font-size: 14px;
-                    width: 28px;
-                    min-width: 28px;
-                    height: 28px;
-                }
-
-            .sidebar.collapsed .sidebar-footer .logout-btn {
-                width: 28px;
-                height: 28px;
-                font-size: 13px;
-            }
-            /* On mobile collapsed, hide floating toggle */
-            .sidebar.collapsed ~ .floating-toggle {
-                display: none;
-            }
-
         }
 
-        /* When sidebar is open on mobile, hide floating toggle */
-        @@media (max-width: 992px) {
-            .sidebar.mobile-open ~ .floating-toggle
-
-        {
-            display: none;
-        }
-            /*/* When sidebar is collapsed on desktop, floating toggle stays hidden */
-            @@media (min-width: 993px) {
-                .floating-toggle
-
-        {
-            display: none !important;
-        }
-
-        }
-        }
     </style>
+
 </head>
+
+
 <body>
 
     <div class="app-wrapper">
 
-        <!-- SIDEBAR -->
+
+        <!-- ======================================================
+             SIDEBAR
+             ====================================================== -->
+
         <aside class="sidebar" id="sidebar">
+
+
+            <!-- Logo -->
+
             <div class="logo-section">
-             
-                <img src="~/image/logo1.png" class="smart-logo" alt="SmartTrack Logo" />
-                <button class="toggle-sidebar-btn ms-auto" id="sidebarToggleBtn" aria-label="Toggle sidebar">
+
+                <img src="~/image/logo1.png"
+                     class="smart-logo"
+                     alt="SmartTrack Logo" />
+
+
+                <button type="button"
+                        class="toggle-sidebar-btn ms-auto"
+                        id="sidebarToggleBtn"
+                        aria-label="Toggle sidebar">
+
                     <i class="fas fa-bars"></i>
+
                 </button>
+
             </div>
+
+
+            <!-- Navigation -->
 
             <nav class="sidebar-nav">
-                <div class="nav-label">Main</div>
+
+                <div class="nav-label">
+                    Main
+                </div>
+
+
                 <ul>
+
+
+                    <!-- Dashboard -->
+
                     <li class="nav-item">
-                        <a class="nav-link active" asp-area="" asp-controller="Home" asp-action="Index">
+
+                        <a class="nav-link @(currentController == "Home" && currentAction == "Index" ? "active" : "")"
+                           asp-area=""
+                           asp-controller="Home"
+                           asp-action="Index">
+
                             <i class="fas fa-th-large"></i>
-                            <span class="link-text">Dashboard</span>
+
+                            <span class="link-text">
+                                Dashboard
+                            </span>
+
                         </a>
+
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">
-                            <i class="fas fa-users"></i>
-                            <span class="link-text">Team</span>
-                            <span class="badge-count">12</span>
-                        </a>
-                    </li>
+
+
+                    <!-- Receipt Scanner -->
+                    @if (User.IsInRole("FamilyMembers") ||
+                        User.IsInRole("HouseholdOwner"))
+                    {
+                        <li class="nav-item">
+
+                            <a class="nav-link @(currentController == "Receipt" && currentAction == "Scan" ? "active" : "")"
+                            asp-area=""
+                            asp-controller="Receipt"
+                            asp-action="Scan">
+
+                                <i class="fas fa-receipt"></i>
+
+                                <span class="link-text">
+                                    Add Receipt
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+                        <!-- Saved Receipts -->
+
+                        <li class="nav-item">
+
+                            <a class="nav-link @(currentController == "Receipt" && currentAction == "ViewSavedReceipts" ? "active" : "")"
+                            asp-area=""
+                            asp-controller="Receipt"
+                            asp-action="ViewSavedReceipts">
+
+                                <i class="fas fa-folder-open"></i>
+
+                                <span class="link-text">
+                                    View Receipts
+                                </span>
+
+                            </a>
+
+                        </li>
+                    }
+
                 </ul>
+
             </nav>
 
+
+            <!-- ==================================================
+                 USER FOOTER
+                 ================================================== -->
+
             <div class="sidebar-footer">
-                <div class="avatar">@userInitial</div>
+
+
+                <div class="avatar">
+                    @userInitial
+                </div>
+
+
                 <div class="user-info">
-                    <a class="name text-decoration-none text-white fw-bold"
+
+                    <a class="name"
                        asp-controller="User"
                        asp-action="Profile">
-                        @userName
-                    </a>
-                    <div class="role">@userRole</div>
-                </div>
-                @* <button class="logout-btn" title="Logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button> *@
 
-                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline" id="logoutForm">
-                    <button type="button" class="logout-btn" title="Logout">
+                        @userName
+
+                    </a>
+
+
+                    <div class="role">
+
+                        @userRole
+
+                    </div>
+
+                </div>
+
+
+                <!-- Logout -->
+
+                <form asp-controller="Account"
+                      asp-action="Logout"
+                      method="post"
+                      id="logoutForm">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="button"
+                            class="logout-btn"
+                            title="Logout"
+                            id="logoutButton">
+
                         <i class="fas fa-sign-out-alt"></i>
+
                     </button>
+
                 </form>
+
             </div>
+
         </aside>
 
-        <!-- FLOATING TOGGLE (mobile) -->
-        <button class="floating-toggle" id="floatingToggleBtn" aria-label="Open sidebar">
+
+        <!-- ======================================================
+             MOBILE FLOATING BUTTON
+             ====================================================== -->
+
+        <button type="button"
+                class="floating-toggle"
+                id="floatingToggleBtn"
+                aria-label="Open sidebar">
+
             <i class="fas fa-bars"></i>
+
         </button>
 
-        <!-- BACKDROP -->
-        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-        <!-- MAIN CONTENT -->
-        <div class="main-area" id="mainArea">
-            <div class="page-content">
+        <!-- Backdrop -->
+
+        <div class="sidebar-backdrop"
+             id="sidebarBackdrop">
+        </div>
+
+
+        <!-- ======================================================
+             MAIN AREA
+             ====================================================== -->
+
+        <div class="main-area"
+             id="mainArea">
+
+
+            <main class="page-content">
+
                 @RenderBody()
-            </div>
+
+            </main>
+
+
+            <!-- Footer -->
 
             <footer class="main-footer">
-                &copy; 2026 <strong>SmartTrack</strong> &mdash; Built with <i class="fas fa-heart"></i> &middot;
-                <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+                &copy; 2026
+
+                <strong>SmartTrack</strong>
+
+                &mdash;
+
+                Built with
+
+                <i class="fas fa-heart"></i>
+
+                &middot;
+
+                <a asp-controller="Home"
+                   asp-action="Privacy">
+
+                    Privacy
+
+                </a>
+
             </footer>
+
         </div>
+
     </div>
 
-    <!-- SCRIPTS -->
+
+    <!-- ==========================================================
+         SCRIPTS
+         ========================================================== -->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+
 
     <script>
-        (function() {
+
+        (function () {
+
             'use strict';
 
-            const sidebar = document.getElementById('sidebar');
-            const mainArea = document.getElementById('mainArea');
-            const sidebarToggle = document.getElementById('sidebarToggleBtn');
-            const floatingToggle = document.getElementById('floatingToggleBtn');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            const navLinks = document.querySelectorAll('.sidebar-nav .nav-link');
+
+            const sidebar =
+                document.getElementById('sidebar');
+
+            const mainArea =
+                document.getElementById('mainArea');
+
+            const sidebarToggle =
+                document.getElementById('sidebarToggleBtn');
+
+            const floatingToggle =
+                document.getElementById('floatingToggleBtn');
+
+            const backdrop =
+                document.getElementById('sidebarBackdrop');
+
+            const logoutButton =
+                document.getElementById('logoutButton');
+
+            const logoutForm =
+                document.getElementById('logoutForm');
+
 
             function isMobile() {
+
                 return window.innerWidth <= 992;
+
             }
 
-            function toggleSidebar() {
-                if (isMobile()) {
-                    sidebar.classList.toggle('mobile-open');
-                    backdrop.classList.toggle('show');
-                    document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
-                } else {
-                    sidebar.classList.toggle('collapsed');
-                    mainArea.classList.toggle('expanded');
-                    localStorage.setItem('smarttrack-sidebar-collapsed',
-                        sidebar.classList.contains('collapsed') ? 'true' : 'false');
-                }
+
+            function openMobileSidebar() {
+
+                sidebar.classList.add('mobile-open');
+
+                backdrop.classList.add('show');
+
+                document.body.style.overflow = 'hidden';
+
             }
+
 
             function closeMobileSidebar() {
+
+                sidebar.classList.remove('mobile-open');
+
+                backdrop.classList.remove('show');
+
+                document.body.style.overflow = '';
+
+            }
+
+
+            function toggleSidebar() {
+
                 if (isMobile()) {
-                    sidebar.classList.remove('mobile-open');
-                    backdrop.classList.remove('show');
-                    document.body.style.overflow = '';
-                }
-            }
 
-            function setActiveLink(clickedLink) {
-                navLinks.forEach(function(link) {
-                    link.classList.remove('active');
-                });
-                clickedLink.classList.add('active');
-            }
+                    if (sidebar.classList.contains('mobile-open')) {
 
-            sidebarToggle.addEventListener('click', toggleSidebar);
-            floatingToggle.addEventListener('click', toggleSidebar);
-
-            backdrop.addEventListener('click', closeMobileSidebar);
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && isMobile() && sidebar.classList.contains('mobile-open')) {
-                    closeMobileSidebar();
-                }
-            });
-
-            navLinks.forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    setActiveLink(this);
-                    if (isMobile()) {
                         closeMobileSidebar();
-                    }
-                });
-            });
 
-            if (!isMobile()) {
-                const stored = localStorage.getItem('smarttrack-sidebar-collapsed');
-                if (stored === 'true') {
-                    sidebar.classList.add('collapsed');
-                    mainArea.classList.add('expanded');
+                    } else {
+
+                        openMobileSidebar();
+
+                    }
+
                 }
+                else {
+
+                    sidebar.classList.toggle('collapsed');
+
+                    mainArea.classList.toggle('expanded');
+
+
+                    localStorage.setItem(
+                        'smarttrack-sidebar-collapsed',
+                        sidebar.classList.contains('collapsed')
+                            ? 'true'
+                            : 'false'
+                    );
+
+                }
+
             }
+
+
+            /* Desktop sidebar */
+
+            sidebarToggle?.addEventListener(
+                'click',
+                toggleSidebar
+            );
+
+
+            /* Mobile sidebar */
+
+            floatingToggle?.addEventListener(
+                'click',
+                toggleSidebar
+            );
+
+
+            /* Backdrop */
+
+            backdrop?.addEventListener(
+                'click',
+                closeMobileSidebar
+            );
+
+
+            /* Escape */
+
+            document.addEventListener(
+                'keydown',
+                function (event) {
+
+                    if (
+                        event.key === 'Escape' &&
+                        isMobile() &&
+                        sidebar.classList.contains('mobile-open')
+                    ) {
+
+                        closeMobileSidebar();
+
+                    }
+
+                }
+            );
+
+
+            /* Logout */
+
+            logoutButton?.addEventListener(
+                'click',
+                function () {
+
+                    if (confirm('Logout from SmartTrack?')) {
+
+                        this.disabled = true;
+
+                        this.innerHTML =
+                            '<i class="fas fa-spinner fa-spin"></i>';
+
+                        logoutForm.submit();
+
+                    }
+
+                }
+            );
+
+
+            /* Restore desktop sidebar state */
+
+            function restoreSidebarState() {
+
+                if (!isMobile()) {
+
+                    const stored =
+                        localStorage.getItem(
+                            'smarttrack-sidebar-collapsed'
+                        );
+
+
+                    if (stored === 'true') {
+
+                        sidebar.classList.add('collapsed');
+
+                        mainArea.classList.add('expanded');
+
+                    }
+                    else {
+
+                        sidebar.classList.remove('collapsed');
+
+                        mainArea.classList.remove('expanded');
+
+                    }
+
+                }
+                else {
+
+                    sidebar.classList.remove('collapsed');
+
+                    mainArea.classList.remove('expanded');
+
+                    closeMobileSidebar();
+
+                }
+
+            }
+
+
+            restoreSidebarState();
+
+
+            /* Handle resize */
 
             let resizeTimer;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(function() {
-                    if (!isMobile()) {
-                        sidebar.classList.remove('mobile-open');
-                        backdrop.classList.remove('show');
-                        document.body.style.overflow = '';
-                        const stored = localStorage.getItem('smarttrack-sidebar-collapsed');
-                        if (stored === 'true') {
-                            sidebar.classList.add('collapsed');
-                            mainArea.classList.add('expanded');
-                        } else {
-                            sidebar.classList.remove('collapsed');
-                            mainArea.classList.remove('expanded');
-                        }
-                    } else {
-                        sidebar.classList.remove('collapsed');
-                        mainArea.classList.remove('expanded');
-                        sidebar.classList.remove('mobile-open');
-                        backdrop.classList.remove('show');
-                        document.body.style.overflow = '';
-                    }
-                }, 150);
-            });
 
-                // Logout button – show confirmation and submit the form
-        document.querySelector('.logout-btn')?.addEventListener('click', function() {
-            if (confirm('Logout from SmartTrack?')) {
-                // Optionally disable the button to prevent multiple clicks
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; // optional spinner
-                // Submit the parent form (includes anti‑forgery token)
-                this.closest('form').submit();
-            }
-        
-        
-        });
+
+            window.addEventListener(
+                'resize',
+                function () {
+
+                    clearTimeout(resizeTimer);
+
+
+                    resizeTimer = setTimeout(
+                        function () {
+
+                            restoreSidebarState();
+
+                        },
+                        150
+                    );
+
+                }
+            );
+
 
         })();
+
     </script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+
+    @await RenderSectionAsync(
+    "Scripts",
+        required: false
+        )
+
 </body>
+
 </html>

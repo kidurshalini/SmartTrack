@@ -1,0 +1,508 @@
+﻿@model SmartTrack.ViewModels.SaveReceiptViewModel
+
+@{
+    ViewData["Title"] = "Manual Receipt Entry";
+}
+<style>
+    .manual-back-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 25px;
+    }
+
+    .manual-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #ffffff;
+        color: #198754;
+        border: 1.5px solid #198754;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.25s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+        .manual-back-btn:hover {
+            background: #198754;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(25, 135, 84, 0.25);
+        }
+
+    .back-arrow {
+        font-size: 20px;
+        line-height: 1;
+        transition: transform 0.25s ease;
+    }
+
+    .manual-back-btn:hover .back-arrow {
+        transform: translateX(-4px);
+    }
+</style>
+<div class="container py-5">
+    <div class="d-flex justify-content-end mb-3">
+
+        <div class="manual-back-wrapper">
+
+            <a asp-action="Scan"
+               asp-controller="Receipt"
+               class="manual-back-btn">
+
+                <span class="back-arrow">←</span>
+                <span>Back to Scan Receipt</span>
+
+            </a>
+
+        </div>
+    </div>
+    <!-- Header -->
+
+    <div class="text-center mb-4">
+
+        <h2 class="fw-bold text-success">
+
+            <i class="bi bi-pencil-square me-2"></i>
+
+            Manual Receipt Entry
+
+        </h2>
+
+        <p class="text-muted">
+            Enter your receipt details manually.
+        </p>
+
+    </div>
+
+
+
+    <form asp-action="ManualEntry"
+          asp-controller="Receipt"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+
+        <!-- Receipt Information -->
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+            <div class="card-body p-4">
+
+                <h4 class="fw-bold text-success mb-4">
+
+                    <i class="bi bi-receipt me-2"></i>
+
+                    Receipt Information
+
+                </h4>
+
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <label asp-for="Date"
+                               class="form-label fw-semibold">
+
+                            Purchase Date
+
+                        </label>
+
+                        <input asp-for="Date"
+                               type="date"
+                               class="form-control" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Items -->
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+
+                    <div>
+
+                        <h4 class="fw-bold text-success mb-1">
+
+                            <i class="bi bi-cart-check me-2"></i>
+
+                            Receipt Items
+
+                        </h4>
+
+                        <p class="text-muted mb-0">
+
+                            Add all items purchased.
+
+                        </p>
+
+                    </div>
+
+
+                    <button type="button"
+                            id="addItem"
+                            class="btn btn-success rounded-pill">
+
+                        <i class="bi bi-plus-circle me-1"></i>
+
+                        Add Item
+
+                    </button>
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered align-middle">
+
+                        <thead class="table-success">
+
+                            <tr>
+
+                                <th>Item Name</th>
+
+                                <th width="130">Quantity</th>
+
+                                <th width="130">Unit</th>
+
+                                <th width="160">Unit Price</th>
+
+                                <th width="160">Total Price</th>
+
+                                <th width="80">Action</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="itemsTableBody">
+
+                            @for (int i = 0; i < Model.Items.Count; i++)
+                            {
+                                <tr class="item-row">
+
+                                    <td>
+
+                                        <input asp-for="Items[i].Name"
+                                               class="form-control"
+                                               placeholder="Item name" />
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <input asp-for="Items[i].Quantity"
+                                               type="number"
+                                               step="0.01"
+                                               min="0"
+                                               class="form-control quantity"
+                                               placeholder="0" />
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <input asp-for="Items[i].Unit"
+                                               class="form-control"
+                                               placeholder="kg, pcs..." />
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <input asp-for="Items[i].UnitPrice"
+                                               type="number"
+                                               step="0.01"
+                                               min="0"
+                                               class="form-control unit-price"
+                                               placeholder="0.00" />
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <input asp-for="Items[i].Price"
+                                               type="number"
+                                               step="0.01"
+                                               min="0"
+                                               class="form-control total-price"
+                                               placeholder="0.00" />
+
+                                    </td>
+
+
+                                    <td class="text-center">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger remove-item">
+
+                                            <i class="bi bi-trash"></i>
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- Total -->
+
+                <div class="d-flex justify-content-end mt-4">
+
+                    <div class="text-end">
+
+                        <h5 class="text-muted">
+                            Receipt Total
+                        </h5>
+
+                        <h3 class="fw-bold text-success">
+
+                            Rs <span id="grandTotal">0.00</span>
+
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Buttons -->
+
+                <div class="d-flex justify-content-between mt-4">
+
+                    <a asp-action="ViewSavedReceipts"
+                       asp-controller="Receipt"
+                       class="btn btn-secondary rounded-pill px-4">
+
+                        <i class="bi bi-arrow-left me-1"></i>
+
+                        Cancel
+
+                    </a>
+
+
+                    <button type="submit"
+                            class="btn btn-success rounded-pill px-5">
+
+                        <i class="bi bi-save me-1"></i>
+
+                        Save Receipt
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+
+    let itemIndex =
+        @Model.Items.Count;
+
+
+    // Add new item
+    document.getElementById("addItem")
+        .addEventListener("click", function () {
+
+            const tbody =
+                document.getElementById("itemsTableBody");
+
+            const row =
+                document.createElement("tr");
+
+            row.classList.add("item-row");
+
+            row.innerHTML = `
+
+                <td>
+
+                    <input type="text"
+                           name="Items[${itemIndex}].Name"
+                           class="form-control"
+                           placeholder="Item name"
+                           required>
+
+                </td>
+
+                <td>
+
+                    <input type="number"
+                           name="Items[${itemIndex}].Quantity"
+                           class="form-control quantity"
+                           step="0.01"
+                           min="0"
+                           placeholder="0">
+
+                </td>
+
+                <td>
+
+                    <input type="text"
+                           name="Items[${itemIndex}].Unit"
+                           class="form-control"
+                           placeholder="kg, pcs...">
+
+                </td>
+
+                <td>
+
+                    <input type="number"
+                           name="Items[${itemIndex}].UnitPrice"
+                           class="form-control unit-price"
+                           step="0.01"
+                           min="0"
+                           placeholder="0.00">
+
+                </td>
+
+                <td>
+
+                    <input type="number"
+                           name="Items[${itemIndex}].Price"
+                           class="form-control total-price"
+                           step="0.01"
+                           min="0"
+                           placeholder="0.00">
+
+                </td>
+
+                <td class="text-center">
+
+                    <button type="button"
+                            class="btn btn-sm btn-danger remove-item">
+
+                        <i class="bi bi-trash"></i>
+
+                    </button>
+
+                </td>
+
+            `;
+
+            tbody.appendChild(row);
+
+            itemIndex++;
+
+        });
+
+
+    // Remove item
+    document.addEventListener("click", function (event) {
+
+        const button =
+            event.target.closest(".remove-item");
+
+        if (!button)
+            return;
+
+        const rows =
+            document.querySelectorAll(".item-row");
+
+        if (rows.length <= 1) {
+
+            alert("At least one item is required.");
+
+            return;
+        }
+
+        button.closest("tr").remove();
+
+        calculateTotal();
+
+    });
+
+
+    // Calculate total price automatically
+    document.addEventListener("input", function (event) {
+
+        if (
+            event.target.classList.contains("quantity") ||
+            event.target.classList.contains("unit-price")
+        ) {
+
+            const row =
+                event.target.closest("tr");
+
+            const quantity =
+                parseFloat(
+                    row.querySelector(".quantity").value
+                ) || 0;
+
+            const unitPrice =
+                parseFloat(
+                    row.querySelector(".unit-price").value
+                ) || 0;
+
+            const total =
+                quantity * unitPrice;
+
+            row.querySelector(".total-price").value =
+                total.toFixed(2);
+
+            calculateTotal();
+        }
+
+        if (
+            event.target.classList.contains("total-price")
+        ) {
+
+            calculateTotal();
+        }
+
+    });
+
+
+    function calculateTotal() {
+
+        let total = 0;
+
+        document
+            .querySelectorAll(".total-price")
+            .forEach(function (input) {
+
+                total +=
+                    parseFloat(input.value) || 0;
+
+            });
+
+        document.getElementById("grandTotal")
+            .innerText = total.toFixed(2);
+    }
+
+
+    calculateTotal();
+
+</script>

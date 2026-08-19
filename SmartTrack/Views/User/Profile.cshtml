@@ -503,12 +503,14 @@
                             </div>
                         </div>
                     </div>
-
+                      @if (User.IsInRole("HouseholdOwner"))
+                    {
                     <div class="mt-1">
                         <button class="btn btn-soft btn-soft-success w-100" data-bs-toggle="modal" data-bs-target="#editHouseholdModal">
                             <i class="bi bi-pencil me-1"></i> Edit Household
                         </button>
                     </div>
+                    }
                 </div>
             </div>
         </div>
@@ -553,12 +555,14 @@
                                 <span class="label">Joined</span>
                                 <span class="value">@DateTime.Now.ToString("MMM yyyy")</span>
                             </div>
-
+                              @if (User.IsInRole("HouseholdOwner"))
+                    {
                             <div class="mt-3 text-center">
                                 <button class="btn btn-soft btn-soft-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                                     <i class="bi bi-pencil me-1"></i> Edit Profile
                                 </button>
                             </div>
+                    }
                         </div>
                     </div>
                 </div>
@@ -622,6 +626,8 @@
                                             <td data-label="Email">@member.Email</td>
                                             <td data-label="Phone">@member.PhoneNumber</td>
                                             <td data-label="Role"><span class="badge @memberRoleBadge">@friendlyRole</span></td>
+        @if (User.IsInRole("HouseholdOwner"))
+        {
                                             <td data-label="Actions" class="text-end">
                                                 <div class="d-flex gap-1 justify-content-end flex-wrap">
                                                     <button class="btn btn-soft btn-soft-primary btn-sm px-3"
@@ -643,6 +649,7 @@
                                                     </form>
                                                 </div>
                                             </td>
+                                            }
                                         </tr>
                                         index++;
                                     }

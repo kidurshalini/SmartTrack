@@ -1,0 +1,234 @@
+﻿@model SmartTrack.ViewModels.EditReceiptViewModel
+
+@{
+    ViewData["Title"] = "Edit Receipt";
+}
+
+<div class="container py-5">
+
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-success">
+            <i class="bi bi-pencil-square me-2"></i>
+            Edit Receipt
+        </h2>
+
+        <p class="text-muted">
+            Update receipt details and receipt items.
+        </p>
+    </div>
+
+    <form asp-action="EditReceipt"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <input type="hidden"
+               asp-for="ReceiptId" />
+
+        <!-- Receipt Information -->
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+            <div class="card-body p-4">
+
+                <h4 class="fw-bold text-success mb-4">
+                    <i class="bi bi-receipt me-2"></i>
+                    Receipt Information
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label asp-for="PurchaseDate"
+                               class="form-label fw-semibold">
+                            Purchase Date
+                        </label>
+
+                        <input asp-for="PurchaseDate"
+                               type="date"
+                               class="form-control" readonly />
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Receipt ID
+                        </label>
+
+                        <input value="@Model.ReceiptId"
+                               class="form-control"
+                               readonly />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Receipt Items -->
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+            <div class="card-body p-4">
+
+                <h4 class="fw-bold text-success mb-4">
+                    <i class="bi bi-cart-check me-2"></i>
+                    Receipt Items
+                </h4>
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered align-middle">
+
+                        <thead class="table-success">
+
+                            <tr>
+
+                                <th>Item Name</th>
+
+                                <th>Quantity</th>
+
+                                <th>Unit</th>
+
+                                <th>Unit Price</th>
+
+                                <th>Total Price</th>
+
+                                <th>Action</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @for (int i = 0; i < Model.Items.Count; i++)
+                            {
+                                <tr>
+
+                                    <input type="hidden"
+                                           asp-for="Items[i].ReceiptItemId" />
+
+                                    <td>
+
+                                        <input asp-for="Items[i].ItemName"
+                                               class="form-control" />
+
+                                    </td>
+
+                                    <td>
+
+                                        <input asp-for="Items[i].Quantity"
+                                               type="number"
+                                               step="0.01"
+                                               class="form-control" />
+
+                                    </td>
+
+                                    <td>
+
+                                        <input asp-for="Items[i].Unit"
+                                               class="form-control" />
+
+                                    </td>
+
+                                    <td>
+
+                                        <input asp-for="Items[i].UnitPrice"
+                                               type="number"
+                                               step="0.01"
+                                               class="form-control" />
+
+                                    </td>
+
+                                    <td>
+
+                                        <input asp-for="Items[i].TotalPrice"
+                                               type="number"
+                                               step="0.01"
+                                               class="form-control" />
+
+                                    </td>
+
+                                       <td>
+            <a asp-action="DeleteReceiptItem"
+               asp-route-id="@Model.Items[i].ReceiptItemId"
+               asp-route-receiptId="@Model.ReceiptId"
+               class="btn btn-sm btn-danger rounded-pill"
+               onclick="return confirm('Are you sure you want to delete this item?');">
+
+                <i class="bi bi-trash me-1"></i>
+                Delete
+
+            </a>
+        </td>
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Buttons -->
+
+        <div class="d-flex justify-content-between">
+
+            <a asp-action="ViewSavedReceipts"
+               class="btn btn-secondary rounded-pill px-4">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Cancel
+
+            </a>
+
+            <button type="submit"
+                    class="btn btn-success rounded-pill px-5">
+
+                <i class="bi bi-check-circle me-1"></i>
+                Save Changes
+
+            </button>
+
+        
+
+        </div>
+
+    </form>
+
+    <div class="d-flex justify-content-end mt-3">
+
+        <form asp-controller="Receipt"
+              asp-action="DeleteReceipt"
+              method="post"
+              onsubmit="return confirm('Are you sure you want to delete this entire receipt? This action cannot be undone.');">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden"
+                   name="id"
+                   value="@Model.ReceiptId" />
+
+            <button type="submit"
+                    class="btn btn-danger rounded-pill px-4">
+
+                <i class="bi bi-trash me-1"></i>
+                Delete Entire Receipt
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
