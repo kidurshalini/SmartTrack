@@ -78,10 +78,23 @@ namespace SmartTrack.Models
               .Property(x => x.UnitPrice)
               .HasPrecision(10, 2);
 
+            builder.Entity<SmartTrackNotification>()
+     .HasOne(x => x.HouseHold)
+     .WithMany()
+     .HasForeignKey(x => x.HouseHoldId)
+     .OnDelete(DeleteBehavior.Cascade);
+
+
+            // SmartTrack Notification -> User
+            builder.Entity<SmartTrackNotification>()
+                .HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
 
-
+       
         public DbSet<HouseHoldDetails> HouseHoldDetails { get; set; }
 
         public DbSet<UserHouseHoldDetails> UserHouseHoldDetails { get; set; }
@@ -94,6 +107,8 @@ namespace SmartTrack.Models
 
 
         public DbSet<ReceiptItemModel> ReceiptItems { get; set; }
+
+        public DbSet<SmartTrackNotification> SmartTrackNotifications { get; set; }
 
     }
 }

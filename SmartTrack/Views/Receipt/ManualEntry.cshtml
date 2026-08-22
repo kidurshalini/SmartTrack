@@ -3,7 +3,23 @@
 @{
     ViewData["Title"] = "Manual Receipt Entry";
 }
+
 <style>
+
+    /* =========================================
+           MAIN CONTAINER
+           ========================================= */
+
+    .manual-receipt-page {
+        max-width: 1200px;
+        margin: auto;
+    }
+
+
+    /* =========================================
+           BACK BUTTON
+           ========================================= */
+
     .manual-back-wrapper {
         display: flex;
         justify-content: flex-end;
@@ -28,23 +44,191 @@
 
         .manual-back-btn:hover {
             background: #198754;
-            color: #ffffff;
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(25, 135, 84, 0.25);
         }
 
     .back-arrow {
         font-size: 20px;
-        line-height: 1;
         transition: transform 0.25s ease;
     }
 
     .manual-back-btn:hover .back-arrow {
         transform: translateX(-4px);
     }
+
+
+    /* =========================================
+           ITEM CARD - MOBILE STYLE
+           ========================================= */
+
+    .mobile-item-card {
+        display: none;
+    }
+
+
+    /* =========================================
+           TOTAL BOX
+           ========================================= */
+
+    .receipt-total-box {
+        background: #f8fff9;
+        border: 1px solid #d8f3df;
+        border-radius: 15px;
+        padding: 18px 25px;
+        min-width: 220px;
+    }
+
+
+    /* =========================================
+           ACTION BUTTONS
+           ========================================= */
+
+    .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+
+    /* =========================================
+           MOBILE RESPONSIVE
+           ========================================= */
+
+    @@media (max-width: 767px) {
+
+        .manual-receipt-page {
+            padding: 0 5px;
+        }
+
+        .manual-back-wrapper {
+            justify-content: stretch;
+        }
+
+        .manual-back-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .card-body {
+            padding: 18px !important;
+        }
+        /* Hide desktop table */
+        .desktop-items-table {
+            display: none;
+        }
+        /* Show mobile cards */
+        .mobile-item-card {
+            display: block;
+            background: #ffffff;
+            border: 1px solid #e1e1e1;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+        }
+
+        .mobile-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .mobile-item-title {
+            font-weight: 700;
+            color: #198754;
+            font-size: 17px;
+        }
+
+        .mobile-field {
+            margin-bottom: 15px;
+        }
+
+            .mobile-field label {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 6px;
+                color: #555;
+                font-size: 14px;
+            }
+
+            .mobile-field input {
+                width: 100%;
+                height: 46px;
+                border-radius: 10px;
+            }
+
+        .items-header {
+            flex-direction: column;
+            align-items: stretch !important;
+            gap: 15px;
+        }
+
+        .add-item-btn {
+            width: 100%;
+        }
+
+        .receipt-total-wrapper {
+            justify-content: stretch !important;
+        }
+
+        .receipt-total-box {
+            width: 100%;
+            text-align: right;
+        }
+
+        .action-buttons {
+            flex-direction: column-reverse;
+        }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+    }
+
+
+    /* =========================================
+           EXTRA SMALL MOBILE
+           ========================================= */
+
+    @@media (max-width: 480px) {
+
+        .page-title {
+            font-size: 21px;
+        }
+
+        .section-title {
+            font-size: 19px;
+        }
+
+        .mobile-item-card {
+            padding: 15px;
+        }
+
+        .mobile-field input {
+            height: 44px;
+        }
+    }
+
 </style>
-<div class="container py-5">
-    <div class="d-flex justify-content-end mb-3">
+
+
+<div class="container-fluid py-4">
+
+    <div class="manual-receipt-page">
+
+
+        <!-- =====================================
+             BACK BUTTON
+             ===================================== -->
 
         <div class="manual-back-wrapper">
 
@@ -52,69 +236,97 @@
                asp-controller="Receipt"
                class="manual-back-btn">
 
-                <span class="back-arrow">←</span>
-                <span>Back to Scan Receipt</span>
+                <span class="back-arrow">
+                    ←
+                </span>
+
+                <span>
+                    Back to Scan Receipt
+                </span>
 
             </a>
 
         </div>
-    </div>
-    <!-- Header -->
-
-    <div class="text-center mb-4">
-
-        <h2 class="fw-bold text-success">
-
-            <i class="bi bi-pencil-square me-2"></i>
-
-            Manual Receipt Entry
-
-        </h2>
-
-        <p class="text-muted">
-            Enter your receipt details manually.
-        </p>
-
-    </div>
 
 
+        <!-- =====================================
+             HEADER
+             ===================================== -->
 
-    <form asp-action="ManualEntry"
-          asp-controller="Receipt"
-          method="post">
+        <div class="text-center mb-4">
 
-        @Html.AntiForgeryToken()
+            <h2 class="fw-bold text-success page-title">
 
+                <i class="bi bi-pencil-square me-2"></i>
 
-        <!-- Receipt Information -->
+                Manual Receipt Entry
 
-        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            </h2>
 
-            <div class="card-body p-4">
+            <p class="text-muted">
 
-                <h4 class="fw-bold text-success mb-4">
+                Enter your receipt details manually.
 
-                    <i class="bi bi-receipt me-2"></i>
+            </p>
 
-                    Receipt Information
-
-                </h4>
+        </div>
 
 
-                <div class="row">
+        <!-- =====================================
+             FORM
+             ===================================== -->
 
-                    <div class="col-md-6">
+        <form asp-action="ManualEntry"
+              asp-controller="Receipt"
+              method="post">
 
-                        <label asp-for="Date"
-                               class="form-label fw-semibold">
+            @Html.AntiForgeryToken()
 
-                            Purchase Date
 
-                        </label>
+            <!-- Validation messages -->
 
-                        <input asp-for="Date"
-                               type="date"
-                               class="form-control" />
+            <div asp-validation-summary="All"
+                 class="text-danger mb-3">
+            </div>
+
+
+            <!-- =================================
+                 RECEIPT INFORMATION
+                 ================================= -->
+
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold text-success mb-4">
+
+                        <i class="bi bi-receipt me-2"></i>
+
+                        Receipt Information
+
+                    </h4>
+
+
+                    <div class="row">
+
+                        <div class="col-12 col-md-6">
+
+                            <label asp-for="Date"
+                                   class="form-label fw-semibold">
+
+                                Purchase Date
+
+                            </label>
+
+                            <input asp-for="Date"
+                                   type="date"
+                                   class="form-control" />
+
+                            <span asp-validation-for="Date"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
 
                     </div>
 
@@ -122,230 +334,471 @@
 
             </div>
 
-        </div>
+
+            <!-- =================================
+                 ITEMS CARD
+                 ================================= -->
+
+            <div class="card shadow-sm border-0 rounded-4">
+
+                <div class="card-body p-4">
 
 
-        <!-- Items -->
+                    <!-- HEADER -->
 
-        <div class="card shadow-sm border-0 rounded-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 items-header">
 
-            <div class="card-body p-4">
+                        <div>
 
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="fw-bold text-success mb-1">
 
-                    <div>
+                                <i class="bi bi-cart-check me-2"></i>
 
-                        <h4 class="fw-bold text-success mb-1">
+                                Receipt Items
 
-                            <i class="bi bi-cart-check me-2"></i>
+                            </h4>
 
-                            Receipt Items
+                            <p class="text-muted mb-0">
 
-                        </h4>
+                                Add all items purchased.
 
-                        <p class="text-muted mb-0">
+                            </p>
 
-                            Add all items purchased.
+                        </div>
 
-                        </p>
+
+                        <button type="button"
+                                id="addItem"
+                                class="btn btn-success rounded-pill px-4 add-item-btn">
+
+                            <i class="bi bi-plus-circle me-1"></i>
+
+                            Add Item
+
+                        </button>
 
                     </div>
 
 
-                    <button type="button"
-                            id="addItem"
-                            class="btn btn-success rounded-pill">
+                    <!-- =================================
+                         DESKTOP TABLE
+                         ================================= -->
 
-                        <i class="bi bi-plus-circle me-1"></i>
+                    <div class="table-responsive desktop-items-table">
 
-                        Add Item
+                        <table class="table table-bordered align-middle">
 
-                    </button>
+                            <thead class="table-success">
 
-                </div>
+                                <tr>
 
+                                    <th>
+                                        Item Name
+                                    </th>
 
-                <div class="table-responsive">
+                                    <th width="130">
+                                        Quantity
+                                    </th>
 
-                    <table class="table table-bordered align-middle">
+                                    <th width="130">
+                                        Unit
+                                    </th>
 
-                        <thead class="table-success">
+                                    <th width="160">
+                                        Unit Price
+                                    </th>
 
-                            <tr>
+                                    <th width="160">
+                                        Total Price
+                                    </th>
 
-                                <th>Item Name</th>
-
-                                <th width="130">Quantity</th>
-
-                                <th width="130">Unit</th>
-
-                                <th width="160">Unit Price</th>
-
-                                <th width="160">Total Price</th>
-
-                                <th width="80">Action</th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody id="itemsTableBody">
-
-                            @for (int i = 0; i < Model.Items.Count; i++)
-                            {
-                                <tr class="item-row">
-
-                                    <td>
-
-                                        <input asp-for="Items[i].Name"
-                                               class="form-control"
-                                               placeholder="Item name" />
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <input asp-for="Items[i].Quantity"
-                                               type="number"
-                                               step="0.01"
-                                               min="0"
-                                               class="form-control quantity"
-                                               placeholder="0" />
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <input asp-for="Items[i].Unit"
-                                               class="form-control"
-                                               placeholder="kg, pcs..." />
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <input asp-for="Items[i].UnitPrice"
-                                               type="number"
-                                               step="0.01"
-                                               min="0"
-                                               class="form-control unit-price"
-                                               placeholder="0.00" />
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <input asp-for="Items[i].Price"
-                                               type="number"
-                                               step="0.01"
-                                               min="0"
-                                               class="form-control total-price"
-                                               placeholder="0.00" />
-
-                                    </td>
-
-
-                                    <td class="text-center">
-
-                                        <button type="button"
-                                                class="btn btn-sm btn-danger remove-item">
-
-                                            <i class="bi bi-trash"></i>
-
-                                        </button>
-
-                                    </td>
+                                    <th width="80">
+                                        Action
+                                    </th>
 
                                 </tr>
-                            }
 
-                        </tbody>
-
-                    </table>
-
-                </div>
+                            </thead>
 
 
-                <!-- Total -->
+                            <tbody id="desktopItemsBody">
 
-                <div class="d-flex justify-content-end mt-4">
+                                @for (int i = 0; i < Model.Items.Count; i++)
+                                {
 
-                    <div class="text-end">
+                                    <tr class="item-row"
+                                        data-index="@i">
 
-                        <h5 class="text-muted">
-                            Receipt Total
-                        </h5>
+                                        <td>
 
-                        <h3 class="fw-bold text-success">
+                                            <input asp-for="Items[i].Name"
+                                                   class="form-control"
+                                                   placeholder="Item name"
+                                                   required />
 
-                            Rs <span id="grandTotal">0.00</span>
+                                        </td>
 
-                        </h3>
+
+                                        <td>
+
+                                            <input asp-for="Items[i].Quantity"
+                                                   type="number"
+                                                   step="0.01"
+                                                   min="0"
+                                                   class="form-control quantity"
+                                                   placeholder="0" />
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <input asp-for="Items[i].Unit"
+                                                   class="form-control"
+                                                   placeholder="kg, pcs..." />
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <input asp-for="Items[i].UnitPrice"
+                                                   type="number"
+                                                   step="0.01"
+                                                   min="0"
+                                                   class="form-control unit-price"
+                                                   placeholder="0.00" />
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <input asp-for="Items[i].Price"
+                                                   type="number"
+                                                   step="0.01"
+                                                   min="0"
+                                                   class="form-control total-price"
+                                                   placeholder="0.00"
+                                                   readonly />
+
+                                        </td>
+
+
+                                        <td class="text-center">
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-danger remove-item">
+
+                                                <i class="bi bi-trash"></i>
+
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <!-- =================================
+                         MOBILE ITEM CARDS
+                         ================================= -->
+
+                    <div id="mobileItemsBody">
+
+                        @for (int i = 0; i < Model.Items.Count; i++)
+                        {
+
+                            <div class="mobile-item-card item-row"
+                                 data-index="@i">
+
+                                <div class="mobile-item-header">
+
+                                    <span class="mobile-item-title">
+
+                                        <i class="bi bi-cart3 me-1"></i>
+
+                                        Item @(i + 1)
+
+                                    </span>
+
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger remove-item">
+
+                                        <i class="bi bi-trash"></i>
+
+                                    </button>
+
+                                </div>
+
+
+                                <!-- Name -->
+
+                                <div class="mobile-field">
+
+                                    <label>
+                                        Item Name
+                                    </label>
+
+                                    <input name="Items[@i].Name"
+                                           value="@Model.Items[i].Name"
+                                           class="form-control mobile-name"
+                                           placeholder="Enter item name"
+                                           required />
+
+                                </div>
+
+
+                                <!-- Quantity -->
+
+                                <div class="mobile-field">
+
+                                    <label>
+                                        Quantity
+                                    </label>
+
+                                    <input name="Items[@i].Quantity"
+                                           value="@Model.Items[i].Quantity"
+                                           type="number"
+                                           step="0.01"
+                                           min="0"
+                                           class="form-control mobile-quantity"
+                                           placeholder="Enter quantity" />
+
+                                </div>
+
+
+                                <!-- Unit -->
+
+                                <div class="mobile-field">
+
+                                    <label>
+                                        Unit
+                                    </label>
+
+                                    <input name="Items[@i].Unit"
+                                           value="@Model.Items[i].Unit"
+                                           class="form-control mobile-unit"
+                                           placeholder="kg, pcs, L..." />
+
+                                </div>
+
+
+                                <!-- Unit Price -->
+
+                                <div class="mobile-field">
+
+                                    <label>
+                                        Unit Price
+                                    </label>
+
+                                    <input name="Items[@i].UnitPrice"
+                                           value="@Model.Items[i].UnitPrice"
+                                           type="number"
+                                           step="0.01"
+                                           min="0"
+                                           class="form-control mobile-unit-price"
+                                           placeholder="0.00" />
+
+                                </div>
+
+
+                                <!-- Total -->
+
+                                <div class="mobile-field mb-0">
+
+                                    <label>
+                                        Total Price
+                                    </label>
+
+                                    <input name="Items[@i].Price"
+                                           value="@Model.Items[i].Price"
+                                           type="number"
+                                           step="0.01"
+                                           min="0"
+                                           class="form-control mobile-total-price"
+                                           placeholder="0.00"
+                                           readonly />
+
+                                </div>
+
+                            </div>
+
+                        }
+
+                    </div>
+
+
+                    <!-- =================================
+                         GRAND TOTAL
+                         ================================= -->
+
+                    <div class="d-flex justify-content-end mt-4 receipt-total-wrapper">
+
+                        <div class="text-end receipt-total-box">
+
+                            <h6 class="text-muted mb-1">
+
+                                Receipt Total
+
+                            </h6>
+
+                            <h3 class="fw-bold text-success mb-0">
+
+                                Rs
+
+                                <span id="grandTotal">
+                                    0.00
+                                </span>
+
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================
+                         BUTTONS
+                         ================================= -->
+
+                    <div class="action-buttons mt-4">
+
+                        <a asp-action="ViewSavedReceipts"
+                           asp-controller="Receipt"
+                           class="btn btn-secondary rounded-pill px-4">
+
+                            <i class="bi bi-arrow-left me-1"></i>
+
+                            Cancel
+
+                        </a>
+
+
+                        <button type="submit"
+                                id="saveReceiptBtn"
+                                class="btn btn-success rounded-pill px-5">
+
+                            <i class="bi bi-save me-1"></i>
+
+                            Save Receipt
+
+                        </button>
 
                     </div>
 
                 </div>
 
-
-                <!-- Buttons -->
-
-                <div class="d-flex justify-content-between mt-4">
-
-                    <a asp-action="ViewSavedReceipts"
-                       asp-controller="Receipt"
-                       class="btn btn-secondary rounded-pill px-4">
-
-                        <i class="bi bi-arrow-left me-1"></i>
-
-                        Cancel
-
-                    </a>
-
-
-                    <button type="submit"
-                            class="btn btn-success rounded-pill px-5">
-
-                        <i class="bi bi-save me-1"></i>
-
-                        Save Receipt
-
-                    </button>
-
-                </div>
-
             </div>
 
-        </div>
+        </form>
 
-    </form>
+    </div>
 
 </div>
 
 
 <script>
 
-    let itemIndex =
-        @Model.Items.Count;
+    let itemIndex = @Model.Items.Count;
 
 
-    // Add new item
-    document.getElementById("addItem")
+    // =========================================
+    // ENABLE ONLY VISIBLE FORM INPUTS
+    // =========================================
+
+    function updateFormInputs() {
+
+        const isMobile = window.innerWidth <= 767;
+
+
+        // Desktop inputs
+
+        document
+            .querySelectorAll("#desktopItemsBody input")
+            .forEach(function (input) {
+
+                input.disabled = isMobile;
+
+            });
+
+
+        // Desktop remove buttons
+
+        document
+            .querySelectorAll("#desktopItemsBody .remove-item")
+            .forEach(function (button) {
+
+                button.disabled = isMobile;
+
+            });
+
+
+        // Mobile inputs
+
+        document
+            .querySelectorAll("#mobileItemsBody input")
+            .forEach(function (input) {
+
+                input.disabled = !isMobile;
+
+            });
+
+
+        // Mobile remove buttons
+
+        document
+            .querySelectorAll("#mobileItemsBody .remove-item")
+            .forEach(function (button) {
+
+                button.disabled = !isMobile;
+
+            });
+
+    }
+
+
+    // =========================================
+    // ADD ITEM
+    // =========================================
+
+    document
+        .getElementById("addItem")
         .addEventListener("click", function () {
 
-            const tbody =
-                document.getElementById("itemsTableBody");
 
-            const row =
+            const desktopBody =
+                document.getElementById("desktopItemsBody");
+
+
+            const mobileBody =
+                document.getElementById("mobileItemsBody");
+
+
+            // -----------------------------
+            // DESKTOP ROW
+            // -----------------------------
+
+            const desktopRow =
                 document.createElement("tr");
 
-            row.classList.add("item-row");
+            desktopRow.classList.add("item-row");
 
-            row.innerHTML = `
+            desktopRow.setAttribute(
+                "data-index",
+                itemIndex
+            );
+
+
+            desktopRow.innerHTML = `
 
                 <td>
 
@@ -395,7 +848,8 @@
                            class="form-control total-price"
                            step="0.01"
                            min="0"
-                           placeholder="0.00">
+                           placeholder="0.00"
+                           readonly>
 
                 </td>
 
@@ -412,96 +866,389 @@
 
             `;
 
-            tbody.appendChild(row);
+
+            desktopBody.appendChild(desktopRow);
+
+
+            // -----------------------------
+            // MOBILE CARD
+            // -----------------------------
+
+            const mobileCard =
+                document.createElement("div");
+
+
+            mobileCard.classList.add(
+                "mobile-item-card",
+                "item-row"
+            );
+
+
+            mobileCard.setAttribute(
+                "data-index",
+                itemIndex
+            );
+
+
+            mobileCard.innerHTML = `
+
+                <div class="mobile-item-header">
+
+                    <span class="mobile-item-title">
+
+                        <i class="bi bi-cart3 me-1"></i>
+
+                        Item ${itemIndex + 1}
+
+                    </span>
+
+
+                    <button type="button"
+                            class="btn btn-sm btn-danger remove-item">
+
+                        <i class="bi bi-trash"></i>
+
+                    </button>
+
+                </div>
+
+
+                <div class="mobile-field">
+
+                    <label>
+                        Item Name
+                    </label>
+
+                    <input type="text"
+                           name="Items[${itemIndex}].Name"
+                           class="form-control mobile-name"
+                           placeholder="Enter item name"
+                           required>
+
+                </div>
+
+
+                <div class="mobile-field">
+
+                    <label>
+                        Quantity
+                    </label>
+
+                    <input type="number"
+                           name="Items[${itemIndex}].Quantity"
+                           class="form-control mobile-quantity"
+                           step="0.01"
+                           min="0"
+                           placeholder="Enter quantity">
+
+                </div>
+
+
+                <div class="mobile-field">
+
+                    <label>
+                        Unit
+                    </label>
+
+                    <input type="text"
+                           name="Items[${itemIndex}].Unit"
+                           class="form-control mobile-unit"
+                           placeholder="kg, pcs, L...">
+
+                </div>
+
+
+                <div class="mobile-field">
+
+                    <label>
+                        Unit Price
+                    </label>
+
+                    <input type="number"
+                           name="Items[${itemIndex}].UnitPrice"
+                           class="form-control mobile-unit-price"
+                           step="0.01"
+                           min="0"
+                           placeholder="0.00">
+
+                </div>
+
+
+                <div class="mobile-field mb-0">
+
+                    <label>
+                        Total Price
+                    </label>
+
+                    <input type="number"
+                           name="Items[${itemIndex}].Price"
+                           class="form-control mobile-total-price"
+                           step="0.01"
+                           readonly>
+
+                </div>
+
+            `;
+
+
+            mobileBody.appendChild(mobileCard);
+
 
             itemIndex++;
+
+
+            // Enable correct inputs
+
+            updateFormInputs();
 
         });
 
 
-    // Remove item
-    document.addEventListener("click", function (event) {
+    // =========================================
+    // REMOVE ITEM
+    // =========================================
 
-        const button =
-            event.target.closest(".remove-item");
-
-        if (!button)
-            return;
-
-        const rows =
-            document.querySelectorAll(".item-row");
-
-        if (rows.length <= 1) {
-
-            alert("At least one item is required.");
-
-            return;
-        }
-
-        button.closest("tr").remove();
-
-        calculateTotal();
-
-    });
+    document.addEventListener(
+        "click",
+        function (event) {
 
 
-    // Calculate total price automatically
-    document.addEventListener("input", function (event) {
+            const button =
+                event.target.closest(".remove-item");
 
-        if (
-            event.target.classList.contains("quantity") ||
-            event.target.classList.contains("unit-price")
-        ) {
 
-            const row =
-                event.target.closest("tr");
+            if (!button)
+                return;
 
-            const quantity =
-                parseFloat(
-                    row.querySelector(".quantity").value
-                ) || 0;
 
-            const unitPrice =
-                parseFloat(
-                    row.querySelector(".unit-price").value
-                ) || 0;
+            const item =
+                button.closest(".item-row");
 
-            const total =
-                quantity * unitPrice;
 
-            row.querySelector(".total-price").value =
-                total.toFixed(2);
+            if (!item)
+                return;
+
+
+            const index =
+                item.getAttribute("data-index");
+
+
+            if (index === null)
+                return;
+
+
+            // Remove desktop version
+
+            document
+                .querySelectorAll(
+                    "#desktopItemsBody .item-row"
+                )
+                .forEach(function (row) {
+
+                    if (
+                        row.getAttribute("data-index") === index
+                    ) {
+
+                        row.remove();
+
+                    }
+
+                });
+
+
+            // Remove mobile version
+
+            document
+                .querySelectorAll(
+                    "#mobileItemsBody .item-row"
+                )
+                .forEach(function (card) {
+
+                    if (
+                        card.getAttribute("data-index") === index
+                    ) {
+
+                        card.remove();
+
+                    }
+
+                });
+
 
             calculateTotal();
-        }
 
-        if (
-            event.target.classList.contains("total-price")
-        ) {
+            updateFormInputs();
+
+        }
+    );
+
+
+    // =========================================
+    // INPUT CALCULATION
+    // =========================================
+
+    document.addEventListener(
+        "input",
+        function (event) {
+
+
+            // Desktop
+
+            if (
+                event.target.classList.contains("quantity") ||
+                event.target.classList.contains("unit-price")
+            ) {
+
+
+                const row =
+                    event.target.closest("tr");
+
+
+                if (row) {
+
+
+                    const quantity =
+                        parseFloat(
+                            row.querySelector(".quantity").value
+                        ) || 0;
+
+
+                    const unitPrice =
+                        parseFloat(
+                            row.querySelector(".unit-price").value
+                        ) || 0;
+
+
+                    row.querySelector(".total-price").value =
+                        (quantity * unitPrice).toFixed(2);
+
+                }
+
+            }
+
+
+            // Mobile
+
+            if (
+                event.target.classList.contains("mobile-quantity") ||
+                event.target.classList.contains("mobile-unit-price")
+            ) {
+
+
+                const card =
+                    event.target.closest(".mobile-item-card");
+
+
+                if (card) {
+
+
+                    const quantity =
+                        parseFloat(
+                            card.querySelector(
+                                ".mobile-quantity"
+                            ).value
+                        ) || 0;
+
+
+                    const unitPrice =
+                        parseFloat(
+                            card.querySelector(
+                                ".mobile-unit-price"
+                            ).value
+                        ) || 0;
+
+
+                    card.querySelector(
+                        ".mobile-total-price"
+                    ).value =
+                        (quantity * unitPrice).toFixed(2);
+
+                }
+
+            }
+
 
             calculateTotal();
+
         }
+    );
 
-    });
 
+    // =========================================
+    // CALCULATE GRAND TOTAL
+    // =========================================
 
     function calculateTotal() {
 
+
         let total = 0;
 
+
+        const isMobile =
+            window.innerWidth <= 767;
+
+
+        if (isMobile) {
+
+
+            document
+                .querySelectorAll(
+                    "#mobileItemsBody .mobile-total-price"
+                )
+                .forEach(function (input) {
+
+                    total +=
+                        parseFloat(input.value) || 0;
+
+                });
+
+        }
+        else {
+
+
+            document
+                .querySelectorAll(
+                    "#desktopItemsBody .total-price"
+                )
+                .forEach(function (input) {
+
+                    total +=
+                        parseFloat(input.value) || 0;
+
+                });
+
+        }
+
+
         document
-            .querySelectorAll(".total-price")
-            .forEach(function (input) {
+            .getElementById("grandTotal")
+            .innerText =
+            total.toFixed(2);
 
-                total +=
-                    parseFloat(input.value) || 0;
-
-            });
-
-        document.getElementById("grandTotal")
-            .innerText = total.toFixed(2);
     }
 
+
+    // =========================================
+    // SCREEN SIZE CHANGE
+    // =========================================
+
+    window.addEventListener(
+        "resize",
+        function () {
+
+            updateFormInputs();
+
+            calculateTotal();
+
+        }
+    );
+
+
+    // =========================================
+    // INITIAL LOAD
+    // =========================================
+
+    updateFormInputs();
 
     calculateTotal();
 

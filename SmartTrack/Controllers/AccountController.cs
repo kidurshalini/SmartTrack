@@ -48,7 +48,13 @@ namespace SmartTrack.Controllers
                     return View(model);
                 }
 
-                // store house hold details
+                // Store registered users for sending emails after successful registration
+                var registeredUsers = new List<(string Email, string UserName)>();
+
+                // ==========================================
+                // 1. CREATE HOUSEHOLD
+                // ==========================================
+
                 var household = new HouseHoldDetails
                 {
                     HouseHoldId = Guid.NewGuid(),
@@ -60,7 +66,11 @@ namespace SmartTrack.Controllers
 
                 _context.HouseHoldDetails.Add(household);
 
-                // store Owner details
+
+                // ==========================================
+                // 2. CREATE HOUSEHOLD OWNER
+                // ==========================================
+
                 var owner = new ApplicationUser
                 {
                     UserName = model.OwnerUserName,
@@ -68,7 +78,10 @@ namespace SmartTrack.Controllers
                     PhoneNumber = model.OwnerPhoneNumber
                 };
 
-                var ownerResult = await _userManager.CreateAsync(owner, model.OwnerPassword);
+                var ownerResult = await _userManager.CreateAsync(
+                    owner,
+                    model.OwnerPassword
+                );
 
                 if (!ownerResult.Succeeded)
                 {
@@ -76,38 +89,69 @@ namespace SmartTrack.Controllers
                     {
                         ModelState.AddModelError("", error.Description);
                     }
+
                     return View(model);
                 }
 
-                var ownerRoleResult = await _userManager.AddToRoleAsync(owner, "HouseholdOwner");
+
+                // ==========================================
+                // 3. ASSIGN OWNER ROLE
+                // ==========================================
+
+                var ownerRoleResult = await _userManager.AddToRoleAsync(
+                    owner,
+                    "HouseholdOwner"
+                );
+
                 if (!ownerRoleResult.Succeeded)
                 {
                     foreach (var error in ownerRoleResult.Errors)
                     {
                         ModelState.AddModelError("", error.Description);
                     }
+
                     return View(model);
                 }
 
-                _context.UserHouseHoldDetails.Add(new UserHouseHoldDetails
-                {
-                    UserHouseHoldId = Guid.NewGuid(),
-                    UserId = owner.Id,
-                    HouseHoldId = household.HouseHoldId,
-                    CreatedBy = owner.Id,
-                    CreatedOn = DateTime.Now
-                });
 
-                // Checking members are added or not and store those things
+                // Add owner to email list
+                registeredUsers.Add(
+                    (owner.Email, owner.UserName)
+                );
+
+
+                // ==========================================
+                // 4. LINK OWNER WITH HOUSEHOLD
+                // ==========================================
+
+                _context.UserHouseHoldDetails.Add(
+                    new UserHouseHoldDetails
+                    {
+                        UserHouseHoldId = Guid.NewGuid(),
+                        UserId = owner.Id,
+                        HouseHoldId = household.HouseHoldId,
+                        CreatedBy = owner.Id,
+                        CreatedOn = DateTime.Now
+                    }
+                );
+
+
+                // ==========================================
+                // 5. CREATE HOUSEHOLD MEMBERS
+                // ==========================================
+
                 if (model.Members != null && model.Members.Any())
                 {
                     foreach (var item in model.Members)
                     {
+                        // Skip empty member rows
                         if (string.IsNullOrWhiteSpace(item.UserName))
                         {
                             continue;
                         }
 
+
+                        // Create user
                         var user = new ApplicationUser
                         {
                             UserName = item.UserName,
@@ -115,53 +159,292 @@ namespace SmartTrack.Controllers
                             PhoneNumber = item.PhoneNumber
                         };
 
-                        var result = await _userManager.CreateAsync(user, item.Password);
+
+                        // Create account
+                        var result = await _userManager.CreateAsync(
+                            user,
+                            item.Password
+                        );
+
                         if (!result.Succeeded)
                         {
                             foreach (var error in result.Errors)
                             {
-                                ModelState.AddModelError("", $"Member {item.UserName}: {error.Description}");
+                                ModelState.AddModelError(
+                                    "",
+                                    $"Member {item.UserName}: {error.Description}"
+                                );
                             }
+
                             return View(model);
                         }
 
+
+                        // ==========================================
+                        // 6. ASSIGN MEMBER ROLE
+                        // ==========================================
+
+                        var roleName = string.IsNullOrWhiteSpace(item.Role)
+                            ? "FamilyMembers"
+                            : item.Role;
+
                         var roleResult = await _userManager.AddToRoleAsync(
                             user,
-                            string.IsNullOrWhiteSpace(item.Role) ? "FamilyMembers" : item.Role);
+                            roleName
+                        );
 
                         if (!roleResult.Succeeded)
                         {
                             foreach (var error in roleResult.Errors)
                             {
-                                ModelState.AddModelError("", error.Description);
+                                ModelState.AddModelError(
+                                    "",
+                                    $"Member {item.UserName}: {error.Description}"
+                                );
                             }
+
                             return View(model);
                         }
 
-                        _context.UserHouseHoldDetails.Add(new UserHouseHoldDetails
-                        {
-                            UserHouseHoldId = Guid.NewGuid(),
-                            UserId = user.Id,
-                            HouseHoldId = household.HouseHoldId,
-                            CreatedBy = owner.Id,
-                            CreatedOn = DateTime.Now
-                        });
+
+                        // Add member to email list
+                        registeredUsers.Add(
+                            (user.Email, user.UserName)
+                        );
+
+
+                        // ==========================================
+                        // 7. LINK MEMBER WITH HOUSEHOLD
+                        // ==========================================
+
+                        _context.UserHouseHoldDetails.Add(
+                            new UserHouseHoldDetails
+                            {
+                                UserHouseHoldId = Guid.NewGuid(),
+                                UserId = user.Id,
+                                HouseHoldId = household.HouseHoldId,
+                                CreatedBy = owner.Id,
+                                CreatedOn = DateTime.Now
+                            }
+                        );
                     }
                 }
 
+
+                // ==========================================
+                // 8. SAVE EVERYTHING TO DATABASE
+                // ==========================================
+
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Household registered successfully!";
-                return RedirectToAction(nameof(Success));
+
+                // ==========================================
+                // 9. SEND REGISTRATION EMAILS
+                // ==========================================
+
+                foreach (var registeredUser in registeredUsers)
+                {
+                    await SendRegistrationEmail(
+                        registeredUser.Email,
+                        registeredUser.UserName,
+                        household.HouseHoldName
+                    );
+                }
+
+
+                // ==========================================
+                // 10. SUCCESS
+                // ==========================================
+
+                TempData["SuccessMessage"] =
+                    "Household registered successfully! Registration emails have been sent.";
+
+                return RedirectToAction(nameof(Login));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during household registration.");
-                ModelState.AddModelError("", "An unexpected error occurred. Please try again later.");
+                _logger.LogError(
+                    ex,
+                    "Error during household registration."
+                );
+
+                ModelState.AddModelError(
+                    "",
+                    "An unexpected error occurred. Please try again later."
+                );
+
                 return View(model);
             }
         }
 
+        private async Task SendRegistrationEmail(
+    string email,
+    string userName,
+    string householdName)
+        {
+            try
+            {
+                string smtpUser = _configuration["EmailSettings:SmtpUser"];
+                string smtpPassword = _configuration["EmailSettings:SmtpPassword"];
+
+                MailMessage message = new MailMessage
+                {
+                    From = new MailAddress(smtpUser, "SmartTrack"),
+                    Subject = "Welcome to SmartTrack - Registration Successful",
+                    IsBodyHtml = true,
+                    Body = $@"
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset='UTF-8'>
+                    <style>
+                        body {{
+                            font-family: Arial, sans-serif;
+                            background-color: #f4f7f6;
+                            margin: 0;
+                            padding: 0;
+                        }}
+
+                        .container {{
+                            max-width: 600px;
+                            margin: 40px auto;
+                            background: white;
+                            border-radius: 10px;
+                            overflow: hidden;
+                            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                        }}
+
+                        .header {{
+                            background-color: #198754;
+                            color: white;
+                            text-align: center;
+                            padding: 25px;
+                        }}
+
+                        .content {{
+                            padding: 35px;
+                            color: #333;
+                        }}
+
+                        .details {{
+                            background-color: #f1f8f4;
+                            border-left: 5px solid #198754;
+                            padding: 15px;
+                            margin: 20px 0;
+                        }}
+
+                        .footer {{
+                            text-align: center;
+                            color: #777;
+                            padding: 20px;
+                            font-size: 14px;
+                        }}
+
+                        .success {{
+                            color: #198754;
+                            font-weight: bold;
+                        }}
+                    </style>
+                </head>
+
+                <body>
+
+                    <div class='container'>
+
+                        <div class='header'>
+                            <h2>🌿 SmartTrack</h2>
+                            <p>Welcome to SmartTrack!</p>
+                        </div>
+
+                        <div class='content'>
+
+                            <h3>Hello {System.Net.WebUtility.HtmlEncode(userName)},</h3>
+
+                            <p>
+                                Your account has been successfully registered
+                                in the SmartTrack household management system.
+                            </p>
+
+                            <div class='details'>
+
+                                <p>
+                                    <strong>Household:</strong>
+                                    {System.Net.WebUtility.HtmlEncode(householdName)}
+                                </p>
+
+                                <p>
+                                    <strong>Username:</strong>
+                                    {System.Net.WebUtility.HtmlEncode(userName)}
+                                </p>
+
+                                <p>
+                                    <strong>Email:</strong>
+                                    {System.Net.WebUtility.HtmlEncode(email)}
+                                </p>
+
+                            </div>
+
+                            <p class='success'>
+                                Your SmartTrack account is now ready to use.
+                            </p>
+
+                            <p>
+                                For security reasons, your password is not
+                                included in this email.
+                                Please contact the <strong>Household Owner</strong>
+                                to obtain your password.
+                            </p>
+
+                            <p>
+                                Once you receive your password, you can use your
+                                registered email/username to log in to SmartTrack.
+                            </p>
+
+                            <p>
+                                Thank you for joining SmartTrack!
+                            </p>
+
+                        </div>
+
+                        <div class='footer'>
+                            <strong>Thank you,</strong><br>
+                            SmartTrack Team
+                        </div>
+
+                    </div>
+
+                </body>
+                </html>"
+                };
+
+                message.To.Add(email);
+
+                using (SmtpClient smtp = new SmtpClient())
+                {
+                    smtp.Host = "smtp.gmail.com";
+                    smtp.Port = 587;
+                    smtp.EnableSsl = true;
+                    smtp.Timeout = 10000;
+                    smtp.UseDefaultCredentials = false;
+                    smtp.Credentials = new NetworkCredential(
+                        smtpUser,
+                        smtpPassword
+                    );
+
+                    await smtp.SendMailAsync(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to send registration email to {Email}",
+                    email
+                );
+
+                throw;
+            }
+        }
         public IActionResult Success()
         {
             return View();
@@ -212,7 +495,7 @@ namespace SmartTrack.Controllers
                     }
 
                     TempData["SuccessMessage"] = "Login successfully!";
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "SmartTrackDashBoard");
                 }
 
                 if (result.IsLockedOut)

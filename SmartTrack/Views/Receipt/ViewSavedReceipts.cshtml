@@ -4,389 +4,1155 @@
     ViewData["Title"] = "Saved Receipts";
 }
 
-<div class="container py-5">
-
-    <!-- Header -->
-    <div class="text-center mb-4">
-
-        <h2 class="fw-bold text-success">
-
-            <i class="bi bi-receipt-cutoff me-2"></i>
-
-            Saved Receipts
-
-        </h2>
-
-        <p class="text-muted">
-            View receipts saved by your household members.
-        </p>
-
-    </div>
-
-
-    <!-- Household Information -->
-
-    <div class="card shadow-sm border-0 rounded-4 mb-4">
-
-        <div class="card-body p-4">
-
-            <div class="d-flex justify-content-between align-items-center">
-
-                <div>
-
-                    <h5 class="fw-bold text-success mb-1">
-
-                        <i class="bi bi-house-door me-2"></i>
-
-                        Household Information
-
-                    </h5>
-
-                    <p class="text-muted mb-0">
-                        Receipts belonging to this household
-                    </p>
-
-                </div>
-
-                <span class="badge bg-success fs-6 px-3 py-2">
-
-                     Household Name:
-                    @Model.HouseholdName
-                    <br />
-                    Household ID:
-                    @Model.HouseholdId
-
-                   
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ================================================= -->
-    <!-- RECEIPTS TABLE -->
-    <!-- ================================================= -->
-
-    <div class="card shadow-sm border-0 rounded-4 mb-5">
-
-        <div class="card-body p-4">
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-
-                <div>
-
-                    <h4 class="fw-bold text-success">
-
-                        <i class="bi bi-receipt me-2"></i>
-
-                        Saved Receipts
-
-                    </h4>
-
-                    <p class="text-muted mb-0">
-                        All receipts saved by household users.
-                    </p>
-
-                </div>
-
-                <span class="badge bg-success">
-
-                    @Model.Receipts.Count Receipts
-
-                </span>
-
-            </div>
-
-
-            @if (Model.Receipts.Any())
-            {
-                <div class="table-responsive">
-
-                    <table class="table table-hover align-middle">
-
-                        <thead class="table-success">
-
-                            <tr>
-
-                                <th>#</th>
-
-                                <th>Receipt ID</th>
-
-                                <th>Purchase Date</th>
-
-                                <th>Total Amount</th>
-
-                                <th>Items</th>
-
-                                <th>Created By</th>
-
-                                <th>Created On</th>
-
-                                <th>Modified On</th>
-
-                                <th>Modified By</th>
-
-                                <th>Action</th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            @{
-                                int number = 1;
-                            }
-
-                            @foreach (var receipt in Model.Receipts)
-                            {
-                                <tr>
-
-                                    <td>
-                                        @number
-                                    </td>
-
-                                    <td>
-
-                                        <span class="badge bg-secondary">
-                                            #@receipt.Id
-                                        </span>
-
-                                    </td>
-
-                                    <td>
-                                        @receipt.PurchaseDate.ToString("yyyy-MM-dd")
-                                    </td>
-
-                                    <td class="fw-bold text-success">
-                                        Rs @receipt.TotalAmount.ToString("0.00")
-                                    </td>
-
-                                    <td>
-                                        @receipt.ItemCount
-                                    </td>
-
-                                    <td>
-                                        @receipt.CreatedByName
-                                    </td>
-
-                                    <td>
-                                        @receipt.CreatedOn.ToString("yyyy-MM-dd HH:mm")
-                                    </td>
-
-                                    <td>
-                                        @(receipt.ModifiedOn.HasValue
-                                                                        ? receipt.ModifiedOn.Value.ToString("yyyy-MM-dd HH:mm")
-                                                                        : "-")
-                                                                          </td>
-
-                                    <td>
-                                        @(string.IsNullOrEmpty(receipt.ModifiedByName)
-                                                                        ? "-"
-                                                                        : receipt.ModifiedByName)
-                            </td>
-
-                                                            <td>
-
-                                                                <a asp-action="EditReceipt"
-                                                                   asp-route-id="@receipt.Id"
-                                                                   class="btn btn-sm btn-primary rounded-pill">
-
-                                                                    <i class="bi bi-pencil me-1"></i>
-
-                                                                    Edit
-
-                                                                </a>
-
-                                                            </td>
-
-                                                        </tr>
-
-                                                        number++;
-                            }
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-            }
-            else
-            {
-                <div class="text-center py-5">
-
-                    <i class="bi bi-receipt text-muted"
-                       style="font-size:60px;">
-                    </i>
-
-                    <h5 class="mt-3 text-muted">
-                        No saved receipts found.
-                    </h5>
-
-                    <p class="text-muted">
-                        Scan and save a receipt to see it here.
-                    </p>
-
-                </div>
-            }
-
-        </div>
-
-    </div>
-
-
-    <!-- ================================================= -->
-    <!-- RECEIPT ITEMS TABLE -->
-    <!-- ================================================= -->
-
-    <div class="card shadow-sm border-0 rounded-4">
-
-        <div class="card-body p-4">
-
-            <h4 class="fw-bold text-success">
-
-                <i class="bi bi-cart-check me-2"></i>
-
-                Receipt Items
-
-            </h4>
-
-            <p class="text-muted">
-                All items extracted from household receipts.
-            </p>
-
-
-            @if (Model.ReceiptItems.Any())
-            {
-                <div class="table-responsive">
-
-                    <table class="table table-hover align-middle">
-
-                        <thead class="table-success">
-
-                            <tr>
-
-                                <th>#</th>
-
-                                <th>Receipt ID</th>
-
-                                <th>Purchase Date</th>
-
-                                <th>Item Name</th>
-
-                                <th>Quantity</th>
-
-                                <th>Unit</th>
-
-                                <th>Unit Price</th>
-
-                                <th>Total Price</th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            @{
-                                int itemNumber = 1;
-                            }
-
-                            @foreach (var item in Model.ReceiptItems)
-                            {
-                                <tr>
-
-                                    <td>
-                                        @itemNumber
-                                    </td>
-
-                                    <td>
-
-                                        <span class="badge bg-secondary">
-                                            #@item.ReceiptId
-                                        </span>
-
-                                    </td>
-
-                                    <td>
-                                        @item.PurchaseDate.ToString("yyyy-MM-dd")
-                                    </td>
-
-                                    <td class="fw-semibold">
-                                        @item.ItemName
-                                    </td>
-
-                                    <td>
-                                        @item.Quantity
-                                    </td>
-
-                                    <td>
-                                        @item.Unit
-                                    </td>
-
-                                    <td>
-                                        Rs @item.UnitPrice.ToString("0.00")
-                                    </td>
-
-                                    <td class="fw-semibold text-success">
-                                        Rs @item.TotalPrice.ToString("0.00")
-                                    </td>
-
-                                </tr>
-
-                                itemNumber++;
-                            }
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-            }
-            else
-            {
-                <div class="text-center py-5">
-
-                    <i class="bi bi-cart-x text-muted"
-                       style="font-size:60px;">
-                    </i>
-
-                    <h5 class="mt-3 text-muted">
-                        No receipt items found.
-                    </h5>
-
-                </div>
-            }
-
-        </div>
-
-    </div>
-
-</div>
-
-
 <style>
 
+    /* ==========================================
+           GENERAL
+           ========================================== */
+
+    .saved-receipts-page {
+        max-width: 1250px;
+        margin: auto;
+    }
+
     .card {
-        transition: 0.3s;
+        transition: 0.3s ease;
+        border-radius: 20px !important;
     }
 
         .card:hover {
             transform: translateY(-2px);
         }
 
-    .table {
-        border-radius: 10px;
-        overflow: hidden;
+
+    /* ==========================================
+           PAGE HEADER
+           ========================================== */
+
+    .page-title {
+        font-size: 30px;
     }
 
-        .table th {
-            white-space: nowrap;
+    .page-description {
+        font-size: 15px;
+    }
+
+
+    /* ==========================================
+           HOUSEHOLD INFORMATION
+           ========================================== */
+
+    .household-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .household-badge {
+        text-align: right;
+        line-height: 1.7;
+    }
+
+
+    /* ==========================================
+           DESKTOP TABLE
+           ========================================== */
+
+    .desktop-table {
+        display: block;
+    }
+
+        .desktop-table table {
+            width: 100%;
         }
 
+        .desktop-table th {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .desktop-table td {
+            vertical-align: middle;
+        }
+
+
+    /* ==========================================
+           MOBILE CONTENT
+           ========================================== */
+
+    .mobile-content {
+        display: none;
+    }
+
+
+    /* ==========================================
+           MOBILE RECEIPT CARD
+           ========================================== */
+
+    .receipt-mobile-card {
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 18px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .receipt-mobile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 14px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    .receipt-mobile-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: #198754;
+    }
+
+
+    /* ==========================================
+           MOBILE INFORMATION ROW
+           ========================================== */
+
+    .mobile-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+        .mobile-info-row:last-child {
+            border-bottom: none;
+        }
+
+    .mobile-info-label {
+        font-size: 13px;
+        color: #777;
+        font-weight: 600;
+        flex: 0 0 42%;
+    }
+
+    .mobile-info-value {
+        text-align: right;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        word-break: break-word;
+    }
+
+
+    /* ==========================================
+           EDIT BUTTON
+           ========================================== */
+
+    .mobile-edit-btn {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+
+    /* ==========================================
+           MOBILE ITEM CARD
+           ========================================== */
+
+    .item-mobile-card {
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 15px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .item-mobile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    .item-mobile-name {
+        font-weight: 700;
+        color: #198754;
+        font-size: 17px;
+        word-break: break-word;
+    }
+
+
+    /* ==========================================
+           EMPTY STATE
+           ========================================== */
+
+    .empty-icon {
+        font-size: 60px;
+    }
+
+
+    /* ==========================================
+           MOBILE RESPONSIVE
+           ========================================== */
+
+    @@media (max-width: 767px) {
+
+        .saved-receipts-page {
+            padding: 0 5px;
+        }
+        /* Page header */
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .page-description {
+            font-size: 14px;
+        }
+        /* Card */
+
+        .card-body {
+            padding: 18px !important;
+        }
+        /* Household */
+
+        .household-info {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+
+        .household-badge {
+            text-align: left;
+            width: 100%;
+            display: block;
+            padding: 12px !important;
+            line-height: 1.6;
+            white-space: normal;
+        }
+        /* Section heading */
+
+        .section-heading {
+            font-size: 20px;
+        }
+        /* Hide desktop */
+
+        .desktop-table {
+            display: none;
+        }
+        /* Show mobile */
+
+        .mobile-content {
+            display: block;
+        }
+        /* Section header */
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 10px;
+        }
+        /* Receipt card */
+
+        .receipt-mobile-card {
+            padding: 16px;
+        }
+        /* Item card */
+
+        .item-mobile-card {
+            padding: 16px;
+        }
+        /* Empty icon */
+
+        .empty-icon {
+            font-size: 50px;
+        }
+    }
+
+
+    /* ==========================================
+           SMALL MOBILE
+           ========================================== */
+
+    @@media (max-width: 480px) {
+
+        .page-title {
+            font-size: 21px;
+        }
+
+        .section-heading {
+            font-size: 18px;
+        }
+
+        .card-body {
+            padding: 15px !important;
+        }
+
+        .receipt-mobile-card,
+        .item-mobile-card {
+            padding: 14px;
+        }
+
+        .mobile-info-row {
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .mobile-info-label {
+            flex: auto;
+        }
+
+        .mobile-info-value {
+            text-align: left;
+        }
+    }
+
 </style>
+
+
+<div class="container-fluid py-4">
+
+    <div class="saved-receipts-page">
+
+
+        <!-- ================================================= -->
+        <!-- PAGE HEADER -->
+        <!-- ================================================= -->
+
+        <div class="text-center mb-4">
+
+            <h2 class="fw-bold text-success page-title">
+
+                <i class="bi bi-receipt-cutoff me-2"></i>
+
+                Saved Receipts
+
+            </h2>
+
+            <p class="text-muted page-description">
+
+                View receipts saved by your household members.
+
+            </p>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- HOUSEHOLD INFORMATION -->
+        <!-- ================================================= -->
+
+        <div class="card shadow-sm border-0 mb-4">
+
+            <div class="card-body p-4">
+
+                <div class="household-info">
+
+                    <div>
+
+                        <h5 class="fw-bold text-success mb-1">
+
+                            <i class="bi bi-house-door me-2"></i>
+
+                            Household Information
+
+                        </h5>
+
+                        <p class="text-muted mb-0">
+
+                            Receipts belonging to this household
+
+                        </p>
+
+                    </div>
+
+
+                    <span class="badge bg-success fs-6 px-3 py-2 household-badge">
+
+                        <strong>
+                            Household Name:
+                        </strong>
+
+                        @Model.HouseholdName
+
+                        <br />
+
+                        <strong>
+                            Household ID:
+                        </strong>
+
+                        @Model.HouseholdId
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- SAVED RECEIPTS -->
+        <!-- ================================================= -->
+
+        <div class="card shadow-sm border-0 mb-5">
+
+            <div class="card-body p-4">
+
+
+                <!-- Section Header -->
+
+                <div class="d-flex justify-content-between align-items-center mb-4 section-header">
+
+                    <div>
+
+                        <h4 class="fw-bold text-success section-heading">
+
+                            <i class="bi bi-receipt me-2"></i>
+
+                            Saved Receipts
+
+                        </h4>
+
+                        <p class="text-muted mb-0">
+
+                            All receipts saved by household users.
+
+                        </p>
+
+                    </div>
+
+
+                    <span class="badge bg-success px-3 py-2">
+
+                        @Model.Receipts.Count Receipts
+
+                    </span>
+
+                </div>
+
+
+
+                @if (Model.Receipts.Any())
+                {
+
+                    <!-- ================================================= -->
+                    <!-- DESKTOP RECEIPT TABLE -->
+                    <!-- ================================================= -->
+
+                    <div class="table-responsive desktop-table">
+
+                        <table class="table table-hover align-middle">
+
+                            <thead class="table-success">
+
+                                <tr>
+
+                                    <th>#</th>
+
+                                    <th>Receipt ID</th>
+
+                                    <th>Purchase Date</th>
+
+                                    <th>Total Amount</th>
+
+                                    <th>Items</th>
+
+                                    <th>Created By</th>
+
+                                    <th>Created On</th>
+
+                                    <th>Modified On</th>
+
+                                    <th>Modified By</th>
+
+                                    <th>Action</th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                @{
+                                    int number = 1;
+                                }
+
+                                @foreach (var receipt in Model.Receipts)
+                                {
+
+                                    <tr>
+
+                                        <td>
+                                            @number
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge bg-secondary">
+
+                                                #@receipt.Id
+
+                                            </span>
+
+                                        </td>
+
+                                        <td>
+
+                                            @receipt.PurchaseDate
+
+                                        </td>
+
+                                        <td class="fw-bold text-success">
+
+                                            Rs @receipt.TotalAmount
+
+                                        </td>
+
+                                        <td>
+
+                                            @receipt.ItemCount
+
+                                        </td>
+
+                                        <td>
+
+                                            @receipt.CreatedByName
+
+                                        </td>
+
+                                        <td>
+
+                                            @receipt.CreatedOn
+
+                                        </td>
+
+                                        <td>
+
+                                            @(receipt.ModifiedOn.HasValue
+                                                                                ? receipt.ModifiedOn.Value
+                                                                                : "-")
+
+                                        </td>
+
+                                        <td>
+
+                                            @(string.IsNullOrEmpty(
+                                                                                receipt.ModifiedByName)
+                                                                                ? "-"
+                                                                                : receipt.ModifiedByName)
+
+                                </td>
+
+                                                                    <td>
+
+                                                                        <a asp-action="EditReceipt"
+                                                                           asp-route-id="@receipt.Id"
+                                                                           class="btn btn-sm btn-primary rounded-pill">
+
+                                                                            <i class="bi bi-pencil me-1"></i>
+
+                                                                            Edit
+
+                                                                        </a>
+
+                                                                    </td>
+
+                                                                </tr>
+
+                                                                number++;
+
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+
+                    <!-- ================================================= -->
+                    <!-- MOBILE RECEIPT CARDS -->
+                    <!-- ================================================= -->
+
+                    <div class="mobile-content">
+
+                        @foreach (var receipt in Model.Receipts)
+                        {
+
+                            <div class="receipt-mobile-card">
+
+
+                                <!-- Receipt Header -->
+
+                                <div class="receipt-mobile-header">
+
+                                    <span class="receipt-mobile-title">
+
+                                        <i class="bi bi-receipt me-1"></i>
+
+                                        Receipt #@receipt.Id
+
+                                    </span>
+
+
+                                    <span class="badge bg-success">
+
+                                        @receipt.ItemCount Items
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Receipt ID -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Receipt ID
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        #@receipt.Id
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Purchase Date -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Purchase Date
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        @receipt.PurchaseDate
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Total -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Total Amount
+                                    </span>
+
+                                    <span class="mobile-info-value text-success fw-bold">
+
+                                        Rs @receipt.TotalAmount
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Item Count -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Number of Items
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        @receipt.ItemCount
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Created By -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Created By
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        @receipt.CreatedByName
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Created On -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Created On
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        @receipt.CreatedOn
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Modified On -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Modified On
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        @(receipt.ModifiedOn.HasValue
+                                                                        ? receipt.ModifiedOn.Value
+                                                                        : "-")
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Modified By -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Modified By
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        @(string.IsNullOrEmpty(
+                                                                        receipt.ModifiedByName)
+                                                                        ? "-"
+                                                                        : receipt.ModifiedByName)
+
+                            </span>
+
+                                </div>
+
+
+
+                                <!-- Edit Button -->
+
+                                <a asp-action="EditReceipt"
+                                   asp-route-id="@receipt.Id"
+                                   class="btn btn-primary rounded-pill mobile-edit-btn">
+
+                                    <i class="bi bi-pencil me-1"></i>
+
+                                    Edit Receipt
+
+                                </a>
+
+                            </div>
+
+                                        }
+
+                    </div>
+
+                }
+                else
+                {
+
+                    <!-- ================================================= -->
+                    <!-- NO RECEIPTS -->
+                    <!-- ================================================= -->
+
+                    <div class="text-center py-5">
+
+                        <i class="bi bi-receipt text-muted empty-icon"></i>
+
+                        <h5 class="mt-3 text-muted">
+
+                            No saved receipts found.
+
+                        </h5>
+
+                        <p class="text-muted">
+
+                            Scan and save a receipt to see it here.
+
+                        </p>
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- RECEIPT ITEMS -->
+        <!-- ================================================= -->
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body p-4">
+
+
+                <!-- Section Header -->
+
+                <div class="mb-4">
+
+                    <h4 class="fw-bold text-success section-heading">
+
+                        <i class="bi bi-cart-check me-2"></i>
+
+                        Receipt Items
+
+                    </h4>
+
+                    <p class="text-muted">
+
+                        All items extracted from household receipts.
+
+                    </p>
+
+                </div>
+
+
+
+                @if (Model.ReceiptItems.Any())
+                {
+
+                    <!-- ================================================= -->
+                    <!-- DESKTOP ITEMS TABLE -->
+                    <!-- ================================================= -->
+
+                    <div class="table-responsive desktop-table">
+
+                        <table class="table table-hover align-middle">
+
+                            <thead class="table-success">
+
+                                <tr>
+
+                                    <th>#</th>
+
+                                    <th>Receipt ID</th>
+
+                                    <th>Purchase Date</th>
+
+                                    <th>Item Name</th>
+
+                                    <th>Quantity</th>
+
+                                    <th>Unit</th>
+
+                                    <th>Unit Price</th>
+
+                                    <th>Total Price</th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                @{
+                                    int itemNumber = 1;
+                                }
+
+                                @foreach (var item in Model.ReceiptItems)
+                                {
+
+                                    <tr>
+
+                                        <td>
+                                            @itemNumber
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge bg-secondary">
+
+                                                #@item.ReceiptId
+
+                                            </span>
+
+                                        </td>
+
+                                        <td>
+
+                                            @item.PurchaseDate
+
+                                        </td>
+
+                                        <td class="fw-semibold">
+
+                                            @item.ItemName
+
+                                        </td>
+
+                                        <td>
+
+                                            @item.Quantity
+
+                                        </td>
+
+                                        <td>
+
+                                            @item.Unit
+
+                                        </td>
+
+                                        <td>
+
+                                            Rs @item.UnitPrice
+
+                                        </td>
+
+                                        <td class="fw-semibold text-success">
+
+                                            Rs @item.TotalPrice
+
+                                        </td>
+
+                                    </tr>
+
+                                    itemNumber++;
+
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+
+                    <!-- ================================================= -->
+                    <!-- MOBILE ITEM CARDS -->
+                    <!-- ================================================= -->
+
+                    <div class="mobile-content">
+
+                        @foreach (var item in Model.ReceiptItems)
+                        {
+
+                            <div class="item-mobile-card">
+
+
+                                <!-- Item Header -->
+
+                                <div class="item-mobile-header">
+
+                                    <span class="item-mobile-name">
+
+                                        <i class="bi bi-cart3 me-1"></i>
+
+                                        @item.ItemName
+
+                                    </span>
+
+
+                                    <span class="badge bg-secondary">
+
+                                        #@item.ReceiptId
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Receipt ID -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Receipt ID
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        #@item.ReceiptId
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Purchase Date -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Purchase Date
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        @item.PurchaseDate
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Item Name -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Item Name
+                                    </span>
+
+                                    <span class="mobile-info-value fw-semibold">
+
+                                        @item.ItemName
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Quantity -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Quantity
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        @item.Quantity
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Unit -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Unit
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        @item.Unit
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Unit Price -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Unit Price
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        Rs @item.UnitPrice
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Total Price -->
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Total Price
+                                    </span>
+
+                                    <span class="mobile-info-value text-success fw-bold">
+
+                                        Rs @item.TotalPrice
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        }
+
+                    </div>
+
+                }
+                else
+                {
+
+                    <!-- ================================================= -->
+                    <!-- NO ITEMS -->
+                    <!-- ================================================= -->
+
+                    <div class="text-center py-5">
+
+                        <i class="bi bi-cart-x text-muted empty-icon"></i>
+
+                        <h5 class="mt-3 text-muted">
+
+                            No receipt items found.
+
+                        </h5>
+
+                    </div>
+
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -4,230 +4,761 @@
     ViewData["Title"] = "Edit Receipt";
 }
 
-<div class="container py-5">
+<style>
 
-    <div class="text-center mb-4">
-        <h2 class="fw-bold text-success">
-            <i class="bi bi-pencil-square me-2"></i>
-            Edit Receipt
-        </h2>
+    /* ==========================================
+           GENERAL
+           ========================================== */
 
-        <p class="text-muted">
-            Update receipt details and receipt items.
-        </p>
-    </div>
+    .edit-receipt-page {
+        max-width: 1100px;
+        margin: auto;
+    }
 
-    <form asp-action="EditReceipt"
-          method="post">
+    .card {
+        border-radius: 20px !important;
+        transition: 0.3s ease;
+    }
 
-        @Html.AntiForgeryToken()
+        .card:hover {
+            transform: translateY(-2px);
+        }
 
-        <input type="hidden"
-               asp-for="ReceiptId" />
 
-        <!-- Receipt Information -->
+    /* ==========================================
+           PAGE HEADER
+           ========================================== */
 
-        <div class="card shadow-sm border-0 rounded-4 mb-4">
+    .page-title {
+        font-size: 30px;
+    }
 
-            <div class="card-body p-4">
+    .page-description {
+        font-size: 15px;
+    }
 
-                <h4 class="fw-bold text-success mb-4">
-                    <i class="bi bi-receipt me-2"></i>
-                    Receipt Information
-                </h4>
 
-                <div class="row">
+    /* ==========================================
+           RECEIPT INFORMATION
+           ========================================== */
 
-                    <div class="col-md-6 mb-3">
+    .receipt-info-row {
+        display: flex;
+        gap: 20px;
+    }
 
-                        <label asp-for="PurchaseDate"
-                               class="form-label fw-semibold">
-                            Purchase Date
-                        </label>
+    .receipt-info-field {
+        flex: 1;
+    }
 
-                        <input asp-for="PurchaseDate"
-                               type="date"
-                               class="form-control" readonly />
 
-                    </div>
+    /* ==========================================
+           DESKTOP ITEMS TABLE
+           ========================================== */
 
-                    <div class="col-md-6 mb-3">
+    .desktop-items {
+        display: block;
+    }
 
-                        <label class="form-label fw-semibold">
-                            Receipt ID
-                        </label>
+        .desktop-items th {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
 
-                        <input value="@Model.ReceiptId"
-                               class="form-control"
-                               readonly />
+        .desktop-items td {
+            vertical-align: middle;
+        }
 
-                    </div>
 
-                </div>
+    /* ==========================================
+           MOBILE ITEMS
+           ========================================== */
 
-            </div>
+    .mobile-items {
+        display: none;
+    }
+
+
+    /* ==========================================
+           MOBILE ITEM CARD
+           ========================================== */
+
+    .edit-item-card {
+        border: 1px solid #e5e5e5;
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 18px;
+        background: #ffffff;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .edit-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 14px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    .edit-item-title {
+        font-size: 17px;
+        font-weight: 700;
+        color: #198754;
+    }
+
+
+    /* ==========================================
+           MOBILE FORM GROUP
+           ========================================== */
+
+    .mobile-field {
+        margin-bottom: 15px;
+    }
+
+        .mobile-field:last-of-type {
+            margin-bottom: 18px;
+        }
+
+        .mobile-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .mobile-field input {
+            width: 100%;
+        }
+
+
+    /* ==========================================
+           DELETE ITEM
+           ========================================== */
+
+    .delete-item-btn {
+        width: 100%;
+    }
+
+
+    /* ==========================================
+           BOTTOM BUTTONS
+           ========================================== */
+
+    .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .delete-receipt-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 15px;
+    }
+
+
+    /* ==========================================
+           MOBILE RESPONSIVE
+           ========================================== */
+
+    @@media (max-width: 767px) {
+
+        .edit-receipt-page {
+            padding: 0 5px;
+        }
+        /* Header */
+
+        .page-title {
+            font-size: 24px;
+        }
+
+        .page-description {
+            font-size: 14px;
+        }
+        /* Card */
+
+        .card-body {
+            padding: 18px !important;
+        }
+        /* Receipt information */
+
+        .receipt-info-row {
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .receipt-info-field {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+            .receipt-info-field:last-child {
+                margin-bottom: 0;
+            }
+        /* Hide desktop table */
+
+        .desktop-items {
+            display: none;
+        }
+        /* Show mobile items */
+
+        .mobile-items {
+            display: block;
+        }
+        /* Action buttons */
+
+        .action-buttons {
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+        /* Delete receipt */
+
+        .delete-receipt-wrapper {
+            justify-content: stretch;
+        }
+
+            .delete-receipt-wrapper form {
+                width: 100%;
+            }
+
+            .delete-receipt-wrapper button {
+                width: 100%;
+            }
+    }
+
+
+    /* ==========================================
+           SMALL MOBILE
+           ========================================== */
+
+    @@media (max-width: 480px) {
+
+        .page-title {
+            font-size: 21px;
+        }
+
+        .card-body {
+            padding: 15px !important;
+        }
+
+        .edit-item-card {
+            padding: 14px;
+        }
+
+        .edit-item-title {
+            font-size: 16px;
+        }
+    }
+
+</style>
+
+
+<div class="container-fluid py-4">
+
+    <div class="edit-receipt-page">
+
+
+        <!-- ================================================= -->
+        <!-- PAGE HEADER -->
+        <!-- ================================================= -->
+
+        <div class="text-center mb-4">
+
+            <h2 class="fw-bold text-success page-title">
+
+                <i class="bi bi-pencil-square me-2"></i>
+
+                Edit Receipt
+
+            </h2>
+
+            <p class="text-muted page-description">
+
+                Update receipt details and receipt items.
+
+            </p>
 
         </div>
 
 
-        <!-- Receipt Items -->
 
-        <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <!-- ================================================= -->
+        <!-- MAIN FORM -->
+        <!-- ================================================= -->
 
-            <div class="card-body p-4">
-
-                <h4 class="fw-bold text-success mb-4">
-                    <i class="bi bi-cart-check me-2"></i>
-                    Receipt Items
-                </h4>
-
-                <div class="table-responsive">
-
-                    <table class="table table-bordered align-middle">
-
-                        <thead class="table-success">
-
-                            <tr>
-
-                                <th>Item Name</th>
-
-                                <th>Quantity</th>
-
-                                <th>Unit</th>
-
-                                <th>Unit Price</th>
-
-                                <th>Total Price</th>
-
-                                <th>Action</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            @for (int i = 0; i < Model.Items.Count; i++)
-                            {
-                                <tr>
-
-                                    <input type="hidden"
-                                           asp-for="Items[i].ReceiptItemId" />
-
-                                    <td>
-
-                                        <input asp-for="Items[i].ItemName"
-                                               class="form-control" />
-
-                                    </td>
-
-                                    <td>
-
-                                        <input asp-for="Items[i].Quantity"
-                                               type="number"
-                                               step="0.01"
-                                               class="form-control" />
-
-                                    </td>
-
-                                    <td>
-
-                                        <input asp-for="Items[i].Unit"
-                                               class="form-control" />
-
-                                    </td>
-
-                                    <td>
-
-                                        <input asp-for="Items[i].UnitPrice"
-                                               type="number"
-                                               step="0.01"
-                                               class="form-control" />
-
-                                    </td>
-
-                                    <td>
-
-                                        <input asp-for="Items[i].TotalPrice"
-                                               type="number"
-                                               step="0.01"
-                                               class="form-control" />
-
-                                    </td>
-
-                                       <td>
-            <a asp-action="DeleteReceiptItem"
-               asp-route-id="@Model.Items[i].ReceiptItemId"
-               asp-route-receiptId="@Model.ReceiptId"
-               class="btn btn-sm btn-danger rounded-pill"
-               onclick="return confirm('Are you sure you want to delete this item?');">
-
-                <i class="bi bi-trash me-1"></i>
-                Delete
-
-            </a>
-        </td>
-                                </tr>
-                            }
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Buttons -->
-
-        <div class="d-flex justify-content-between">
-
-            <a asp-action="ViewSavedReceipts"
-               class="btn btn-secondary rounded-pill px-4">
-
-                <i class="bi bi-arrow-left me-1"></i>
-                Cancel
-
-            </a>
-
-            <button type="submit"
-                    class="btn btn-success rounded-pill px-5">
-
-                <i class="bi bi-check-circle me-1"></i>
-                Save Changes
-
-            </button>
-
-        
-
-        </div>
-
-    </form>
-
-    <div class="d-flex justify-content-end mt-3">
-
-        <form asp-controller="Receipt"
-              asp-action="DeleteReceipt"
-              method="post"
-              onsubmit="return confirm('Are you sure you want to delete this entire receipt? This action cannot be undone.');">
+        <form asp-action="EditReceipt"
+              method="post">
 
             @Html.AntiForgeryToken()
 
+
+            <!-- Receipt ID -->
+
             <input type="hidden"
-                   name="id"
-                   value="@Model.ReceiptId" />
+                   asp-for="ReceiptId" />
 
-            <button type="submit"
-                    class="btn btn-danger rounded-pill px-4">
 
-                <i class="bi bi-trash me-1"></i>
-                Delete Entire Receipt
+            <!-- ================================================= -->
+            <!-- RECEIPT INFORMATION -->
+            <!-- ================================================= -->
 
-            </button>
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+                <div class="card-body p-4">
+
+                    <h4 class="fw-bold text-success mb-4">
+
+                        <i class="bi bi-receipt me-2"></i>
+
+                        Receipt Information
+
+                    </h4>
+
+
+                    <div class="receipt-info-row">
+
+
+                        <!-- Purchase Date -->
+
+                        <div class="receipt-info-field">
+
+                            <label asp-for="PurchaseDate"
+                                   class="form-label fw-semibold">
+
+                                Purchase Date
+
+                            </label>
+
+                            <input asp-for="PurchaseDate"
+                                   type="date"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+
+                        <!-- Receipt ID -->
+
+                        <div class="receipt-info-field">
+
+                            <label class="form-label fw-semibold">
+
+                                Receipt ID
+
+                            </label>
+
+                            <input value="@Model.ReceiptId"
+                                   class="form-control"
+                                   readonly />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================================================= -->
+            <!-- RECEIPT ITEMS -->
+            <!-- ================================================= -->
+
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+                <div class="card-body p-4">
+
+
+                    <h4 class="fw-bold text-success mb-4">
+
+                        <i class="bi bi-cart-check me-2"></i>
+
+                        Receipt Items
+
+                    </h4>
+
+
+
+                    <!-- ================================================= -->
+                    <!-- DESKTOP TABLE -->
+                    <!-- ================================================= -->
+
+                    <div class="table-responsive desktop-items">
+
+                        <table class="table table-bordered align-middle">
+
+                            <thead class="table-success">
+
+                                <tr>
+
+                                    <th>
+                                        Item Name
+                                    </th>
+
+                                    <th>
+                                        Quantity
+                                    </th>
+
+                                    <th>
+                                        Unit
+                                    </th>
+
+                                    <th>
+                                        Unit Price
+                                    </th>
+
+                                    <th>
+                                        Total Price
+                                    </th>
+
+                                    <th>
+                                        Action
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                @for (int i = 0;
+                                                                i < Model.Items.Count;
+                                                                i++)
+                                {
+
+                                    <tr>
+
+
+                                        <!-- Hidden ID -->
+
+                                        <input type="hidden"
+                                               asp-for="Items[i].ReceiptItemId" />
+
+
+                                        <!-- Item Name -->
+
+                                        <td>
+
+                                            <input asp-for="Items[i].ItemName"
+                                                   class="form-control" />
+
+                                        </td>
+
+
+                                        <!-- Quantity -->
+
+                                        <td>
+
+                                            <input asp-for="Items[i].Quantity"
+                                                   type="number"
+                                                   step="0.01"
+                                                   class="form-control" />
+
+                                        </td>
+
+
+                                        <!-- Unit -->
+
+                                        <td>
+
+                                            <input asp-for="Items[i].Unit"
+                                                   class="form-control" />
+
+                                        </td>
+
+
+                                        <!-- Unit Price -->
+
+                                        <td>
+
+                                            <input asp-for="Items[i].UnitPrice"
+                                                   type="number"
+                                                   step="0.01"
+                                                   class="form-control" />
+
+                                        </td>
+
+
+                                        <!-- Total Price -->
+
+                                        <td>
+
+                                            <input asp-for="Items[i].TotalPrice"
+                                                   type="number"
+                                                   step="0.01"
+                                                   class="form-control" />
+
+                                        </td>
+
+
+                                        <!-- Delete -->
+
+                                        <td class="text-center">
+
+                                            <a asp-action="DeleteReceiptItem"
+                                               asp-route-id="@Model.Items[i].ReceiptItemId"
+                                               asp-route-receiptId="@Model.ReceiptId"
+                                               class="btn btn-sm btn-danger rounded-pill"
+                                               onclick="return confirm('Are you sure you want to delete this item?');">
+
+                                                <i class="bi bi-trash me-1"></i>
+
+                                                Delete
+
+                                            </a>
+
+                                        </td>
+
+                                    </tr>
+
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+
+                    <!-- ================================================= -->
+                    <!-- MOBILE ITEM CARDS -->
+                    <!-- ================================================= -->
+
+                    <div class="mobile-items">
+
+                        @for (int i = 0;
+                                                i < Model.Items.Count;
+                                                i++)
+                        {
+
+                            <div class="edit-item-card">
+
+
+                                <!-- Hidden Receipt Item ID -->
+
+                                <input type="hidden"
+                                       asp-for="Items[i].ReceiptItemId" />
+
+
+
+                                <!-- Item Header -->
+
+                                <div class="edit-item-header">
+
+                                    <span class="edit-item-title">
+
+                                        <i class="bi bi-cart3 me-1"></i>
+
+                                        Item @(i + 1)
+
+                                    </span>
+
+
+                                    <span class="badge bg-secondary">
+
+                                        #@Model.Items[i].ReceiptItemId
+
+                                    </span>
+
+                                </div>
+
+
+
+                                <!-- Item Name -->
+
+                                <div class="mobile-field">
+
+                                    <label asp-for="Items[i].ItemName">
+
+                                        Item Name
+
+                                    </label>
+
+                                    <input asp-for="Items[i].ItemName"
+                                           class="form-control" />
+
+                                </div>
+
+
+
+                                <!-- Quantity -->
+
+                                <div class="mobile-field">
+
+                                    <label asp-for="Items[i].Quantity">
+
+                                        Quantity
+
+                                    </label>
+
+                                    <input asp-for="Items[i].Quantity"
+                                           type="number"
+                                           step="0.01"
+                                           class="form-control" />
+
+                                </div>
+
+
+
+                                <!-- Unit -->
+
+                                <div class="mobile-field">
+
+                                    <label asp-for="Items[i].Unit">
+
+                                        Unit
+
+                                    </label>
+
+                                    <input asp-for="Items[i].Unit"
+                                           class="form-control" />
+
+                                </div>
+
+
+
+                                <!-- Unit Price -->
+
+                                <div class="mobile-field">
+
+                                    <label asp-for="Items[i].UnitPrice">
+
+                                        Unit Price
+
+                                    </label>
+
+                                    <input asp-for="Items[i].UnitPrice"
+                                           type="number"
+                                           step="0.01"
+                                           class="form-control" />
+
+                                </div>
+
+
+
+                                <!-- Total Price -->
+
+                                <div class="mobile-field">
+
+                                    <label asp-for="Items[i].TotalPrice">
+
+                                        Total Price
+
+                                    </label>
+
+                                    <input asp-for="Items[i].TotalPrice"
+                                           type="number"
+                                           step="0.01"
+                                           class="form-control" />
+
+                                </div>
+
+
+
+                                <!-- Delete Item -->
+
+                                <a asp-action="DeleteReceiptItem"
+                                   asp-route-id="@Model.Items[i].ReceiptItemId"
+                                   asp-route-receiptId="@Model.ReceiptId"
+                                   class="btn btn-danger rounded-pill delete-item-btn"
+                                   onclick="return confirm('Are you sure you want to delete this item?');">
+
+                                    <i class="bi bi-trash me-1"></i>
+
+                                    Delete Item
+
+                                </a>
+
+                            </div>
+
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================================================= -->
+            <!-- SAVE / CANCEL BUTTONS -->
+            <!-- ================================================= -->
+
+            <div class="action-buttons">
+
+
+                <!-- Cancel -->
+
+                <a asp-action="ViewSavedReceipts"
+                   class="btn btn-secondary rounded-pill px-4">
+
+                    <i class="bi bi-arrow-left me-1"></i>
+
+                    Cancel
+
+                </a>
+
+
+                <!-- Save -->
+
+                <button type="submit"
+                        class="btn btn-success rounded-pill px-5">
+
+                    <i class="bi bi-check-circle me-1"></i>
+
+                    Save Changes
+
+                </button>
+
+            </div>
 
         </form>
+
+
+
+        <!-- ================================================= -->
+        <!-- DELETE ENTIRE RECEIPT -->
+        <!-- ================================================= -->
+
+        <div class="delete-receipt-wrapper">
+
+            <form asp-controller="Receipt"
+                  asp-action="DeleteReceipt"
+                  method="post"
+                  onsubmit="return confirm('Are you sure you want to delete this entire receipt? This action cannot be undone.');">
+
+                @Html.AntiForgeryToken()
+
+
+                <input type="hidden"
+                       name="id"
+                       value="@Model.ReceiptId" />
+
+
+                <button type="submit"
+                        class="btn btn-danger rounded-pill px-4">
+
+                    <i class="bi bi-trash me-1"></i>
+
+                    Delete Entire Receipt
+
+                </button>
+
+            </form>
+
+        </div>
 
     </div>
 

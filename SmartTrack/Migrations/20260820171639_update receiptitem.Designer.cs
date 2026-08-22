@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartTrack.Models;
 
@@ -11,9 +12,11 @@ using SmartTrack.Models;
 namespace SmartTrack.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260820171639_update receiptitem")]
+    partial class updatereceiptitem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,55 +393,6 @@ namespace SmartTrack.Migrations
                     b.ToTable("Receipts");
                 });
 
-            modelBuilder.Entity("SmartTrack.Models.SmartTrackNotification", b =>
-                {
-                    b.Property<Guid>("NotificationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("EmailSent")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("EmailSentOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("HouseHoldId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NotificationType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("NotificationId");
-
-                    b.HasIndex("HouseHoldId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("SmartTrackNotifications");
-                });
-
             modelBuilder.Entity("SmartTrack.Models.UserHouseHoldDetails", b =>
                 {
                     b.Property<Guid>("UserHouseHoldId")
@@ -547,25 +501,6 @@ namespace SmartTrack.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SmartTrack.Models.SmartTrackNotification", b =>
-                {
-                    b.HasOne("SmartTrack.Models.HouseHoldDetails", "HouseHold")
-                        .WithMany()
-                        .HasForeignKey("HouseHoldId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SmartTrack.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("HouseHold");
 
                     b.Navigation("User");
                 });

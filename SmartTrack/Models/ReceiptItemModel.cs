@@ -10,6 +10,8 @@ namespace SmartTrack.Models
 
         public string ItemName { get; set; }
 
+        [StringLength(100)]
+        public string? Category { get; set; }
 
         public int Quantity { get; set; }
 

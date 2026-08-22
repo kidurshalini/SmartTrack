@@ -1,0 +1,597 @@
+﻿@model SmartTrack.Models.SmartTrackDashboardViewModel
+
+@{
+    ViewData["Title"] = "SmartTrack Dashboard";
+}
+
+<div class="container-fluid py-4">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="d-flex justify-content-between
+                align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold">
+                SmartTrack
+            </h2>
+
+            <p class="text-muted mb-0">
+                Welcome back, @Model.UserName.
+                Here's what your household needs attention on.
+            </p>
+
+        </div>
+
+        <div>
+
+            <a asp-controller="SmartTrack"
+               asp-action="Prediction"
+               class="btn btn-primary">
+
+                Check Product
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY CARDS
+    ====================================================== -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        DUE NOW
+                    </small>
+
+                    <h2 class="text-danger fw-bold">
+                        @Model.DueNowCount
+                    </h2>
+
+                    <span>
+                        Purchase required
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        DUE SOON
+                    </small>
+
+                    <h2 class="text-warning fw-bold">
+                        @Model.DueSoonCount
+                    </h2>
+
+                    <span>
+                        Within 3 days
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        UPCOMING
+                    </small>
+
+                    <h2 class="text-info fw-bold">
+                        @Model.UpcomingCount
+                    </h2>
+
+                    <span>
+                        Within 7 days
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        ANOMALIES
+                    </small>
+
+                    <h2 class="text-secondary fw-bold">
+                        @Model.AnomalyCount
+                    </h2>
+
+                    <span>
+                        Unusual activity
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         PURCHASE RECOMMENDATIONS
+    ====================================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+                🛒 Purchase Recommendations
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            @if (
+                        Model.PurchaseRecommendations.Count == 0)
+            {
+                <div class="alert alert-success">
+                    No purchase recommendations at the moment.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table align-middle">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Product
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Expected Date
+                                </th>
+
+                                <th>
+                                    Time
+                                </th>
+
+                                <th>
+                                    Priority
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (
+                                                    var item
+                                                    in Model.PurchaseRecommendations
+                                                    .OrderBy(
+                                                    x => x.DaysUntilPurchase))
+                            {
+
+                                <tr>
+
+                                    <td>
+
+                                        <strong>
+                                            @item.Product
+                                        </strong>
+
+                                        <br />
+
+                                        <small class="text-muted">
+                                            @item.LatestQuantity units
+                                        </small>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        @if (
+                                                                        item.DaysUntilPurchase <= 0)
+                                        {
+                                            <span class="badge bg-danger">
+                                                PURCHASE NOW
+                                            </span>
+                                        }
+                                        else if (
+                                        item.DaysUntilPurchase <= 3)
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                DUE SOON
+                                            </span>
+                                        }
+                                        else if (
+                                        item.DaysUntilPurchase <= 7)
+                                        {
+                                            <span class="badge bg-info">
+                                                UPCOMING
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">
+                                                OK
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <td>
+                                        @item.ExpectedPurchaseDate
+                                    </td>
+
+
+                                    <td>
+
+                                        @if (
+                                                                        item.DaysUntilPurchase <= 0)
+                                        {
+                                            <strong class="text-danger">
+                                                Overdue
+                                            </strong>
+                                        }
+                                        else
+                                        {
+                                            <strong>
+                                                @item.DaysUntilPurchase days left
+                                            </strong>
+                                        }
+
+                                    </td>
+
+
+                                    <td>
+
+                                        @if (
+                                                                        item.Priority == "HIGH")
+                                        {
+                                            <span class="text-danger">
+                                                ● High
+                                            </span>
+                                        }
+                                        else if (
+                                        item.Priority == "MEDIUM")
+                                        {
+                                            <span class="text-warning">
+                                                ● Medium
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-success">
+                                                ● Normal
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <a asp-controller="SmartTrack"
+                                           asp-action="Prediction"
+                                           class="btn btn-sm btn-outline-primary">
+
+                                            View
+
+                                        </a>
+
+                                    </td>
+
+                                </tr>
+
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <!-- =================================================
+             STOCK
+        ================================================== -->
+
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+                        📦 Stock Getting Low
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    @foreach (
+                                        var item
+                                        in Model.StockItems
+                                        .OrderBy(
+                                        x => x.DaysUntilPurchase))
+                    {
+
+                        <div class="mb-3">
+
+                            <div class="d-flex
+                                            justify-content-between">
+
+                                <strong>
+                                    @item.Product
+                                </strong>
+
+                                <span class="badge bg-@item.StatusClass">
+
+                                    @item.StockStatus
+
+                                </span>
+
+                            </div>
+
+                            <div class="progress mt-2"
+                                 style="height:8px;">
+
+                                @{
+                                    var width =
+                                    Math.Max(
+                                    5,
+                                    Math.Min(
+                                    100,
+                                    item.DaysUntilPurchase
+                                    * 10));
+                                }
+
+                                <div class="progress-bar
+                                                bg-@item.StatusClass"
+                                     style="width:@width%;">
+                                </div>
+
+                            </div>
+
+                            <small class="text-muted">
+
+                                @if (
+                                                            item.DaysUntilPurchase <= 0)
+                                {
+                                    <span>
+                                        Purchase now
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        @item.DaysUntilPurchase
+                                        days remaining
+                                    </span>
+                                }
+
+                            </small>
+
+                        </div>
+
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ALERTS
+        ================================================== -->
+
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm border-0">
+
+                <div class="card-header bg-white">
+
+                    <h5 class="mb-0">
+                        🔔 Recent Alerts
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    @if (
+                                        Model.Notifications.Count == 0)
+                    {
+                        <p class="text-muted">
+                            No recent alerts.
+                        </p>
+                    }
+                    else
+                    {
+                        @foreach (
+                                            var notification
+                                            in Model.Notifications
+                                            .Take(5))
+                        {
+
+                            <div class="border-bottom
+                                                pb-3 mb-3">
+
+                                <strong>
+                                    @notification.ProductName
+                                </strong>
+
+                                <p class="mb-1">
+                                    @notification.Message
+                                </p>
+
+                                <small class="text-muted">
+                                    @notification.CreatedOn
+                                </small>
+
+                            </div>
+
+                        }
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT PURCHASES
+    ====================================================== -->
+
+    <div class="card shadow-sm border-0 mt-4">
+
+        <div class="card-header bg-white">
+
+            <h5 class="mb-0">
+                🧾 Recent Household Purchases
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Product
+                            </th>
+
+                            <th>
+                                Quantity
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Unit Price
+                            </th>
+
+                            <th>
+                                Total
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (
+                                                var purchase
+                                                in Model.RecentPurchases)
+                        {
+
+                            <tr>
+
+                                <td>
+                                    @purchase.Product
+                                </td>
+
+                                <td>
+                                    @purchase.Quantity
+                                </td>
+
+                                <td>
+                                    @purchase.PurchaseDate
+                                </td>
+
+                                <td>
+                                    @purchase.UnitPrice.ToString("0.00")
+                                </td>
+
+                                <td>
+                                    @purchase.TotalPrice.ToString("0.00")
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
