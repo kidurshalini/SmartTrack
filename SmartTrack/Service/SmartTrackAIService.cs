@@ -1,135 +1,4 @@
-﻿//using SmartTrack.Models;
-//using SmartTrack.ViewModel;
-//using System.Text;
-//using System.Text.Json;
-
-//namespace SmartTrack.Services
-//{
-//    public class SmartTrackAIService
-//    {
-//        private readonly HttpClient _httpClient;
-
-
-//        // =====================================================
-//        // CONSTRUCTOR
-//        // =====================================================
-
-//        public SmartTrackAIService(
-//            HttpClient httpClient)
-//        {
-//            _httpClient = httpClient;
-//        }
-
-
-//        // =====================================================
-//        // SEND HOUSEHOLD HISTORY TO PYTHON SMARTTRACK
-//        // =====================================================
-
-//        public async Task<SmartTrackPredictionResponse>
-//            PredictAsync(
-//                string productName,
-//                string? adjustment,
-//                List<SmartTrackPurchaseHistoryDto>
-//                    purchaseHistory)
-//        {
-//            // -------------------------------------------------
-//            // PREPARE REQUEST
-//            // -------------------------------------------------
-
-//            var requestData = new
-//            {
-//                product_name = productName,
-
-//                adjustment = adjustment,
-
-//                purchase_history = purchaseHistory
-//            };
-
-
-//            // -------------------------------------------------
-//            // SERIALIZE JSON
-//            // -------------------------------------------------
-
-//            var json =
-//                JsonSerializer.Serialize(
-//                    requestData,
-//                    new JsonSerializerOptions
-//                    {
-//                        PropertyNamingPolicy =
-//                            JsonNamingPolicy.CamelCase
-//                    });
-
-
-//            // -------------------------------------------------
-//            // CREATE HTTP CONTENT
-//            // -------------------------------------------------
-
-//            var content =
-//                new StringContent(
-//                    json,
-//                    Encoding.UTF8,
-//                    "application/json");
-
-
-//            // -------------------------------------------------
-//            // CALL FLASK API
-//            // -------------------------------------------------
-
-//            var response =
-//                await _httpClient.PostAsync(
-//                    "api/smarttrack/predict",
-//                    content);
-
-
-//            // -------------------------------------------------
-//            // READ RESPONSE
-//            // -------------------------------------------------
-
-//            var responseBody =
-//                await response.Content
-//                    .ReadAsStringAsync();
-
-
-//            // -------------------------------------------------
-//            // HANDLE ERROR
-//            // -------------------------------------------------
-
-//            if (!response.IsSuccessStatusCode)
-//            {
-//                throw new Exception(
-//                    $"SmartTrack AI returned " +
-//                    $"{(int)response.StatusCode}: " +
-//                    $"{responseBody}");
-//            }
-
-
-//            // -------------------------------------------------
-//            // DESERIALIZE
-//            // -------------------------------------------------
-
-//            var result =
-//                JsonSerializer.Deserialize
-//                <SmartTrackPredictionResponse>(
-//                    responseBody,
-//                    new JsonSerializerOptions
-//                    {
-//                        PropertyNameCaseInsensitive = true
-//                    });
-
-
-//            if (result == null)
-//            {
-//                throw new Exception(
-//                    "Unable to deserialize SmartTrack AI response.");
-//            }
-
-
-//            return result;
-//        }
-//    }
-//}
-using SmartTrack.Models;
-using SmartTrack.ViewModel;
+﻿using SmartTrack.Models;
 using System.Text;
 using System.Text.Json;
 
@@ -139,11 +8,6 @@ namespace SmartTrack.Services
     {
         private readonly HttpClient _httpClient;
 
-
-        // =====================================================
-        // CONSTRUCTOR
-        // =====================================================
-
         public SmartTrackAIService(
             HttpClient httpClient)
         {
@@ -151,9 +15,9 @@ namespace SmartTrack.Services
         }
 
 
-        // =====================================================
-        // SEND HOUSEHOLD HISTORY TO PYTHON SMARTTRACK
-        // =====================================================
+        // =========================================================
+        // SEND PURCHASE HISTORY TO PYTHON
+        // =========================================================
 
         public async Task<SmartTrackPredictionResponse>
             PredictAsync(
@@ -162,23 +26,43 @@ namespace SmartTrack.Services
                 List<SmartTrackPurchaseHistoryDto>
                     purchaseHistory)
         {
-            // -------------------------------------------------
-            // PREPARE REQUEST
-            // -------------------------------------------------
+            if (string.IsNullOrWhiteSpace(productName))
+            {
+                throw new ArgumentException(
+                    "Product name is required.",
+                    nameof(productName));
+            }
+
+            if (purchaseHistory == null ||
+                purchaseHistory.Count == 0)
+            {
+                throw new ArgumentException(
+                    "Purchase history is required.",
+                    nameof(purchaseHistory));
+            }
+
+
+            // -----------------------------------------------------
+            // REQUEST
+            // -----------------------------------------------------
 
             var requestData = new
             {
-                product_name = productName,
+                product_name = productName.Trim(),
 
-                adjustment = adjustment,
+                adjustment =
+                    string.IsNullOrWhiteSpace(adjustment)
+                        ? "MEDIUM"
+                        : adjustment,
 
-                purchase_history = purchaseHistory
+                purchase_history =
+                    purchaseHistory
             };
 
 
-            // -------------------------------------------------
-            // SERIALIZE JSON
-            // -------------------------------------------------
+            // -----------------------------------------------------
+            // JSON
+            // -----------------------------------------------------
 
             var json =
                 JsonSerializer.Serialize(
@@ -190,20 +74,16 @@ namespace SmartTrack.Services
                     });
 
 
-            // -------------------------------------------------
-            // CREATE HTTP CONTENT
-            // -------------------------------------------------
-
-            var content =
+            using var content =
                 new StringContent(
                     json,
                     Encoding.UTF8,
                     "application/json");
 
 
-            // -------------------------------------------------
-            // CALL FLASK API
-            // -------------------------------------------------
+            // -----------------------------------------------------
+            // PYTHON API
+            // -----------------------------------------------------
 
             var response =
                 await _httpClient.PostAsync(
@@ -211,31 +91,31 @@ namespace SmartTrack.Services
                     content);
 
 
-            // -------------------------------------------------
-            // READ RESPONSE
-            // -------------------------------------------------
+            // -----------------------------------------------------
+            // RESPONSE BODY
+            // -----------------------------------------------------
 
             var responseBody =
                 await response.Content
                     .ReadAsStringAsync();
 
 
-            // -------------------------------------------------
-            // HANDLE ERROR
-            // -------------------------------------------------
+            // -----------------------------------------------------
+            // ERROR
+            // -----------------------------------------------------
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception(
+                throw new HttpRequestException(
                     $"SmartTrack AI returned " +
                     $"{(int)response.StatusCode}: " +
                     $"{responseBody}");
             }
 
 
-            // -------------------------------------------------
+            // -----------------------------------------------------
             // DESERIALIZE
-            // -------------------------------------------------
+            // -----------------------------------------------------
 
             var result =
                 JsonSerializer.Deserialize

@@ -102,6 +102,79 @@ namespace SmartTrack.Models
             builder.Entity<ShoppingListItem>()
     .Property(x => x.Quantity)
     .HasPrecision(10, 2);
+
+
+            // =====================================================
+            // STOCK STATE
+            // =====================================================
+
+            builder.Entity<SmartTrackStockState>()
+                .HasIndex(x => new
+                {
+                    x.HouseholdId,
+                    x.ProductName
+                })
+                .IsUnique();
+
+            builder.Entity<SmartTrackStockState>()
+                .Property(x => x.CurrentStock)
+                .HasPrecision(18, 4);
+
+            builder.Entity<SmartTrackStockState>()
+                .Property(x => x.NormalDailyConsumption)
+                .HasPrecision(18, 6);
+
+            builder.Entity<SmartTrackStockState>()
+                .Property(x => x.LastPurchaseQuantity)
+                .HasPrecision(18, 4);
+
+
+            // =====================================================
+            // DAILY USAGE
+            // =====================================================
+
+            builder.Entity<SmartTrackDailyUsage>()
+                .HasIndex(x => new
+                {
+                    x.HouseholdId,
+                    x.ProductName,
+                    x.UsageDate
+                })
+                .IsUnique();
+
+            builder.Entity<SmartTrackDailyUsage>()
+                .Property(x => x.AdjustmentFactor)
+                .HasPrecision(10, 4);
+
+            builder.Entity<SmartTrackDailyUsage>()
+                .Property(x => x.NormalUsage)
+                .HasPrecision(18, 6);
+
+            builder.Entity<SmartTrackDailyUsage>()
+                .Property(x => x.ActualUsage)
+                .HasPrecision(18, 6);
+
+            builder.Entity<SmartTrackDailyUsage>()
+                .Property(x => x.StockBefore)
+                .HasPrecision(18, 4);
+
+            builder.Entity<SmartTrackDailyUsage>()
+                .Property(x => x.StockAfter)
+                .HasPrecision(18, 4);
+
+
+            // =====================================================
+            // USER ADJUSTMENT
+            // =====================================================
+
+            builder.Entity<SmartTrackStockAdjustment>()
+                .HasIndex(x => new
+                {
+                    x.HouseholdId,
+                    x.ProductName,
+                    x.AdjustmentDate
+                })
+                .IsUnique();
         }
 
 
@@ -124,5 +197,17 @@ namespace SmartTrack.Models
 
         public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
 
+
+        public DbSet<SmartTrackStockState>
+        SmartTrackStockStates
+        { get; set; }
+
+        public DbSet<SmartTrackDailyUsage>
+            SmartTrackDailyUsages
+        { get; set; }
+
+        public DbSet<SmartTrackStockAdjustment>
+            SmartTrackStockAdjustments
+        { get; set; }
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmartTrack.Common;
 using SmartTrack.Models;
+
 using SmartTrack.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -92,6 +93,10 @@ builder.Services.AddScoped<SmartTrackPurchaseHistoryService>();
 builder.Services.AddScoped<SmartTrackNotificationService>();
 builder.Services.AddScoped<SmartTrackDashboardService>();
 builder.Services.AddScoped<ShoppingListService>();
+builder.Services.AddScoped<SmartTrackStockBackgroundService>();
+
+
+builder.Services.AddScoped<SmartTrackStockService>();
 // Add services
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();

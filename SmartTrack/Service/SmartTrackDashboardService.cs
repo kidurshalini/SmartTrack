@@ -1,783 +1,876 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using SmartTrack.Models;
-using SmartTrack.ViewModel;
 using System.Globalization;
 
 namespace SmartTrack.Services
 {
-    public class SmartTrackDashboardService
+    public class SmartTrackStockService
     {
         private readonly ApplicationDbContext _context;
 
-        private readonly SmartTrackPurchaseHistoryService
-            _purchaseHistoryService;
+        // =========================================================
+        // CONSUMPTION FACTORS
+        // =========================================================
 
-        private readonly SmartTrackAIService
-            _aiService;
+        private const decimal NORMAL_FACTOR = 1.0m;
+        private const decimal HIGH_FACTOR = 1.5m;
+        private const decimal MEDIUM_FACTOR = 1.0m;
+        private const decimal LOW_FACTOR = 0.5m;
+        private const decimal UNUSED_FACTOR = 0.0m;
 
-        private readonly SmartTrackNotificationService
-            _notificationService;
-
-
-        // =====================================================
+        // =========================================================
         // CONSTRUCTOR
-        // =====================================================
+        // =========================================================
 
-        public SmartTrackDashboardService(
-            ApplicationDbContext context,
-            SmartTrackPurchaseHistoryService purchaseHistoryService,
-            SmartTrackAIService aiService,
-            SmartTrackNotificationService notificationService)
+        public SmartTrackStockService(
+            ApplicationDbContext context)
         {
-            _context =
-                context;
-
-            _purchaseHistoryService =
-                purchaseHistoryService;
-
-            _aiService =
-                aiService;
-
-            _notificationService =
-                notificationService;
+            _context = context;
         }
 
+        // =========================================================
+        // GET STOCK
+        // =========================================================
 
-        // =====================================================
-        // GET DASHBOARD
-        // =====================================================
-
-        public async Task<SmartTrackDashboardViewModel>
-            GetDashboardAsync(string userId)
+        public async Task<SmartTrackStockState?> GetStockAsync(
+            Guid householdId,
+            string productName)
         {
-            // =================================================
-            // 1. FIND USER HOUSEHOLD
-            // =================================================
-
-            var userHousehold =
-                await _context.UserHouseHoldDetails
-                    .FirstOrDefaultAsync(x =>
-                        x.UserId == userId);
-
-
-            if (userHousehold == null)
-            {
-                throw new Exception(
-                    "User is not connected to a household.");
-            }
-
-
-            Guid householdId =
-                userHousehold.HouseHoldId;
-
-
-            // =================================================
-            // 2. GET USER
-            // =================================================
-
-            var user =
-                await _context.Users
-                    .FirstOrDefaultAsync(x =>
-                        x.Id == userId);
-
-
-            // =================================================
-            // 3. CREATE DASHBOARD MODEL
-            // =================================================
-
-            var model =
-                new SmartTrackDashboardViewModel
-                {
-                    UserName =
-                        user?.UserName ?? "User"
-                };
-
-
-            // =================================================
-            // 4. GET PURCHASE HISTORY
-            // =================================================
-
-            var history =
-                await _purchaseHistoryService
-                    .GetHouseholdPurchaseHistoryAsync(
-                        userId,
-                        householdId);
-
-
-            // =================================================
-            // 5. GET UNIQUE PRODUCTS
-            // =================================================
-
-            var products =
-                history
-                    .Select(x => x.ProductName)
-                    .Where(x =>
-                        !string.IsNullOrWhiteSpace(x))
-                    .Distinct(
-                        StringComparer.OrdinalIgnoreCase)
-                    .ToList();
-
-
-            // =================================================
-            // 6. PROCESS PRODUCTS
-            // =================================================
-
-            foreach (var product in products)
-            {
-                // ---------------------------------------------
-                // PRODUCT HISTORY
-                // ---------------------------------------------
-
-                var productHistory =
-                    history
-                        .Where(x =>
-                            string.Equals(
-                                x.ProductName,
-                                product,
-                                StringComparison.OrdinalIgnoreCase))
-                        .OrderBy(x =>
-                            ParseDate(x.PurchaseDate))
-                        .ToList();
-
-
-                if (!productHistory.Any())
-                {
-                    continue;
-                }
-
-
-                // ---------------------------------------------
-                // AI PREDICTION
-                // ---------------------------------------------
-
-                SmartTrackPredictionResponse? result;
-
-
-                try
-                {
-                    result =
-                        await _aiService.PredictAsync(
-                            product,
-                            "MEDIUM",
-                            productHistory);
-                }
-                catch (Exception)
-                {
-                    continue;
-                }
-
-
-                if (result == null)
-                {
-                    continue;
-                }
-
-
-                // ---------------------------------------------
-                // SAFE VALUES
-                // ---------------------------------------------
-
-                string productName =
-                    string.IsNullOrWhiteSpace(
-                        result.Product)
-                            ? product
-                            : result.Product;
-
-
-                double latestQuantity =
-                    result.LatestQuantity ?? 0;
-
-
-                int daysUntilPurchase =
-                    result.DaysUntilPurchase ?? 0;
-
-
-                // =================================================
-                // PURCHASE RECOMMENDATION
-                // =================================================
-
-                var recommendation =
-                    new PurchaseRecommendationViewModel
-                    {
-                        Product =
-                            productName,
-
-                        LatestQuantity =
-                            latestQuantity,
-
-                        LastPurchaseDate =
-                            FormatDate(
-                                result.LastPurchaseDate),
-
-                        ExpectedPurchaseDate =
-                            FormatDate(
-                                result.ExpectedPurchaseDate),
-
-                        DaysUntilPurchase =
-                            daysUntilPurchase,
-
-                        Status =
-                            string.IsNullOrWhiteSpace(
-                                result.Status)
-                                    ? "NORMAL"
-                                    : result.Status,
-
-                        Recommendation =
-                            result.Recommendation
-                            ?? string.Empty,
-
-                        Anomaly =
-                            result.Anomaly,
-
-                        AnomalyStatus =
-                            result.AnomalyStatus
-                            ?? "NORMAL",
-
-                        AnomalyScore =
-                            result.AnomalyScore ?? 0,
-
-                        Priority =
-                            GetPriority(
-                                daysUntilPurchase)
-                    };
-
-
-                model.PurchaseRecommendations
-                    .Add(recommendation);
-
-
-                // =================================================
-                // STOCK STATUS
-                // =================================================
-
-                var stock =
-                    new StockStatusViewModel
-                    {
-                        Product =
-                            productName,
-
-                        LatestQuantity =
-                            latestQuantity,
-
-                        AdaptiveConsumption =
-                            result.AdaptiveConsumption ?? 0,
-
-                        AdaptiveIntervalDays =
-                            result.AdaptiveIntervalDays ?? 0,
-
-                        DaysUntilPurchase =
-                            daysUntilPurchase,
-
-                        StockStatus =
-                            GetStockStatus(
-                                daysUntilPurchase),
-
-                        StatusClass =
-                            GetStockClass(
-                                daysUntilPurchase)
-                    };
-
-
-                model.StockItems
-                    .Add(item: stock);
-
-
-                // =================================================
-                // COUNTS
-                // =================================================
-
-                if (daysUntilPurchase <= 0)
-                {
-                    model.DueNowCount++;
-                }
-                else if (daysUntilPurchase <= 3)
-                {
-                    model.DueSoonCount++;
-                }
-                else if (daysUntilPurchase <= 7)
-                {
-                    model.UpcomingCount++;
-                }
-
-
-                // =================================================
-                // STOCK LOW
-                // =================================================
-
-                if (daysUntilPurchase <= 7)
-                {
-                    model.StockGettingLowCount++;
-                }
-
-
-                // =================================================
-                // ANOMALY
-                // =================================================
-
-                if (result.Anomaly)
-                {
-                    model.AnomalyCount++;
-                }
-
-
-                // =================================================
-                // NOTIFICATIONS
-                // =================================================
-
-                await CreateAlertsAsync(
-                    userId,
-                    householdId,
-                    result,
-                    productName);
-            }
-
-
-            // =====================================================
-            // IMPORTANT:
-            // AUTOMATIC SHOPPING LIST CREATION
-            // =====================================================
-
-            await SyncShoppingListAsync(
-                userId,
-                householdId,
-                model.PurchaseRecommendations);
-
-
-            // =====================================================
-            // GET NOTIFICATIONS
-            // =====================================================
-
-            var notifications =
-                await _notificationService
-                    .GetNotificationsAsync(
-                        userId,
-                        householdId);
-
-
-            model.Notifications =
-                notifications
-                    .Select(x =>
-                        new SmartTrackNotificationViewModel
-                        {
-                            NotificationId =
-                                x.NotificationId,
-
-                            ProductName =
-                                x.ProductName,
-
-                            NotificationType =
-                                x.NotificationType,
-
-                            Message =
-                                x.Message,
-
-                            IsRead =
-                                x.IsRead,
-
-                            CreatedOn =
-                                x.CreatedOn
-                        })
-                    .ToList();
-
-
-            // =====================================================
-            // RECENT PURCHASES
-            // =====================================================
-
-            model.RecentPurchases =
-                history
-                    .OrderByDescending(x =>
-                        ParseDate(
-                            x.PurchaseDate))
-                    .Take(10)
-                    .Select(x =>
-                        new RecentPurchaseViewModel
-                        {
-                            Product =
-                                x.ProductName,
-
-                            Quantity =
-                                x.Quantity,
-
-                            PurchaseDate =
-                                FormatDate(
-                                    x.PurchaseDate),
-
-                            UnitPrice =
-                                x.UnitPrice,
-
-                            TotalPrice =
-                                x.TotalPrice,
-
-                            UserId =
-                                x.UserId
-                        })
-                    .ToList();
-
-
-            // =====================================================
-            // RETURN
-            // =====================================================
-
-            return model;
+            productName = productName.Trim();
+
+            return await _context.SmartTrackStockStates
+                .FirstOrDefaultAsync(x =>
+                    x.HouseholdId == householdId &&
+                    x.ProductName.ToLower() ==
+                    productName.ToLower());
         }
 
+        // =========================================================
+        // GET OR CREATE STOCK
+        // =========================================================
 
-        // =====================================================
-        // AUTOMATIC SHOPPING LIST SYNC
-        // =====================================================
-
-        private async Task SyncShoppingListAsync(
+        public async Task<SmartTrackStockState> GetOrCreateStockAsync(
             string userId,
             Guid householdId,
-            List<PurchaseRecommendationViewModel> recommendations)
+            string productName,
+            List<SmartTrackPurchaseHistoryDto> history)
         {
-            if (recommendations == null ||
-                recommendations.Count == 0)
+            productName = productName.Trim();
+
+            var stock = await GetStockAsync(
+                householdId,
+                productName);
+
+            var latestPurchase =
+                GetLatestPurchase(history);
+
+            if (latestPurchase == null)
             {
-                return;
+                if (stock != null)
+                {
+                    return stock;
+                }
+
+                return new SmartTrackStockState
+                {
+                    HouseholdId = householdId,
+                    ProductName = productName,
+                    CurrentStock = 0,
+                    NormalDailyConsumption = 0,
+                    LastProcessedDate = DateTime.Today,
+                    UpdatedAt = DateTime.Now,
+                    LastAdjustmentType = "NORMAL"
+                };
             }
 
+            DateTime purchaseDate =
+                ParseDate(latestPurchase.PurchaseDate)
+                ?? DateTime.Today;
 
-            // =================================================
-            // FIND ACTIVE LIST
-            // =================================================
+            decimal purchaseQuantity =
+                Convert.ToDecimal(latestPurchase.Quantity);
 
-            var shoppingList =
-                await _context.ShoppingLists
-                    .Include(x => x.Items)
-                    .FirstOrDefaultAsync(x =>
-                        x.UserId == userId &&
-                        x.Status == "ACTIVE");
+            // =====================================================
+            // CREATE FIRST STOCK STATE
+            // =====================================================
 
-
-            // =================================================
-            // CREATE LIST
-            // =================================================
-
-            if (shoppingList == null)
+            if (stock == null)
             {
-                shoppingList =
-                    new ShoppingList
-                    {
-                        UserId =
-                            userId,
+                decimal normalUsage =
+                    CalculateNormalDailyConsumption(history);
 
-                        Status =
-                            "ACTIVE",
+                stock = new SmartTrackStockState
+                {
+                    HouseholdId = householdId,
 
-                        CreatedDate =
-                            DateTime.Now,
+                    ProductName = productName,
 
-                        Items =
-                            new List<ShoppingListItem>()
-                    };
+                    CurrentStock = purchaseQuantity,
 
+                    LastPurchaseQuantity =
+                        purchaseQuantity,
 
-                _context.ShoppingLists
-                    .Add(shoppingList);
+                    LastPurchaseDate =
+                        purchaseDate,
 
+                    NormalDailyConsumption =
+                        normalUsage,
+
+                    LastProcessedDate =
+                        purchaseDate,
+
+                    LastAdjustmentType =
+                        "NORMAL",
+
+                    LastAdjustmentDate =
+                        null,
+
+                    UpdatedAt =
+                        DateTime.Now
+                };
+
+                _context.SmartTrackStockStates.Add(stock);
+
+                await _context.SaveChangesAsync();
+
+                return stock;
+            }
+
+            // =====================================================
+            // CHECK FOR NEW PURCHASE
+            // =====================================================
+
+            DateTime existingPurchaseDate =
+                stock.LastPurchaseDate;
+
+            if (purchaseDate > existingPurchaseDate)
+            {
+                stock.CurrentStock =
+                    purchaseQuantity;
+
+                stock.LastPurchaseQuantity =
+                    purchaseQuantity;
+
+                stock.LastPurchaseDate =
+                    purchaseDate;
+
+                stock.LastProcessedDate =
+                    purchaseDate;
+
+                stock.NormalDailyConsumption =
+                    CalculateNormalDailyConsumption(history);
+
+                stock.LastAdjustmentType =
+                    "NORMAL";
+
+                stock.LastAdjustmentDate =
+                    null;
+
+                stock.UpdatedAt =
+                    DateTime.Now;
 
                 await _context.SaveChangesAsync();
             }
 
+            return stock;
+        }
 
-            // =================================================
-            // SYNC RECOMMENDATIONS
-            // =================================================
+        // =========================================================
+        // PROCESS STOCK
+        // =========================================================
 
-            foreach (var recommendation
-                in recommendations)
+        public async Task<SmartTrackStockState> ProcessStockAsync(
+            string userId,
+            Guid householdId,
+            string productName,
+            List<SmartTrackPurchaseHistoryDto> history)
+        {
+            var stock =
+                await GetOrCreateStockAsync(
+                    userId,
+                    householdId,
+                    productName,
+                    history);
+
+            if (stock.LastPurchaseDate == DateTime.MinValue)
             {
-                if (string.IsNullOrWhiteSpace(
-                    recommendation.Product))
-                {
-                    continue;
-                }
-
-
-                string product =
-                    recommendation.Product.Trim();
-
-
-                // ---------------------------------------------
-                // FIND EXISTING ITEM
-                // ---------------------------------------------
-
-                var existingItem =
-                    shoppingList.Items
-                        .FirstOrDefault(x =>
-                            x.Product.Equals(
-                                product,
-                                StringComparison.OrdinalIgnoreCase));
-
-
-                // ---------------------------------------------
-                // EXPECTED DATE
-                // ---------------------------------------------
-
-                DateTime? expectedDate = null;
-
-
-                if (!string.IsNullOrWhiteSpace(
-                    recommendation.ExpectedPurchaseDate))
-                {
-                    if (DateTime.TryParse(
-                        recommendation.ExpectedPurchaseDate,
-                        out DateTime parsedDate))
-                    {
-                        expectedDate =
-                            parsedDate;
-                    }
-                }
-
-
-                // =============================================
-                // EXISTING ITEM
-                // =============================================
-
-                if (existingItem != null)
-                {
-                    // -----------------------------------------
-                    // Do not overwrite purchased items
-                    // -----------------------------------------
-
-                    if (!existingItem.IsPurchased)
-                    {
-                        existingItem.Quantity =
-                            Convert.ToDecimal(
-                                recommendation.LatestQuantity);
-
-                        existingItem.Priority =
-                            recommendation.Priority;
-
-                        existingItem.RecommendationStatus =
-                            recommendation.Status;
-
-                        existingItem.ExpectedPurchaseDate =
-                            expectedDate;
-
-                        existingItem.DaysUntilPurchase =
-                            recommendation.DaysUntilPurchase;
-                    }
-
-
-                    continue;
-                }
-
-
-                // =============================================
-                // NEW ITEM
-                // =============================================
-
-                var newItem =
-                    new ShoppingListItem
-                    {
-                        ShoppingListId =
-                            shoppingList.Id,
-
-                        Product =
-                            product,
-
-                        Quantity =
-                            Convert.ToDecimal(
-                                recommendation.LatestQuantity),
-
-                        Priority =
-                            recommendation.Priority,
-
-                        RecommendationStatus =
-                            recommendation.Status,
-
-                        ExpectedPurchaseDate =
-                            expectedDate,
-
-                        DaysUntilPurchase =
-                            recommendation.DaysUntilPurchase,
-
-                        IsPurchased =
-                            false,
-
-                        PurchasedDate =
-                            null
-                    };
-
-
-                _context.ShoppingListItems
-                    .Add(newItem);
+                return stock;
             }
 
+            DateTime today =
+                DateTime.Today;
 
-            // =================================================
-            // SAVE
-            // =================================================
+            DateTime lastProcessedDay =
+                stock.LastProcessedDate.Date;
+
+            // =====================================================
+            // NOTHING TO PROCESS
+            // =====================================================
+
+            if (lastProcessedDay >= today)
+            {
+                return stock;
+            }
+
+            // =====================================================
+            // PROCESS EVERY MISSED DAY
+            // =====================================================
+
+            DateTime processDate =
+                lastProcessedDay.AddDays(1);
+
+            while (processDate <= today)
+            {
+                await ProcessSingleDayAsync(
+                    stock,
+                    processDate);
+
+                processDate =
+                    processDate.AddDays(1);
+            }
+
+            stock.UpdatedAt =
+                DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return stock;
+        }
+
+        // =========================================================
+        // PROCESS ONE DAY
+        // =========================================================
+
+        private async Task ProcessSingleDayAsync(
+            SmartTrackStockState stock,
+            DateTime date)
+        {
+            decimal normalUsage =
+                stock.NormalDailyConsumption;
+
+            // =====================================================
+            // FIND USER'S DAILY BEHAVIOUR
+            // =====================================================
+
+            var adjustment =
+                await _context
+                    .SmartTrackStockAdjustments
+                    .FirstOrDefaultAsync(x =>
+                        x.HouseholdId ==
+                        stock.HouseholdId &&
+
+                        x.ProductName.ToLower() ==
+                        stock.ProductName.ToLower() &&
+
+                        x.AdjustmentDate.Date ==
+                        date.Date);
+
+            string usageType;
+            decimal factor;
+            bool automatic;
+
+            // =====================================================
+            // NO USER ENTRY = NORMAL
+            // =====================================================
+
+            if (adjustment == null)
+            {
+                usageType = "NORMAL";
+                factor = NORMAL_FACTOR;
+                automatic = true;
+            }
+            else
+            {
+                usageType =
+                    adjustment.AdjustmentType
+                        .Trim()
+                        .ToUpperInvariant();
+
+                factor =
+                    GetAdjustmentFactor(
+                        usageType);
+
+                automatic = false;
+            }
+
+            // =====================================================
+            // CALCULATE ACTUAL USAGE
+            // =====================================================
+
+            decimal actualUsage =
+                normalUsage * factor;
+
+            decimal stockBefore =
+                stock.CurrentStock;
+
+            decimal stockAfter =
+                Math.Max(
+                    0,
+                    stockBefore - actualUsage);
+
+            // =====================================================
+            // SAVE DAILY USAGE
+            // =====================================================
+
+            var existingDailyRecord =
+                await _context
+                    .SmartTrackDailyUsages
+                    .FirstOrDefaultAsync(x =>
+                        x.HouseholdId ==
+                        stock.HouseholdId &&
+
+                        x.ProductName.ToLower() ==
+                        stock.ProductName.ToLower() &&
+
+                        x.UsageDate.Date ==
+                        date.Date);
+
+            if (existingDailyRecord == null)
+            {
+                var dailyUsage =
+                    new SmartTrackDailyUsage
+                    {
+                        HouseholdId =
+                            stock.HouseholdId,
+
+                        ProductName =
+                            stock.ProductName,
+
+                        UsageDate =
+                            date.Date,
+
+                        UsageType =
+                            usageType,
+
+                        AdjustmentFactor =
+                            factor,
+
+                        NormalUsage =
+                            normalUsage,
+
+                        ActualUsage =
+                            actualUsage,
+
+                        StockBefore =
+                            stockBefore,
+
+                        StockAfter =
+                            stockAfter,
+
+                        IsAutomatic =
+                            automatic,
+
+                        CreatedAt =
+                            DateTime.Now
+                    };
+
+                _context
+                    .SmartTrackDailyUsages
+                    .Add(dailyUsage);
+            }
+
+            // =====================================================
+            // UPDATE STOCK
+            // =====================================================
+
+            stock.CurrentStock =
+                stockAfter;
+
+            stock.LastProcessedDate =
+                date;
+
+            stock.LastAdjustmentType =
+                usageType;
+
+            stock.LastAdjustmentDate =
+                adjustment?.AdjustmentDate;
+
+            stock.UpdatedAt =
+                DateTime.Now;
+        }
+
+        // =========================================================
+        // SAVE DAILY USER ADJUSTMENT
+        // =========================================================
+
+        public async Task<bool> SetDailyAdjustmentAsync(
+            string userId,
+            Guid householdId,
+            string productName,
+            DateTime date,
+            string adjustmentType)
+        {
+            if (string.IsNullOrWhiteSpace(productName))
+            {
+                return false;
+            }
+
+            adjustmentType =
+                adjustmentType
+                    .Trim()
+                    .ToUpperInvariant();
+
+            if (!IsValidAdjustment(adjustmentType))
+            {
+                return false;
+            }
+
+            // =====================================================
+            // VERIFY USER HOUSEHOLD
+            // =====================================================
+
+            bool householdUser =
+                await _context
+                    .UserHouseHoldDetails
+                    .AnyAsync(x =>
+                        x.UserId == userId &&
+                        x.HouseHoldId == householdId);
+
+            if (!householdUser)
+            {
+                return false;
+            }
+
+            // =====================================================
+            // FIND EXISTING ADJUSTMENT
+            // =====================================================
+
+            var existing =
+                await _context
+                    .SmartTrackStockAdjustments
+                    .FirstOrDefaultAsync(x =>
+                        x.HouseholdId ==
+                        householdId &&
+
+                        x.ProductName.ToLower() ==
+                        productName.Trim().ToLower() &&
+
+                        x.AdjustmentDate.Date ==
+                        date.Date);
+
+            if (existing == null)
+            {
+                existing =
+                    new SmartTrackStockAdjustment
+                    {
+                        HouseholdId =
+                            householdId,
+
+                        UserId =
+                            userId,
+
+                        ProductName =
+                            productName.Trim(),
+
+                        AdjustmentDate =
+                            date.Date,
+
+                        AdjustmentType =
+                            adjustmentType,
+
+                        CreatedAt =
+                            DateTime.Now
+                    };
+
+                _context
+                    .SmartTrackStockAdjustments
+                    .Add(existing);
+            }
+            else
+            {
+                existing.UserId =
+                    userId;
+
+                existing.AdjustmentType =
+                    adjustmentType;
+            }
+
+            await _context.SaveChangesAsync();
+
+            // =====================================================
+            // REBUILD STOCK
+            // =====================================================
+
+            var history =
+                await GetProductHistoryAsync(
+                    householdId,
+                    productName);
+
+            var stock =
+                await GetStockAsync(
+                    householdId,
+                    productName);
+
+            if (stock != null)
+            {
+                await RebuildStockAsync(
+                    stock,
+                    history);
+            }
+
+            return true;
+        }
+
+        // =========================================================
+        // REBUILD STOCK
+        // =========================================================
+
+        private async Task RebuildStockAsync(
+            SmartTrackStockState stock,
+            List<SmartTrackPurchaseHistoryDto> history)
+        {
+            var latestPurchase =
+                GetLatestPurchase(history);
+
+            if (latestPurchase == null)
+            {
+                return;
+            }
+
+            DateTime purchaseDate =
+                ParseDate(
+                    latestPurchase.PurchaseDate)
+                ?? DateTime.Today;
+
+            // =====================================================
+            // RESET TO PURCHASE
+            // =====================================================
+
+            stock.CurrentStock =
+                Convert.ToDecimal(
+                    latestPurchase.Quantity);
+
+            stock.LastPurchaseDate =
+                purchaseDate;
+
+            stock.LastPurchaseQuantity =
+                Convert.ToDecimal(
+                    latestPurchase.Quantity);
+
+            stock.NormalDailyConsumption =
+                CalculateNormalDailyConsumption(
+                    history);
+
+            stock.LastProcessedDate =
+                purchaseDate;
+
+            stock.LastAdjustmentType =
+                "NORMAL";
+
+            stock.LastAdjustmentDate =
+                null;
+
+            stock.UpdatedAt =
+                DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            // =====================================================
+            // REPROCESS EACH DAY
+            // =====================================================
+
+            DateTime processDate =
+                purchaseDate.Date.AddDays(1);
+
+            while (processDate <= DateTime.Today)
+            {
+                await ProcessSingleDayAsync(
+                    stock,
+                    processDate);
+
+                processDate =
+                    processDate.AddDays(1);
+            }
 
             await _context.SaveChangesAsync();
         }
 
+        // =========================================================
+        // NORMAL DAILY CONSUMPTION
+        // =========================================================
 
-        // =====================================================
-        // CREATE ALERTS
-        // =====================================================
+        public decimal CalculateNormalDailyConsumption(
+            List<SmartTrackPurchaseHistoryDto> history)
+        {
+            if (history == null ||
+                history.Count < 2)
+            {
+                return 0;
+            }
 
-        private async Task CreateAlertsAsync(
+            var purchases =
+                history
+                    .Select(x => new
+                    {
+                        Date =
+                            ParseDate(
+                                x.PurchaseDate),
+
+                        Quantity =
+                            Convert.ToDecimal(
+                                x.Quantity)
+                    })
+                    .Where(x =>
+                        x.Date.HasValue &&
+                        x.Quantity > 0)
+                    .OrderBy(x => x.Date)
+                    .ToList();
+
+            if (purchases.Count < 2)
+            {
+                return 0;
+            }
+
+            var usageValues =
+                new List<decimal>();
+
+            for (int i = 1;
+                 i < purchases.Count;
+                 i++)
+            {
+                decimal days =
+                    Convert.ToDecimal(
+                        (
+                            purchases[i].Date!.Value -
+                            purchases[i - 1].Date!.Value
+                        ).TotalDays);
+
+                if (days <= 0)
+                {
+                    continue;
+                }
+
+                decimal previousQuantity =
+                    purchases[i - 1].Quantity;
+
+                if (previousQuantity <= 0)
+                {
+                    continue;
+                }
+
+                decimal usage =
+                    previousQuantity / days;
+
+                usageValues.Add(usage);
+            }
+
+            if (usageValues.Count == 0)
+            {
+                return 0;
+            }
+
+            return Math.Round(
+                usageValues.Average(),
+                6);
+        }
+
+        // =========================================================
+        // GET CURRENT STOCK
+        // =========================================================
+
+        public async Task<decimal> GetCurrentStockAsync(
             string userId,
             Guid householdId,
-            SmartTrackPredictionResponse result,
-            string product)
+            string productName,
+            List<SmartTrackPurchaseHistoryDto> history)
         {
-            int days =
-                result.DaysUntilPurchase ?? 0;
+            var stock =
+                await ProcessStockAsync(
+                    userId,
+                    householdId,
+                    productName,
+                    history);
 
-
-            if (days <= 0)
-            {
-                await _notificationService
-                    .CreateNotificationAsync(
-                        userId,
-                        householdId,
-                        product,
-                        "PURCHASE_DUE",
-                        $"{product} should be purchased now.");
-            }
-            else if (days <= 3)
-            {
-                await _notificationService
-                    .CreateNotificationAsync(
-                        userId,
-                        householdId,
-                        product,
-                        "PURCHASE_SOON",
-                        $"{product} may need to be purchased in {days} days.");
-            }
-            else if (days <= 7)
-            {
-                await _notificationService
-                    .CreateNotificationAsync(
-                        userId,
-                        householdId,
-                        product,
-                        "STOCK_LOW",
-                        $"{product} is getting low and may need to be purchased within {days} days.");
-            }
-
-
-            if (result.Anomaly)
-            {
-                await _notificationService
-                    .CreateNotificationAsync(
-                        userId,
-                        householdId,
-                        product,
-                        "ANOMALY",
-                        $"An unusual purchasing pattern was detected for {product}.");
-            }
+            return stock.CurrentStock;
         }
 
+        // =========================================================
+        // GET STOCK STATE
+        // =========================================================
 
-        // =====================================================
-        // PRIORITY
-        // =====================================================
-
-        private string GetPriority(int days)
+        public async Task<SmartTrackStockState> GetStockStateAsync(
+            string userId,
+            Guid householdId,
+            string productName,
+            List<SmartTrackPurchaseHistoryDto> history)
         {
-            if (days <= 0)
-                return "HIGH";
-
-            if (days <= 3)
-                return "MEDIUM";
-
-            if (days <= 7)
-                return "LOW";
-
-            return "NORMAL";
+            return await ProcessStockAsync(
+                userId,
+                householdId,
+                productName,
+                history);
         }
 
+        // =========================================================
+        // ADJUSTMENT FACTOR
+        // =========================================================
 
-        // =====================================================
-        // STOCK STATUS
-        // =====================================================
-
-        private string GetStockStatus(int days)
+        private decimal GetAdjustmentFactor(
+            string type)
         {
-            if (days <= 0)
-                return "PURCHASE NOW";
+            return type switch
+            {
+                "HIGH" =>
+                    HIGH_FACTOR,
 
-            if (days <= 3)
-                return "VERY LOW";
+                "MEDIUM" =>
+                    MEDIUM_FACTOR,
 
-            if (days <= 7)
-                return "GETTING LOW";
+                "LOW" =>
+                    LOW_FACTOR,
 
-            return "OK";
+                "UNUSED" =>
+                    UNUSED_FACTOR,
+
+                "NORMAL" =>
+                    NORMAL_FACTOR,
+
+                _ =>
+                    NORMAL_FACTOR
+            };
         }
 
+        // =========================================================
+        // VALID ADJUSTMENT
+        // =========================================================
 
-        // =====================================================
-        // STOCK CLASS
-        // =====================================================
-
-        private string GetStockClass(int days)
+        private bool IsValidAdjustment(
+            string type)
         {
-            if (days <= 0)
-                return "danger";
-
-            if (days <= 3)
-                return "warning";
-
-            if (days <= 7)
-                return "info";
-
-            return "success";
+            return type switch
+            {
+                "HIGH" => true,
+                "MEDIUM" => true,
+                "LOW" => true,
+                "UNUSED" => true,
+                "NORMAL" => true,
+                _ => false
+            };
         }
 
+        // =========================================================
+        // LATEST PURCHASE
+        // =========================================================
 
-        // =====================================================
-        // PARSE DATE
-        // =====================================================
+        private SmartTrackPurchaseHistoryDto?
+            GetLatestPurchase(
+                List<SmartTrackPurchaseHistoryDto> history)
+        {
+            return history
+                .Where(x =>
+                    !string.IsNullOrWhiteSpace(
+                        x.PurchaseDate))
+                .OrderByDescending(x =>
+                    ParseDate(
+                        x.PurchaseDate)
+                    ?? DateTime.MinValue)
+                .FirstOrDefault();
+        }
 
-        private DateTime ParseDate(string? value)
+        // =========================================================
+        // GET PRODUCT HISTORY
+        // =========================================================
+
+        private async Task<
+            List<SmartTrackPurchaseHistoryDto>>
+            GetProductHistoryAsync(
+                Guid householdId,
+                string productName)
+        {
+            var householdUsers =
+                await _context
+                    .UserHouseHoldDetails
+                    .Where(x =>
+                        x.HouseHoldId ==
+                        householdId)
+                    .Select(x =>
+                        x.UserId)
+                    .Distinct()
+                    .ToListAsync();
+
+            return await (
+                from item
+                    in _context.ReceiptItems
+
+                join receipt
+                    in _context.Receipts
+                    on item.ReceiptId
+                        equals receipt.ReceiptId
+
+                where
+                    householdUsers.Contains(
+                        receipt.CreatedBy)
+
+                    && item.ItemName != null
+
+                    && item.ItemName.ToLower() ==
+                       productName.Trim().ToLower()
+
+                orderby
+                    receipt.PurchaseDate
+
+                select new SmartTrackPurchaseHistoryDto
+                {
+                    ProductName =
+                        item.ItemName,
+
+                    Quantity =
+                        item.Quantity,
+
+                    PurchaseDate =
+                        receipt.PurchaseDate
+                            .ToString(
+                                "yyyy-MM-ddTHH:mm:ss"),
+
+                    UnitPrice =
+                        (double)item.UnitPrice,
+
+                    TotalPrice =
+                        (double)item.TotalPrice,
+
+                    Category =
+                        "Unknown",
+
+                    UserId =
+                        receipt.CreatedBy,
+
+                    ReceiptId =
+                        receipt.ReceiptId
+                }
+            ).ToListAsync();
+        }
+
+        // =========================================================
+        // DATE PARSER
+        // =========================================================
+
+        private DateTime? ParseDate(
+            string? value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                return DateTime.MinValue;
+                return null;
             }
-
 
             if (DateTime.TryParse(
                 value,
-                out DateTime date))
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var result))
             {
-                return date;
+                return result;
             }
-
-
-            return DateTime.MinValue;
-        }
-
-
-        // =====================================================
-        // FORMAT DATE
-        // =====================================================
-
-        private string FormatDate(string? value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
 
             if (DateTime.TryParse(
                 value,
-                out DateTime date))
+                out result))
             {
-                return date.ToString(
-                    "dd/MM/yyyy");
+                return result;
             }
 
-
-            return value;
+            return null;
         }
     }
 }
+
