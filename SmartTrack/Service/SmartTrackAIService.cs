@@ -16,7 +16,7 @@ namespace SmartTrack.Services
 
 
         // =========================================================
-        // SEND PURCHASE HISTORY TO PYTHON
+        // PYTHON AI PREDICTION
         // =========================================================
 
         public async Task<SmartTrackPredictionResponse>
@@ -33,6 +33,7 @@ namespace SmartTrack.Services
                     nameof(productName));
             }
 
+
             if (purchaseHistory == null ||
                 purchaseHistory.Count == 0)
             {
@@ -42,29 +43,30 @@ namespace SmartTrack.Services
             }
 
 
-            // -----------------------------------------------------
-            // REQUEST
-            // -----------------------------------------------------
+            // =====================================================
+            // REQUEST DATA
+            // =====================================================
 
             var requestData = new
             {
-                product_name = productName.Trim(),
+                product_name =
+                    productName.Trim(),
 
                 adjustment =
                     string.IsNullOrWhiteSpace(adjustment)
                         ? "MEDIUM"
-                        : adjustment,
+                        : adjustment.Trim(),
 
                 purchase_history =
                     purchaseHistory
             };
 
 
-            // -----------------------------------------------------
-            // JSON
-            // -----------------------------------------------------
+            // =====================================================
+            // SERIALIZE
+            // =====================================================
 
-            var json =
+            string json =
                 JsonSerializer.Serialize(
                     requestData,
                     new JsonSerializerOptions
@@ -81,41 +83,46 @@ namespace SmartTrack.Services
                     "application/json");
 
 
-            // -----------------------------------------------------
-            // PYTHON API
-            // -----------------------------------------------------
+            // =====================================================
+            // CALL PYTHON API
+            // =====================================================
 
-            var response =
+            using var response =
                 await _httpClient.PostAsync(
                     "api/smarttrack/predict",
                     content);
 
 
-            // -----------------------------------------------------
-            // RESPONSE BODY
-            // -----------------------------------------------------
-
-            var responseBody =
+            string responseBody =
                 await response.Content
                     .ReadAsStringAsync();
 
 
-            // -----------------------------------------------------
-            // ERROR
-            // -----------------------------------------------------
+            // =====================================================
+            // API ERROR
+            // =====================================================
 
             if (!response.IsSuccessStatusCode)
             {
                 throw new HttpRequestException(
                     $"SmartTrack AI returned " +
-                    $"{(int)response.StatusCode}: " +
-                    $"{responseBody}");
+                    $"{(int)response.StatusCode} " +
+                    $"{response.ReasonPhrase}. " +
+                    $"Response: {responseBody}");
             }
 
 
-            // -----------------------------------------------------
+            if (string.IsNullOrWhiteSpace(
+                responseBody))
+            {
+                throw new Exception(
+                    "SmartTrack AI returned an empty response.");
+            }
+
+
+            // =====================================================
             // DESERIALIZE
-            // -----------------------------------------------------
+            // =====================================================
 
             var result =
                 JsonSerializer.Deserialize
@@ -123,7 +130,8 @@ namespace SmartTrack.Services
                     responseBody,
                     new JsonSerializerOptions
                     {
-                        PropertyNameCaseInsensitive = true
+                        PropertyNameCaseInsensitive =
+                            true
                     });
 
 
@@ -131,6 +139,18 @@ namespace SmartTrack.Services
             {
                 throw new Exception(
                     "Unable to deserialize SmartTrack AI response.");
+            }
+
+
+            // =====================================================
+            // ENSURE PRODUCT NAME
+            // =====================================================
+
+            if (string.IsNullOrWhiteSpace(
+                result.Product))
+            {
+                result.Product =
+                    productName.Trim();
             }
 
 

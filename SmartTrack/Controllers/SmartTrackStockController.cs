@@ -19,9 +19,11 @@ namespace SmartTrack.Controllers
         private readonly SmartTrackStockService
             _stockService;
 
+
         public SmartTrackStockController(
             UserManager<ApplicationUser> userManager,
-            SmartTrackPurchaseHistoryService purchaseHistoryService,
+            SmartTrackPurchaseHistoryService
+                purchaseHistoryService,
             SmartTrackStockService stockService)
         {
             _userManager =
@@ -33,6 +35,46 @@ namespace SmartTrack.Controllers
             _stockService =
                 stockService;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+
+if (user == null)
+            {
+                return Challenge();
+            }
+
+            try
+            {
+                var dashboard =
+                    await new SmartTrackDashboardService(
+                        HttpContext.RequestServices
+                            .GetRequiredService<ApplicationDbContext>(),
+                        _purchaseHistoryService,
+                        HttpContext.RequestServices
+                            .GetRequiredService<SmartTrackAIService>(),
+                        HttpContext.RequestServices
+                            .GetRequiredService<SmartTrackNotificationService>(),
+                        _stockService)
+                        .GetDashboardAsync(user.Id);
+
+                return View(dashboard);
+            }
+            catch
+            {
+                return View(
+                    new SmartTrackDashboardViewModel
+                    {
+                        UserName = user.UserName ?? "User"
+                    });
+            }
+
+
+}
+
 
         // =========================================================
         // SAVE DAILY BEHAVIOUR
@@ -46,25 +88,38 @@ namespace SmartTrack.Controllers
                 string adjustmentType,
                 DateTime? date)
         {
-            if (string.IsNullOrWhiteSpace(productName))
+            if (string.IsNullOrWhiteSpace(
+                productName))
             {
                 return BadRequest(
                     "Product name is required.");
             }
 
+
+            if (string.IsNullOrWhiteSpace(
+                adjustmentType))
+            {
+                return BadRequest(
+                    "Adjustment type is required.");
+            }
+
+
             var user =
                 await _userManager
                     .GetUserAsync(User);
+
 
             if (user == null)
             {
                 return Challenge();
             }
 
+
             var household =
                 await _purchaseHistoryService
                     .GetUserHouseholdAsync(
                         user.Id);
+
 
             if (household == null)
             {
@@ -72,23 +127,27 @@ namespace SmartTrack.Controllers
                     "Household was not found.");
             }
 
+
             DateTime adjustmentDate =
                 (date ?? DateTime.Today).Date;
+
 
             bool success =
                 await _stockService
                     .SetDailyAdjustmentAsync(
                         user.Id,
                         household.HouseHoldId,
-                        productName,
+                        productName.Trim(),
                         adjustmentDate,
-                        adjustmentType);
+                        adjustmentType.Trim());
+
 
             if (!success)
             {
                 return BadRequest(
                     "Invalid stock adjustment.");
             }
+
 
             return RedirectToAction(
                 "Index",

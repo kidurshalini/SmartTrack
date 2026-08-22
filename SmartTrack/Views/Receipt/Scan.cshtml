@@ -4,685 +4,1321 @@
     ViewData["Title"] = "Scan Receipt";
 }
 
-<div class="container py-5">
+<style>
+    /* =========================================================
+           SMARTTRACK SCAN RECEIPT PAGE
+           ========================================================= */
 
-    <!-- =====================================================
-         PAGE HEADER
-    ====================================================== -->
-
-    <div class="text-center mb-4">
-
-        <h2 class="fw-bold text-success">
-
-            <i class="bi bi-receipt"></i>
-
-            Scan Receipt
-
-        </h2>
-
-        <p class="text-muted">
-
-            Upload your receipt and let SmartTrack automatically
-            extract the purchase details.
-
-        </p>
-
-    </div>
-
-
-    <!-- =====================================================
-         SUCCESS MESSAGE
-    ====================================================== -->
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm"
-             role="alert">
-
-            <i class="bi bi-check-circle-fill me-2"></i>
-
-            <strong>Success!</strong>
-
-            @TempData["SuccessMessage"]
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
-
-        </div>
+    .scan-page {
+        width: 100%;
+        max-width: 1250px;
+        margin: 0 auto;
     }
 
+    /* =========================================================
+           PAGE HEADER
+           ========================================================= */
 
-    <!-- =====================================================
-         UPLOAD CARD
-    ====================================================== -->
+    .scan-page-header {
+        margin-bottom: 28px;
+    }
 
-    <div class="card shadow-sm border-0 rounded-4 mb-4">
+    .scan-page-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 30px;
+        font-weight: 700;
+        color: #198754;
+        margin-bottom: 8px;
+    }
 
-        <div class="card-body p-4">
+    .scan-page-title-icon {
+        width: 46px;
+        height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #198754, #157347);
+        color: #fff;
+        font-size: 21px;
+        box-shadow: 0 6px 18px rgba(25, 135, 84, 0.25);
+    }
 
-            <h5 class="fw-bold mb-3">
+    .scan-page-description {
+        max-width: 650px;
+        margin: 0 auto;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
 
-                <i class="bi bi-cloud-upload text-success me-2"></i>
+    /* =========================================================
+           COMMON CARD
+           ========================================================= */
 
-                Upload Receipt
+    .scan-card {
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
 
-            </h5>
+        .scan-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+    .scan-card-body {
+        padding: 28px;
+    }
+
+    /* =========================================================
+           CARD SECTION HEADER
+           ========================================================= */
+
+    .scan-section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .scan-section-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e8f5ee;
+        color: #198754;
+        font-size: 18px;
+    }
+
+    .scan-section-title {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .scan-section-subtitle {
+        margin: 3px 0 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    /* =========================================================
+           SUCCESS ALERT
+           ========================================================= */
+
+    .scan-success-alert {
+        border: none;
+        border-left: 4px solid #198754;
+        background: #ecfdf3;
+        color: #166534;
+        border-radius: 14px;
+        padding: 14px 17px;
+        box-shadow: 0 3px 12px rgba(25, 135, 84, 0.08);
+    }
+
+        .scan-success-alert .btn-close {
+            font-size: 11px;
+        }
+
+    /* =========================================================
+           UPLOAD AREA
+           ========================================================= */
+
+    .receipt-upload-box {
+        border: 2px dashed #8ac9a6;
+        border-radius: 18px;
+        background: linear-gradient( 135deg, #f8fffa 0%, #f1fbf5 100% );
+        padding: 35px 25px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+        .receipt-upload-box:hover {
+            border-color: #198754;
+            background: #effaf2;
+            transform: translateY(-1px);
+        }
+
+    .upload-icon-wrapper {
+        width: 74px;
+        height: 74px;
+        margin: 0 auto 15px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #dff4e7;
+        color: #198754;
+        font-size: 34px;
+    }
+
+    .upload-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 5px;
+    }
+
+    .upload-description {
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .receipt-file-input {
+        max-width: 600px;
+        margin: auto;
+        background: #fff;
+        border: 1px solid #dbe3e8;
+        border-radius: 12px;
+        padding: 10px;
+        font-size: 13px;
+    }
+
+        .receipt-file-input:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.12);
+        }
+
+    /* =========================================================
+           BUTTONS
+           ========================================================= */
+
+    .scan-action-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        margin-top: 22px;
+        flex-wrap: wrap;
+    }
+
+    .scan-btn {
+        min-width: 180px;
+        padding: 11px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.25s ease;
+    }
+
+        .scan-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .scan-btn-success {
+        background: #198754;
+        border-color: #198754;
+        box-shadow: 0 5px 15px rgba(25, 135, 84, 0.2);
+    }
+
+        .scan-btn-success:hover {
+            background: #157347;
+            border-color: #157347;
+        }
+
+    .scan-btn-primary {
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.15);
+    }
+
+    /* =========================================================
+           RESULT HEADER
+           ========================================================= */
+
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    .result-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .result-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        border-radius: 13px;
+        background: #e8f5ee;
+        color: #198754;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+    }
+
+    .result-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .result-description {
+        color: #64748b;
+        font-size: 13px;
+        margin: 4px 0 0;
+    }
+
+    .items-count-badge {
+        background: #198754;
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* =========================================================
+           PURCHASE DATE
+           ========================================================= */
+
+    .purchase-date-box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        padding: 16px 18px;
+        margin-bottom: 24px;
+        border-radius: 14px;
+        background: #f8fafc;
+        border: 1px solid #e8edf2;
+    }
+
+    .purchase-date-label {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: #475569;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+        .purchase-date-label i {
+            color: #198754;
+        }
+
+    .purchase-date-value {
+        color: #0f172a;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    /* =========================================================
+           RECEIPT TABLE
+           ========================================================= */
+
+    .receipt-table-wrapper {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .receipt-table {
+        margin: 0;
+        width: 100%;
+    }
+
+        .receipt-table thead th {
+            background: #e8f5ee;
+            color: #14532d;
+            border-bottom: 1px solid #cfe8d9;
+            padding: 13px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .receipt-table tbody td {
+            padding: 13px 12px;
+            border-color: #eef1f3;
+            color: #334155;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .receipt-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+            .receipt-table tbody tr:hover {
+                background: #f8fcf9;
+            }
+
+        .receipt-table tfoot td,
+        .receipt-table tfoot th {
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+            padding: 16px 12px;
+        }
+
+    .product-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .quantity-badge {
+        display: inline-flex;
+        min-width: 42px;
+        justify-content: center;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: #e8f5ee;
+        color: #198754;
+        font-weight: 700;
+        font-size: 12px;
+    }
+
+    .unit-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #f1f5f9;
+        color: #475569;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    .price-text {
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .total-price-text {
+        font-weight: 700;
+        color: #198754;
+    }
+
+    .grand-total-label {
+        font-size: 14px;
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .grand-total {
+        font-size: 17px;
+        font-weight: 800;
+        color: #198754;
+    }
+
+    /* =========================================================
+           SAVE AREA
+           ========================================================= */
+
+    .save-receipt-area {
+        display: flex;
+        justify-content: center;
+        padding-top: 24px;
+    }
+
+    .save-receipt-btn {
+        min-width: 200px;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        box-shadow: 0 5px 15px rgba(13, 110, 253, 0.15);
+        transition: all 0.25s ease;
+    }
+
+        .save-receipt-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    /* =========================================================
+           MOBILE RESULT ITEMS
+           ========================================================= */
+
+    .mobile-items {
+        display: none;
+    }
+
+    .mobile-item-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 15px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .mobile-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 12px;
+        margin-bottom: 5px;
+        border-bottom: 1px solid #eef1f3;
+    }
+
+    .mobile-item-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #198754;
+        word-break: break-word;
+    }
+
+    .mobile-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 9px 0;
+        border-bottom: 1px solid #f1f3f5;
+    }
+
+        .mobile-info-row:last-child {
+            border-bottom: none;
+        }
+
+    .mobile-info-label {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .mobile-info-value {
+        color: #334155;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: right;
+        word-break: break-word;
+    }
+
+    /* =========================================================
+           EMPTY / GENERAL
+           ========================================================= */
+
+    .scan-spacing {
+        margin-bottom: 24px;
+    }
+
+    /* =========================================================
+           TABLET
+           ========================================================= */
+
+    @@media (max-width: 992px) {
+
+        .scan-page {
+            max-width: 100%;
+        }
+
+        .scan-card-body {
+            padding: 22px;
+        }
+
+        .scan-page-title {
+            font-size: 27px;
+        }
+
+        .receipt-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .receipt-table {
+            min-width: 760px;
+        }
+    }
+
+    /* =========================================================
+           MOBILE
+           ========================================================= */
+
+    @@media (max-width: 767px) {
+
+        .scan-page {
+            padding: 0 2px;
+        }
+
+        .scan-page-header {
+            margin-bottom: 22px;
+        }
+
+        .scan-page-title {
+            font-size: 23px;
+        }
+
+        .scan-page-title-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 18px;
+        }
+
+        .scan-page-description {
+            font-size: 13px;
+            padding: 0 8px;
+        }
+
+        .scan-card {
+            border-radius: 17px;
+        }
+
+        .scan-card-body {
+            padding: 17px;
+        }
+
+        .scan-section-header {
+            margin-bottom: 17px;
+        }
+
+        .scan-section-icon {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            font-size: 16px;
+        }
+
+        .scan-section-title {
+            font-size: 17px;
+        }
+
+        .receipt-upload-box {
+            padding: 25px 15px;
+            border-radius: 15px;
+        }
+
+        .upload-icon-wrapper {
+            width: 62px;
+            height: 62px;
+            border-radius: 17px;
+            font-size: 28px;
+        }
+
+        .upload-title {
+            font-size: 16px;
+        }
+
+        .upload-description {
+            font-size: 12px;
+        }
+
+        .receipt-file-input {
+            font-size: 12px;
+        }
+
+        .scan-action-buttons {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .scan-btn {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .result-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 13px;
+        }
+
+        .result-title {
+            font-size: 17px;
+        }
+
+        .result-description {
+            font-size: 12px;
+        }
+
+        .items-count-badge {
+            align-self: flex-start;
+        }
+
+        .purchase-date-box {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 7px;
+            padding: 14px;
+        }
+
+        .purchase-date-value {
+            padding-left: 25px;
+        }
+        /* Hide desktop table */
+
+        .receipt-table-wrapper {
+            display: none;
+        }
+        /* Show mobile items */
+
+        .mobile-items {
+            display: block;
+        }
+
+        .save-receipt-area {
+            padding-top: 15px;
+        }
+
+        .save-receipt-btn {
+            width: 100%;
+        }
+    }
+
+    /* =========================================================
+           SMALL MOBILE
+           ========================================================= */
+
+    @@media (max-width: 480px) {
+
+        .scan-page-title {
+            font-size: 21px;
+        }
+
+        .scan-page-title-icon {
+            width: 37px;
+            height: 37px;
+            font-size: 16px;
+        }
+
+        .scan-page-description {
+            font-size: 12px;
+        }
+
+        .scan-card-body {
+            padding: 14px;
+        }
+
+        .receipt-upload-box {
+            padding: 22px 12px;
+        }
+
+        .upload-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            font-size: 25px;
+        }
+
+        .upload-title {
+            font-size: 15px;
+        }
+
+        .purchase-date-box {
+            padding: 12px;
+        }
+
+        .mobile-item-card {
+            padding: 14px;
+        }
+
+        .mobile-info-row {
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .mobile-info-value {
+            text-align: left;
+        }
+    }
+</style>
 
 
-            <form asp-action="Scan"
-                  method="post"
-                  enctype="multipart/form-data">
+<div class="container-fluid py-4">
 
+    <div class="scan-page">
 
-                <div class="upload-box text-center p-4">
+        <!-- =====================================================
+             PAGE HEADER
+        ====================================================== -->
 
-                    <i class="bi bi-receipt-cutoff upload-icon"></i>
+        <div class="scan-page-header text-center">
 
+            <h2 class="scan-page-title">
 
-                    <h5 class="mt-3">
+                <span class="scan-page-title-icon">
+                    <i class="fas fa-receipt"></i>
+                </span>
 
-                        Select your receipt image
+                Scan Receipt
 
-                    </h5>
+            </h2>
 
+            <p class="scan-page-description">
 
-                    <p class="text-muted">
+                Upload your receipt and let SmartTrack automatically
+                extract your purchase details.
 
-                        Supported formats: JPG, JPEG, PNG
-
-                    </p>
-
-
-                    <input type="file"
-                           name="image"
-                           id="receiptImage"
-                           class="form-control"
-                           accept=".jpg,.jpeg,.png"
-                           required />
-
-                </div>
-
-
-                <!-- BUTTONS -->
-
-                <div class="d-flex justify-content-center gap-3 mt-4">
-
-
-                    <button type="submit"
-                            class="btn btn-success btn-lg px-5 rounded-pill">
-
-                        <i class="bi bi-search me-2"></i>
-
-                        Scan Receipt
-
-                    </button>
-
-
-                    <a asp-controller="Receipt"
-                       asp-action="ManualEntry"
-                       class="btn btn-primary btn-lg px-5 rounded-pill">
-
-                        <i class="bi bi-pencil-square me-2"></i>
-
-                        Manual Entry
-
-                    </a>
-
-
-                </div>
-
-            </form>
+            </p>
 
         </div>
 
-    </div>
+
+        <!-- =====================================================
+             SUCCESS MESSAGE
+        ====================================================== -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert scan-success-alert alert-dismissible fade show scan-spacing"
+                 role="alert">
+
+                <i class="fas fa-circle-check me-2"></i>
+
+                <strong>Success!</strong>
+
+                @TempData["SuccessMessage"]
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                </button>
+
+            </div>
+        }
 
 
+        <!-- =====================================================
+             UPLOAD CARD
+        ====================================================== -->
 
-    <!-- =====================================================
-         EXTRACTED RESULTS
-    ====================================================== -->
+        <div class="scan-card scan-spacing">
 
-    @if (Model != null &&
-         Model.Items != null &&
-         Model.Items.Any())
-    {
+            <div class="scan-card-body">
 
-        <div class="card shadow-sm border-0 rounded-4">
+                <div class="scan-section-header">
 
-            <div class="card-body p-4">
-
-
-                <!-- =================================================
-                     RESULT HEADER
-                ================================================== -->
-
-                <div class="d-flex justify-content-between
-                            align-items-center mb-4">
-
+                    <div class="scan-section-icon">
+                        <i class="fas fa-cloud-arrow-up"></i>
+                    </div>
 
                     <div>
 
-                        <h4 class="fw-bold text-success mb-1">
+                        <h5 class="scan-section-title">
+                            Upload Receipt
+                        </h5>
 
-                            <i class="bi bi-check-circle me-2"></i>
-
-                            Receipt Scanned Successfully
-
-                        </h4>
-
-
-                        <p class="text-muted mb-0">
-
-                            The following information was extracted
-                            from your receipt.
-
+                        <p class="scan-section-subtitle">
+                            Select a clear image of your shopping receipt.
                         </p>
 
                     </div>
 
-
-                    <span class="badge bg-success fs-6 px-3 py-2">
-
-                        @Model.Items.Count Items
-
-                    </span>
-
                 </div>
 
 
+                <form asp-action="Scan"
+                      method="post"
+                      enctype="multipart/form-data">
 
-                <!-- =================================================
-                     PURCHASE DATE
-                ================================================== -->
+                    <div class="receipt-upload-box">
 
-                <div class="info-box mb-4">
+                        <div class="upload-icon-wrapper">
 
-                    <div class="row">
-
-
-                        <div class="col-md-6">
-
-                            <strong>
-
-                                <i class="bi bi-calendar3 me-2"></i>
-
-                                Purchase Date
-
-                            </strong>
+                            <i class="fas fa-file-invoice"></i>
 
                         </div>
 
-
-                        <div class="col-md-6 text-md-end">
-
-                            @(Model.Date.HasValue
-                                                    ? Model.Date.Value.ToString("dd/MM/yyyy")
-                                                    : "Not detected")
-
+                        <div class="upload-title">
+                            Select your receipt image
                         </div>
+
+                        <p class="upload-description">
+                            Supported formats: JPG, JPEG, PNG
+                        </p>
+
+                        <input type="file"
+                               name="image"
+                               id="receiptImage"
+                               class="form-control receipt-file-input"
+                               accept=".jpg,.jpeg,.png"
+                               required />
 
                     </div>
 
-                </div>
 
+                    <!-- BUTTONS -->
 
-
-                <!-- =================================================
-                     ITEMS TABLE
-                ================================================== -->
-
-                <div class="table-responsive">
-
-
-                    <table class="table table-hover
-                                  align-middle
-                                  receipt-table">
-
-
-                        <!-- TABLE HEADER -->
-
-                        <thead class="table-success">
-
-                            <tr>
-
-                                <th class="text-center">
-                                    #
-                                </th>
-
-
-                                <th>
-                                    Product Name
-                                </th>
-
-
-                                <!-- SEPARATE QUANTITY -->
-
-                                <th class="text-center">
-                                    Quantity
-                                </th>
-
-
-                                <!-- SEPARATE UNIT -->
-
-                                <th class="text-center">
-                                    Unit
-                                </th>
-
-
-                                <th class="text-end">
-                                    Unit Price
-                                </th>
-
-
-                                <th class="text-end">
-                                    Total Price
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-
-                        <!-- TABLE BODY -->
-
-                        <tbody>
-
-                            @{
-                                int itemNumber = 1;
-                            }
-
-
-                            @foreach (var item in Model.Items)
-                            {
-
-                                <tr>
-
-
-                                    <!-- NUMBER -->
-
-                                    <td class="text-center">
-
-                                        @itemNumber
-
-                                    </td>
-
-
-                                    <!-- PRODUCT -->
-
-                                    <td class="fw-semibold">
-
-                                        @item.Name
-
-                                    </td>
-
-
-                                    <!-- QUANTITY -->
-
-                                    <td class="text-center">
-
-                                        <span class="quantity-badge">
-
-                                            @item.Quantity
-
-                                        </span>
-
-                                    </td>
-
-
-                                    <!-- UNIT -->
-
-                                    <td class="text-center">
-
-                                        @if (!string.IsNullOrWhiteSpace(item.Unit))
-                                        {
-
-                                            <span class="unit-badge">
-
-                                                @item.Unit
-
-                                            </span>
-
-                                        }
-                                        else
-                                        {
-
-                                            <span class="text-muted">
-
-                                                -
-
-                                            </span>
-
-                                        }
-
-                                    </td>
-
-
-                                    <!-- UNIT PRICE -->
-
-                                    <td class="text-end">
-
-                                        Rs
-                                        @item.UnitPrice.ToString("N2")
-
-                                    </td>
-
-
-                                    <!-- TOTAL -->
-
-                                    <td class="text-end fw-semibold">
-
-                                        Rs
-                                        @item.Price.ToString("N2")
-
-                                    </td>
-
-
-                                </tr>
-
-
-                                itemNumber++;
-
-                            }
-
-                        </tbody>
-
-
-
-                        <!-- =================================================
-                             TOTAL
-                        ================================================== -->
-
-                        <tfoot>
-
-                            <tr class="table-light">
-
-
-                                <th colspan="5"
-                                    class="text-end fs-5">
-
-                                    Total Amount
-
-                                </th>
-
-
-                                <th class="text-success
-                                           text-end
-                                           fs-5">
-
-                                    Rs
-                                    @Model.TotalAmount.ToString("N2")
-
-                                </th>
-
-
-                            </tr>
-
-                        </tfoot>
-
-
-                    </table>
-
-                </div>
-
-
-
-                <!-- =================================================
-                     SAVE RECEIPT
-                ================================================== -->
-
-                <form asp-action="SaveReceipt"
-                      method="post"
-                      onsubmit="return confirm(
-                          'Are you sure you want to save this receipt?'
-                      );">
-
-
-                    <!-- =============================================
-                         SAVE EACH ITEM
-                    ============================================== -->
-
-                    @for (int i = 0;
-                          i < Model.Items.Count;
-                          i++)
-                    {
-
-                        <!-- PRODUCT NAME -->
-
-                        <input type="hidden"
-                               name="Items[@i].Name"
-                               value="@Model.Items[i].Name" />
-
-
-                        <!-- QUANTITY
-                             SAVED SEPARATELY -->
-
-                        <input type="hidden"
-                               name="Items[@i].Quantity"
-                               value="@Model.Items[i].Quantity" />
-
-
-                        <!-- UNIT
-                             SAVED SEPARATELY -->
-
-                        <input type="hidden"
-                               name="Items[@i].Unit"
-                               value="@Model.Items[i].Unit" />
-
-
-                        <!-- UNIT PRICE -->
-
-                        <input type="hidden"
-                               name="Items[@i].UnitPrice"
-                               value="@Model.Items[i].UnitPrice" />
-
-
-                        <!-- TOTAL PRICE -->
-
-                        <input type="hidden"
-                               name="Items[@i].Price"
-                               value="@Model.Items[i].Price" />
-
-                    }
-
-
-                    <!-- PURCHASE DATE -->
-
-                    <input type="hidden"
-                           name="Date"
-                           value="@Model.Date" />
-
-
-
-                    <!-- SAVE BUTTON -->
-
-                    <div class="text-center mt-4">
-
+                    <div class="scan-action-buttons">
 
                         <button type="submit"
-                                class="btn btn-primary
-                                       btn-lg
-                                       px-5
-                                       rounded-pill">
+                                class="btn btn-success scan-btn scan-btn-success">
 
+                            <i class="fas fa-magnifying-glass me-2"></i>
 
-                            <i class="bi bi-save me-2"></i>
-
-                            Save Receipt
+                            Scan Receipt
 
                         </button>
 
 
+                        <a asp-controller="Receipt"
+                           asp-action="ManualEntry"
+                           class="btn btn-primary scan-btn scan-btn-primary">
+
+                            <i class="fas fa-pen-to-square me-2"></i>
+
+                            Manual Entry
+
+                        </a>
+
                     </div>
 
-
                 </form>
-
 
             </div>
 
         </div>
 
-    }
+
+        <!-- =====================================================
+             EXTRACTED RESULTS
+        ====================================================== -->
+        @if (Model != null &&
+                Model.Items != null &&
+                Model.Items.Any())
+        {
+
+            <div class="scan-card">
+
+                <div class="scan-card-body">
+
+
+                    <!-- =================================================
+                         RESULT HEADER
+                    ================================================== -->
+
+                    <div class="result-header">
+
+                        <div class="result-title-wrapper">
+
+                            <div class="result-icon">
+
+                                <i class="fas fa-circle-check"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h4 class="result-title">
+                                    Receipt Scanned Successfully
+                                </h4>
+
+                                <p class="result-description">
+                                    The following information was extracted
+                                    from your receipt.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <span class="items-count-badge">
+
+                            @Model.Items.Count Items
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         PURCHASE DATE
+                    ================================================== -->
+
+                    <div class="purchase-date-box">
+
+                        <div class="purchase-date-label">
+
+                            <i class="fas fa-calendar-days"></i>
+
+                            <span>
+                                Purchase Date
+                            </span>
+
+                        </div>
+
+                        <div class="purchase-date-value">
+
+                            @(Model.Date.HasValue
+                                                    ? Model.Date.Value.ToString("dd/MM/yyyy")
+                                                    : "Not detected")
+
+                    </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         DESKTOP ITEMS TABLE
+                    ================================================== -->
+
+                    <div class="receipt-table-wrapper">
+
+                        <table class="table receipt-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th class="text-center">
+                                        #
+                                    </th>
+
+                                    <th>
+                                        Product Name
+                                    </th>
+
+                                    <th class="text-center">
+                                        Quantity
+                                    </th>
+
+                                    <th class="text-center">
+                                        Unit
+                                    </th>
+
+                                    <th class="text-end">
+                                        Unit Price
+                                    </th>
+
+                                    <th class="text-end">
+                                        Total Price
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                            @{
+                                    int itemNumber = 1;
+                                }
+
+                                @foreach (var item in Model.Items)
+                                {
+
+                                    <tr>
+
+                                        <td class="text-center text-muted">
+                                            @itemNumber
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="product-name">
+                                                @item.Name
+                                            </span>
+
+                                        </td>
+
+
+                                        <td class="text-center">
+
+                                            <span class="quantity-badge">
+                                                @item.Quantity
+                                            </span>
+
+                                        </td>
+
+
+                                        <td class="text-center">
+
+                                            @if (!string.IsNullOrWhiteSpace(item.Unit))
+                                            {
+                                                <span class="unit-badge">
+                                                    @item.Unit
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    -
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        <td class="text-end price-text">
+
+                                            Rs @item.UnitPrice.ToString("N2")
+
+                                        </td>
+
+
+                                        <td class="text-end total-price-text">
+
+                                            Rs @item.Price.ToString("N2")
+
+                                        </td>
+
+                                    </tr>
+
+                                    itemNumber++;
+                                }
+
+                            </tbody>
+
+
+                            <!-- TOTAL -->
+
+                            <tfoot>
+
+                                <tr>
+
+                                    <th colspan="5"
+                                        class="text-end grand-total-label">
+
+                                        Total Amount
+
+                                    </th>
+
+                                    <th class="text-end grand-total">
+
+                                        Rs @Model.TotalAmount.ToString("N2")
+
+                                    </th>
+
+                                </tr>
+
+                            </tfoot>
+
+                        </table>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         MOBILE ITEM CARDS
+                    ================================================== -->
+
+                    <div class="mobile-items">
+
+                        @foreach (var item in Model.Items)
+                        {
+
+                            <div class="mobile-item-card">
+
+                                <div class="mobile-item-header">
+
+                                    <span class="mobile-item-name">
+
+                                        <i class="fas fa-cart-shopping me-1"></i>
+
+                                        @item.Name
+
+                                    </span>
+
+                                    <span class="quantity-badge">
+                                        @item.Quantity
+                                    </span>
+
+                                </div>
+
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Quantity
+                                    </span>
+
+                                    <span class="mobile-info-value">
+                                        @item.Quantity
+                                    </span>
+
+                                </div>
+
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Unit
+                                    </span>
+
+                                    <span class="mobile-info-value">
+
+                                        @if (!string.IsNullOrWhiteSpace(item.Unit))
+                                        {
+                                            @item.Unit
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+
+                                    </span>
+
+                                </div>
+
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Unit Price
+                                    </span>
+
+                                    <span class="mobile-info-value">
+                                        Rs @item.UnitPrice.ToString("N2")
+                                    </span>
+
+                                </div>
+
+
+                                <div class="mobile-info-row">
+
+                                    <span class="mobile-info-label">
+                                        Total Price
+                                    </span>
+
+                                    <span class="mobile-info-value text-success fw-bold">
+                                        Rs @item.Price.ToString("N2")
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        }
+
+
+                        <!-- MOBILE TOTAL -->
+
+                        <div class="purchase-date-box">
+
+                            <div class="purchase-date-label">
+
+                                <i class="fas fa-wallet"></i>
+
+                                <span>
+                                    Total Amount
+                                </span>
+
+                            </div>
+
+                            <div class="grand-total">
+
+                                Rs @Model.TotalAmount.ToString("N2")
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         SAVE RECEIPT
+                    ================================================== -->
+
+                    <form asp-action="SaveReceipt"
+                          method="post"
+                          onsubmit="return confirm('Are you sure you want to save this receipt?');">
+
+
+                        <!-- SAVE EACH ITEM -->
+                        @for (int i = 0;
+                                            i < Model.Items.Count;
+                                            i++)
+                        {
+
+                            <input type="hidden"
+                                   name="Items[@i].Name"
+                                   value="@Model.Items[i].Name" />
+
+
+                            <input type="hidden"
+                                   name="Items[@i].Quantity"
+                                   value="@Model.Items[i].Quantity" />
+
+
+                            <input type="hidden"
+                                   name="Items[@i].Unit"
+                                   value="@Model.Items[i].Unit" />
+
+
+                            <input type="hidden"
+                                   name="Items[@i].UnitPrice"
+                                   value="@Model.Items[i].UnitPrice" />
+
+
+                            <input type="hidden"
+                                   name="Items[@i].Price"
+                                   value="@Model.Items[i].Price" />
+
+                        }
+
+
+                        <!-- PURCHASE DATE -->
+
+                        <input type="hidden"
+                               name="Date"
+                               value="@Model.Date" />
+
+
+                        <!-- SAVE BUTTON -->
+
+                        <div class="save-receipt-area">
+
+                            <button type="submit"
+                                    class="btn btn-primary save-receipt-btn">
+
+                                <i class="fas fa-floppy-disk me-2"></i>
+
+                                Save Receipt
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+
+                </div>
+
+            </div>
+
+        }
+
+    </div>
 
 </div>
 
 
+<script>
 
-<!-- =========================================================
-     CSS
-========================================================= -->
+    document.addEventListener("DOMContentLoaded", function () {
 
-<style>
+        const fileInput =
+            document.getElementById("receiptImage");
 
-    /* =========================================
-       UPLOAD BOX
-    ========================================== */
+        if (fileInput) {
 
-    .upload-box {
+            fileInput.addEventListener("change", function () {
 
-        border: 2px dashed #198754;
+                if (this.files && this.files.length > 0) {
 
-        border-radius: 15px;
+                    const fileName = this.files[0].name;
 
-        background-color: #f8fff9;
+                    console.log("Receipt selected:", fileName);
 
-        transition: 0.3s;
+                }
 
-    }
+            });
 
+        }
 
-    .upload-box:hover {
+    });
 
-        background-color: #effaf2;
-
-        border-color: #146c43;
-
-    }
-
-
-    /* =========================================
-       UPLOAD ICON
-    ========================================== */
-
-    .upload-icon {
-
-        font-size: 55px;
-
-        color: #198754;
-
-    }
-
-
-    /* =========================================
-       DATE INFORMATION BOX
-    ========================================== */
-
-    .info-box {
-
-        background: #f8f9fa;
-
-        border-left: 5px solid #198754;
-
-        padding: 15px 20px;
-
-        border-radius: 8px;
-
-    }
-
-
-    /* =========================================
-       TABLE
-    ========================================== */
-
-    .receipt-table {
-
-        border-radius: 10px;
-
-        overflow: hidden;
-
-        margin-bottom: 0;
-
-    }
-
-
-    .receipt-table th {
-
-        white-space: nowrap;
-
-    }
-
-
-    .receipt-table td {
-
-        vertical-align: middle;
-
-    }
-
-
-    /* =========================================
-       QUANTITY BADGE
-    ========================================== */
-
-    .quantity-badge {
-
-        display: inline-block;
-
-        min-width: 45px;
-
-        padding: 5px 10px;
-
-        border-radius: 20px;
-
-        background-color: #e8f5e9;
-
-        color: #198754;
-
-        font-weight: 600;
-
-    }
-
-
-    /* =========================================
-       UNIT BADGE
-    ========================================== */
-
-    .unit-badge {
-
-        display: inline-block;
-
-        padding: 5px 12px;
-
-        border-radius: 20px;
-
-        background-color: #f1f3f5;
-
-        color: #495057;
-
-        font-weight: 500;
-
-    }
-
-
-    /* =========================================
-       CARD
-    ========================================== */
-
-    .card {
-
-        transition: 0.3s;
-
-    }
-
-
-    .card:hover {
-
-        transform: translateY(-2px);
-
-    }
-
-
-</style>
+</script>

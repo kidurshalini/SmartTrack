@@ -6,6 +6,37 @@
 
 <style>
 
+    /* =========================================================
+           SMARTTRACK DASHBOARD THEME
+           ========================================================= */
+
+    :root {
+        --primary-green: #198754;
+        --dark-green: #146c43;
+        --primary-blue: #0d6efd;
+        --dark-blue: #084298;
+        --primary-yellow: #ffc107;
+        --light-green: #eaf7ef;
+        --light-blue: #eaf2ff;
+        --light-yellow: #fff8df;
+        --light-red: #fff0f0;
+        --text-dark: #212529;
+        --text-muted: #6c757d;
+        --border-light: #e9ecef;
+        --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.10);
+        --shadow-md: 0 12px 40px rgba(0, 0, 0, 0.15);
+        --shadow-lg: 0 25px 70px rgba(0, 0, 0, 0.20);
+        --radius-sm: 12px;
+        --radius-md: 20px;
+        --radius-lg: 28px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+
+    /* =========================================================
+           GLOBAL
+           ========================================================= */
+
     html,
     body {
         width: 100%;
@@ -19,226 +50,1252 @@
         box-sizing: border-box;
     }
 
-    .prediction-page {
+    .smarttrack-prediction {
         width: 100%;
         max-width: 100%;
+        padding-left: 0;
+        padding-right: 0;
     }
+
+
+    /* =========================================================
+           PAGE HEADER
+           ========================================================= */
+
+    .prediction-header-area {
+        width: 100%;
+        margin-bottom: 22px;
+    }
+
+    .prediction-page-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .prediction-title-icon {
+        width: 46px;
+        height: 46px;
+        flex: 0 0 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        font-size: 1.05rem;
+    }
+
+    .prediction-header-area h2 {
+        margin: 0;
+        color: var(--text-dark);
+        font-size: 1.65rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .prediction-header-area p {
+        margin: 4px 0 0;
+        color: var(--text-muted);
+        font-size: 0.72rem;
+    }
+
+
+    /* =========================================================
+           AI HERO
+           ========================================================= */
+
+    .prediction-hero {
+        position: relative;
+        width: 100%;
+        padding: 28px 30px;
+        margin-bottom: 20px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        background: linear-gradient( 135deg, var(--primary-blue), var(--dark-blue) );
+        box-shadow: 0 10px 35px rgba(13, 110, 253, 0.20);
+    }
+
+        .prediction-hero::before {
+            content: "";
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            right: -90px;
+            top: -150px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .prediction-hero::after {
+            content: "";
+            position: absolute;
+            width: 170px;
+            height: 170px;
+            right: 160px;
+            bottom: -130px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+        }
+
+    .prediction-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .prediction-hero-icon {
+        width: 58px;
+        height: 58px;
+        flex: 0 0 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.18);
+        color: white;
+        font-size: 1.3rem;
+    }
+
+    .prediction-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        margin-bottom: 5px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.13);
+        color: rgba(255,255,255,0.92);
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+
+    .prediction-hero h3 {
+        color: white;
+        font-size: 1.35rem;
+        font-weight: 800;
+        margin: 0 0 4px;
+    }
+
+    .prediction-hero p {
+        color: rgba(255,255,255,0.82);
+        font-size: 0.7rem;
+        margin: 0;
+        line-height: 1.5;
+        max-width: 700px;
+    }
+
+
+    /* =========================================================
+           MAIN GRID
+           ========================================================= */
+
+    .prediction-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+        gap: 20px;
+        width: 100%;
+    }
+
+
+    /* =========================================================
+           COMMON CARD
+           ========================================================= */
 
     .prediction-card {
         width: 100%;
-        border-radius: 14px;
+        border: 0 !important;
+        border-radius: var(--radius-md) !important;
         overflow: hidden;
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
     }
 
-    .prediction-header {
-        padding: 20px;
+        .prediction-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+
+    /* =========================================================
+           CARD HEADER
+           ========================================================= */
+
+    .prediction-card-header {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 18px 20px;
+        border-bottom: 1px solid #f1f3f5;
+        background: white;
     }
 
-    .prediction-body {
-        padding: 20px;
+    .prediction-card-icon {
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        font-size: 0.85rem;
+    }
+
+        .prediction-card-icon.green {
+            background: var(--light-green);
+            color: var(--primary-green);
+        }
+
+        .prediction-card-icon.yellow {
+            background: var(--light-yellow);
+            color: #d39e00;
+        }
+
+    .prediction-card-header h5 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .prediction-card-header small {
+        display: block;
+        margin-top: 2px;
+        font-size: 0.62rem;
+        color: var(--text-muted);
+    }
+
+
+    /* =========================================================
+           FORM
+           ========================================================= */
+
+    .prediction-form-body {
+        padding: 22px;
+    }
+
+    .product-label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .product-input-wrapper {
+        position: relative;
+    }
+
+    .product-input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-blue);
+        pointer-events: none;
+        font-size: 0.82rem;
     }
 
     .prediction-input {
         width: 100%;
-        min-height: 44px;
+        min-height: 48px;
+        padding-left: 40px;
+        border: 1px solid #dee2e6;
+        border-radius: 11px;
+        font-size: 0.76rem;
+        transition: var(--transition);
     }
 
-    .prediction-result {
-        border-radius: 12px;
-        padding: 20px;
+        .prediction-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.10);
+        }
+
+    .product-help {
+        display: block;
+        margin-top: 6px;
+        font-size: 0.6rem;
+        color: var(--text-muted);
+    }
+
+
+    /* =========================================================
+           HOW IT WORKS
+           ========================================================= */
+
+    .prediction-info {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 17px;
+        padding: 13px;
+        border-radius: 11px;
+        background: var(--light-green);
+        border: 1px solid #d9f0e2;
+    }
+
+    .prediction-info-icon {
+        width: 31px;
+        height: 31px;
+        flex: 0 0 31px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: white;
+        color: var(--primary-green);
+        font-size: 0.7rem;
+    }
+
+    .prediction-info-content {
+        min-width: 0;
+    }
+
+        .prediction-info-content strong {
+            display: block;
+            font-size: 0.68rem;
+            margin-bottom: 3px;
+            color: var(--dark-green);
+        }
+
+        .prediction-info-content span {
+            display: block;
+            font-size: 0.61rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+
+    /* =========================================================
+           ACTION BUTTONS
+           ========================================================= */
+
+    .prediction-actions {
+        display: flex;
+        gap: 10px;
         margin-top: 20px;
+    }
+
+    .prediction-btn {
+        min-height: 46px;
+        padding: 9px 19px;
+        border: 0;
+        border-radius: var(--radius-sm);
+        background: linear-gradient( 135deg, var(--primary-green), var(--dark-green) );
+        color: white;
+        font-size: 0.72rem;
+        font-weight: 700;
+        box-shadow: 0 6px 18px rgba(25,135,84,0.20);
+        transition: var(--transition);
+    }
+
+        .prediction-btn:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(25,135,84,0.28);
+        }
+
+    .back-btn {
+        min-height: 46px;
+        padding: 9px 18px;
+        border-radius: var(--radius-sm);
+        font-size: 0.72rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    /* =========================================================
+           RIGHT SIDE INFORMATION
+           ========================================================= */
+
+    .prediction-guide {
+        padding: 20px;
+    }
+
+    .guide-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 13px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+        .guide-item:first-child {
+            padding-top: 0;
+        }
+
+        .guide-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+    .guide-number {
+        width: 32px;
+        height: 32px;
+        flex: 0 0 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        font-size: 0.68rem;
+        font-weight: 800;
+    }
+
+    .guide-item:nth-child(2) .guide-number {
+        background: var(--light-green);
+        color: var(--primary-green);
+    }
+
+    .guide-item:nth-child(3) .guide-number {
+        background: var(--light-yellow);
+        color: #b58100;
+    }
+
+    .guide-content strong {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 0.7rem;
+        color: var(--text-dark);
+    }
+
+    .guide-content span {
+        display: block;
+        font-size: 0.61rem;
+        line-height: 1.45;
+        color: var(--text-muted);
+    }
+
+
+    /* =========================================================
+           RESULT CARD
+           ========================================================= */
+
+    .prediction-result-card {
+        margin-top: 20px;
+    }
+
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        padding: 18px 20px;
+        border-bottom: 1px solid #f1f3f5;
+    }
+
+    .result-title-wrapper {
+        min-width: 0;
+    }
+
+    .result-title {
+        margin: 0 0 4px;
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--text-dark);
+    }
+
+    .result-product {
+        color: var(--text-muted);
+        font-size: 0.65rem;
+        overflow-wrap: anywhere;
+    }
+
+    .result-status {
+        flex: 0 0 auto;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 0.58rem;
+    }
+
+
+    /* =========================================================
+           RESULT BODY
+           ========================================================= */
+
+    .result-body {
+        padding: 20px;
+    }
+
+    .prediction-main-result {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 25px;
+        padding: 18px 10px 25px;
+    }
+
+    .prediction-result-circle {
+        width: 135px;
+        height: 135px;
+        flex: 0 0 135px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--light-green);
+        border: 8px solid #d9f0e2;
+        box-shadow: 0 8px 25px rgba(25,135,84,0.10);
     }
 
     .prediction-number {
         font-size: 2.5rem;
-        font-weight: 700;
+        font-weight: 800;
         line-height: 1;
+        color: var(--primary-green);
+    }
+
+    .prediction-days {
+        margin-top: 5px;
+        font-size: 0.58rem;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+    }
+
+    .prediction-result-message {
+        max-width: 270px;
+    }
+
+        .prediction-result-message h6 {
+            margin: 0 0 5px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .prediction-result-message p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            line-height: 1.5;
+        }
+
+
+    /* =========================================================
+           RESULT DETAILS
+           ========================================================= */
+
+    .result-details {
+        border-top: 1px solid #f1f3f5;
     }
 
     .result-item {
-        padding: 12px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 2px;
         border-bottom: 1px solid #eeeeee;
+        font-size: 0.7rem;
     }
 
-    .result-item:last-child {
-        border-bottom: none;
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+    .result-item-label {
+        color: var(--text-muted);
     }
+
+    .result-item-value {
+        min-width: 0;
+        text-align: right;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+
+    /* =========================================================
+           RECOMMENDATION
+           ========================================================= */
+
+    .recommendation-box {
+        margin-top: 16px;
+        padding: 14px;
+        border-radius: 11px;
+        background: var(--light-yellow);
+        border: 1px solid #ffe69c;
+    }
+
+    .recommendation-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 5px;
+        color: #795548;
+        font-size: 0.7rem;
+        font-weight: 800;
+    }
+
+        .recommendation-title i {
+            color: #d39e00;
+        }
+
+    .recommendation-text {
+        margin: 0;
+        color: #6c5b3e;
+        font-size: 0.65rem;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+    }
+
+
+    /* =========================================================
+           ERROR
+           ========================================================= */
+
+    .prediction-error {
+        border-radius: 11px;
+        font-size: 0.7rem;
+        margin-bottom: 18px;
+    }
+
+
+    /* =========================================================
+           MOBILE
+           ========================================================= */
+
+    @@media (max-width: 991.98px) {
+
+        .prediction-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .prediction-guide {
+            display: none;
+        }
+    }
+
 
     @@media (max-width: 767.98px) {
 
-        .prediction-page {
+        .container-fluid.smarttrack-prediction {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
             padding: 12px 10px !important;
         }
+        /* HEADER */
+
+        .prediction-header-area {
+            margin-bottom: 15px;
+        }
+
+        .prediction-page-title {
+            gap: 9px;
+        }
+
+        .prediction-title-icon {
+            width: 38px;
+            height: 38px;
+            flex-basis: 38px;
+        }
+
+        .prediction-header-area h2 {
+            font-size: 1.3rem;
+        }
+
+        .prediction-header-area p {
+            font-size: 0.63rem;
+        }
+        /* HERO */
+
+        .prediction-hero {
+            padding: 18px 15px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+        }
+
+        .prediction-hero-content {
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .prediction-hero-icon {
+            width: 43px;
+            height: 43px;
+            flex-basis: 43px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        .prediction-hero-badge {
+            font-size: 0.52rem;
+            padding: 4px 7px;
+        }
+
+        .prediction-hero h3 {
+            font-size: 1.15rem;
+        }
+
+        .prediction-hero p {
+            font-size: 0.6rem;
+        }
+        /* LAYOUT */
+
+        .prediction-layout {
+            display: block;
+        }
+        /* CARDS */
 
         .prediction-card {
-            border-radius: 10px;
+            border-radius: 14px !important;
+            margin-bottom: 15px;
         }
 
-        .prediction-header {
-            padding: 15px !important;
+        .prediction-card-header {
+            padding: 13px;
         }
 
-        .prediction-body {
-            padding: 15px !important;
+        .prediction-card-icon {
+            width: 34px;
+            height: 34px;
+            flex-basis: 34px;
         }
 
-        .prediction-header h3 {
-            font-size: 1.25rem;
+        .prediction-card-header h5 {
+            font-size: 0.84rem;
         }
 
-        .prediction-header p {
-            font-size: 0.75rem;
-            line-height: 1.4;
+        .prediction-card-header small {
+            font-size: 0.57rem;
         }
 
-        .form-label {
-            font-size: 0.78rem;
+        .prediction-form-body {
+            padding: 13px;
+        }
+        /* INPUT */
+
+        .product-label {
+            font-size: 0.68rem;
         }
 
         .prediction-input {
-            min-height: 42px;
-            font-size: 0.82rem;
+            min-height: 43px;
+            font-size: 0.72rem;
         }
 
-        .prediction-btn {
+        .product-help {
+            font-size: 0.56rem;
+        }
+        /* INFO */
+
+        .prediction-info {
+            padding: 10px;
+        }
+
+        .prediction-info-icon {
+            width: 27px;
+            height: 27px;
+            flex-basis: 27px;
+        }
+
+        .prediction-info-content strong {
+            font-size: 0.62rem;
+        }
+
+        .prediction-info-content span {
+            font-size: 0.55rem;
+        }
+        /* BUTTONS */
+
+        .prediction-actions {
+            flex-direction: column;
             width: 100%;
-            min-height: 44px;
         }
 
-        .prediction-result {
-            padding: 15px;
+        .prediction-btn,
+        .back-btn {
+            width: 100%;
+            min-height: 43px;
+            font-size: 0.68rem;
+        }
+        /* RESULT */
+
+        .prediction-result-card {
+            margin-top: 0;
+        }
+
+        .result-header {
+            padding: 13px;
+        }
+
+        .result-title {
+            font-size: 0.85rem;
+        }
+
+        .result-product {
+            font-size: 0.58rem;
+        }
+
+        .result-status {
+            font-size: 0.52rem;
+            padding: 5px 8px;
+        }
+
+        .result-body {
+            padding: 13px;
+        }
+
+        .prediction-main-result {
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px 5px 20px;
+        }
+
+        .prediction-result-circle {
+            width: 105px;
+            height: 105px;
+            flex-basis: 105px;
+            border-width: 6px;
         }
 
         .prediction-number {
             font-size: 2rem;
         }
 
+        .prediction-days {
+            font-size: 0.52rem;
+        }
+
+        .prediction-result-message {
+            max-width: 100%;
+            text-align: center;
+        }
+
+            .prediction-result-message h6 {
+                font-size: 0.72rem;
+            }
+
+            .prediction-result-message p {
+                font-size: 0.58rem;
+            }
+        /* DETAILS */
+
         .result-item {
-            font-size: 0.78rem;
+            padding: 10px 0;
+            font-size: 0.63rem;
+        }
+        /* RECOMMENDATION */
+
+        .recommendation-box {
+            padding: 11px;
+        }
+
+        .recommendation-title {
+            font-size: 0.64rem;
+        }
+
+        .recommendation-text {
+            font-size: 0.58rem;
+        }
+    }
+
+
+    /* =========================================================
+           VERY SMALL PHONES
+           ========================================================= */
+
+    @@media (max-width: 400px) {
+
+        .container-fluid.smarttrack-prediction {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+        }
+
+        .prediction-hero {
+            padding: 15px 12px;
+        }
+
+        .prediction-hero-icon {
+            width: 39px;
+            height: 39px;
+            flex-basis: 39px;
+        }
+
+        .prediction-hero h3 {
+            font-size: 1.05rem;
+        }
+
+        .prediction-hero p {
+            font-size: 0.56rem;
+        }
+
+        .prediction-form-body,
+        .result-body {
+            padding: 11px;
+        }
+
+        .prediction-result-circle {
+            width: 95px;
+            height: 95px;
+            flex-basis: 95px;
+        }
+
+        .prediction-number {
+            font-size: 1.8rem;
         }
     }
 
 </style>
 
 
-<div class="container-fluid py-4 prediction-page">
+<div class="container-fluid py-4 smarttrack-prediction">
+
 
     <!-- =====================================================
          PAGE HEADER
     ====================================================== -->
 
-    <div class="mb-4">
+    <div class="prediction-header-area">
 
-        <h2 class="fw-bold mb-1">
-            <i class="fas fa-search text-primary me-2"></i>
-            Check Product
-        </h2>
+        <div class="prediction-page-title">
 
-        <p class="text-muted mb-0">
-            Enter the current product information to predict
-            when the product will need to be purchased.
-        </p>
+            <div class="prediction-title-icon">
+
+                <i class="fas fa-wand-magic-sparkles"></i>
+
+            </div>
+
+            <div>
+
+                <h2>
+                    Check Product
+                </h2>
+
+                <p>
+                    SmartTrack AI-powered household purchase prediction
+                </p>
+
+            </div>
+
+        </div>
 
     </div>
 
 
     <!-- =====================================================
-         VALIDATION / ERROR
+         AI HERO
     ====================================================== -->
 
+    <div class="prediction-hero">
+
+        <div class="prediction-hero-content">
+
+            <div class="prediction-hero-icon">
+
+                <i class="fas fa-brain"></i>
+
+            </div>
+
+            <div>
+
+                <div class="prediction-hero-badge">
+
+                    <i class="fas fa-sparkles"></i>
+
+                    AI-POWERED PREDICTION
+
+                </div>
+
+                <h3>
+                    Predict Your Next Purchase
+                </h3>
+
+                <p>
+                    SmartTrack analyses your household purchasing
+                    patterns to estimate when a product may need
+                    to be purchased again.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         VALIDATION
+    ====================================================== -->
     @if (!ViewData.ModelState.IsValid)
     {
-        <div class="alert alert-danger">
 
-            <i class="fas fa-exclamation-circle me-2"></i>
+        <div class="alert alert-danger prediction-error">
 
-            Please check the information you entered.
+            <i class="fas fa-circle-exclamation me-2"></i>
+
+            <strong>
+                Please check the information you entered.
+            </strong>
 
             <div asp-validation-summary="All"
                  class="mt-2">
             </div>
 
         </div>
+
     }
 
 
     <!-- =====================================================
-         PREDICTION FORM
+         MAIN CONTENT
     ====================================================== -->
 
-    <div class="card shadow-sm border-0 prediction-card">
+    <div class="prediction-layout">
 
-        <div class="card-header bg-white border-0 prediction-header">
 
-            <h4 class="fw-semibold mb-1">
-                Product Information
-            </h4>
+        <!-- =================================================
+             PRODUCT FORM
+        ================================================== -->
 
-            <p class="text-muted small mb-0">
-                Provide the latest household usage information.
-            </p>
+        <div class="card prediction-card">
+
+            <div class="prediction-card-header">
+
+                <div class="prediction-card-icon">
+
+                    <i class="fas fa-box"></i>
+
+                </div>
+
+                <div>
+
+                    <h5>
+                        Product Information
+                    </h5>
+
+                    <small>
+                        Enter a household product to analyse
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="prediction-form-body">
+
+                <form asp-controller="SmartTrackDashboard"
+                      asp-action="Prediction"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+
+                    <!-- PRODUCT -->
+
+                    <div>
+
+                        <label asp-for="ProductName"
+                               class="product-label">
+
+                            Product
+
+                        </label>
+
+
+                        <div class="product-input-wrapper">
+
+                            <i class="fas fa-box product-input-icon"></i>
+
+                            <input asp-for="ProductName"
+                                   class="form-control prediction-input"
+                                   placeholder="Example: Milk" />
+
+                        </div>
+
+
+                        <span asp-validation-for="ProductName"
+                              class="text-danger small">
+                        </span>
+
+
+                        <span class="product-help">
+
+                            <i class="fas fa-circle-info me-1"></i>
+
+                            Enter a product from your household
+                            purchase records.
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- HOW IT WORKS -->
+
+                    <div class="prediction-info">
+
+                        <div class="prediction-info-icon">
+
+                            <i class="fas fa-lightbulb"></i>
+
+                        </div>
+
+                        <div class="prediction-info-content">
+
+                            <strong>
+                                How does SmartTrack predict?
+                            </strong>
+
+                            <span>
+                                SmartTrack uses your household
+                                purchasing information and usage
+                                patterns to estimate when the
+                                product may need to be purchased again.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="prediction-actions">
+
+                        <button type="submit"
+                                class="btn prediction-btn">
+
+                            <i class="fas fa-wand-magic-sparkles me-1"></i>
+
+                            Predict Purchase Date
+
+                        </button>
+
+
+                        <a asp-controller="SmartTrackDashboard"
+                           asp-action="Index"
+                           class="btn btn-outline-secondary back-btn">
+
+                            <i class="fas fa-arrow-left me-1"></i>
+
+                            Back to Dashboard
+
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
 
         </div>
 
 
-        <div class="card-body prediction-body">
+        <!-- =================================================
+             GUIDE
+        ================================================== -->
 
-            <form asp-controller="SmartTrackDashboard"
-                  asp-action="Prediction"
-                  method="post">
+        <div class="card prediction-card">
 
-                @Html.AntiForgeryToken()
+            <div class="prediction-card-header">
+
+                <div class="prediction-card-icon green">
+
+                    <i class="fas fa-chart-line"></i>
+
+                </div>
+
+                <div>
+
+                    <h5>
+                        SmartTrack Intelligence
+                    </h5>
+
+                    <small>
+                        How your prediction is generated
+                    </small>
+
+                </div>
+
+            </div>
 
 
-                <!-- PRODUCT -->
+            <div class="prediction-guide">
 
-                <div class="mb-3">
 
-                    <label asp-for="ProductName"
-                           class="form-label fw-semibold">
-                        Product
-                    </label>
+                <div class="guide-item">
 
-                    <input asp-for="ProductName"
-                           class="form-control prediction-input"
-                           placeholder="Example: Milk" />
+                    <div class="guide-number">
+                        01
+                    </div>
 
-                    <span asp-validation-for="ProductName"
-                          class="text-danger small">
-                    </span>
+                    <div class="guide-content">
+
+                        <strong>
+                            Product History
+                        </strong>
+
+                        <span>
+                            SmartTrack checks your previous
+                            household purchase records for the
+                            selected product.
+                        </span>
+
+                    </div>
 
                 </div>
 
 
-           
+                <div class="guide-item">
 
-                <!-- BUTTONS -->
+                    <div class="guide-number">
+                        02
+                    </div>
 
-                <div class="d-flex gap-2">
+                    <div class="guide-content">
 
-                    <button type="submit"
-                            class="btn btn-primary prediction-btn">
+                        <strong>
+                            Usage Pattern
+                        </strong>
 
-                        <i class="fas fa-brain me-1"></i>
+                        <span>
+                            Historical usage information helps
+                            estimate the product's expected
+                            consumption rate.
+                        </span>
 
-                        Predict
-
-                    </button>
-
-
-                    <a asp-controller="SmartTrackDashboard"
-                       asp-action="Dashboard"
-                       class="btn btn-outline-secondary">
-
-                        <i class="fas fa-arrow-left me-1"></i>
-
-                        Back
-
-                    </a>
+                    </div>
 
                 </div>
 
-            </form>
+
+                <div class="guide-item">
+
+                    <div class="guide-number">
+                        03
+                    </div>
+
+                    <div class="guide-content">
+
+                        <strong>
+                            Purchase Prediction
+                        </strong>
+
+                        <span>
+                            SmartTrack estimates how many days
+                            remain before the next purchase may
+                            be required.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+            </div>
 
         </div>
 
@@ -246,53 +1303,93 @@
 
 
     <!-- =====================================================
-         PREDICTION RESULT
+         RESULT
     ====================================================== -->
-
     @if (Model.HasPrediction)
     {
-        <div class="card shadow-sm border-0 prediction-card prediction-result">
 
-            <div class="card-body">
+        <div class="card prediction-card prediction-result-card">
 
-                <div class="d-flex justify-content-between
-                            align-items-start mb-3">
 
-                    <div>
+            <!-- RESULT HEADER -->
 
-                        <h4 class="fw-bold mb-1">
-                            Prediction Result
-                        </h4>
+            <div class="result-header">
 
-                        <p class="text-muted small mb-0">
+                <div class="result-title-wrapper">
+
+                    <h4 class="result-title">
+
+                        <i class="fas fa-chart-line text-primary me-1"></i>
+
+                        Prediction Result
+
+                    </h4>
+
+
+                    <div class="result-product">
+
+                        Product:
+
+                        <strong>
                             @Model.ProductName
-                        </p>
+                        </strong>
 
                     </div>
-
-                    <span class="badge bg-@Model.StatusClass">
-                        @Model.StockStatus
-                    </span>
 
                 </div>
 
 
-                <!-- PREDICTED DAYS -->
+                <span class="badge bg-@Model.StatusClass result-status">
 
-                <div class="text-center py-4">
+                    @Model.StockStatus
 
-                    <div class="prediction-number
-                                text-@Model.StatusClass">
+                </span>
 
-                        @Model.PredictedDaysUntilPurchase
-                        <span class="fs-6">
-                            days
-                        </span>
+            </div>
+
+
+            <!-- RESULT BODY -->
+
+            <div class="result-body">
+
+
+                <!-- MAIN RESULT -->
+
+                <div class="prediction-main-result">
+
+
+                    <div class="prediction-result-circle">
+
+                        <div class="prediction-number">
+
+                            @Model.PredictedDaysUntilPurchase
+
+                        </div>
+
+                        <div class="prediction-days">
+
+                            DAYS
+
+                        </div>
 
                     </div>
 
-                    <div class="text-muted mt-2">
-                        Predicted time until purchase
+
+                    <div class="prediction-result-message">
+
+                        <h6>
+                            Estimated Next Purchase
+                        </h6>
+
+                        <p>
+                            SmartTrack predicts that this product
+                            may need to be purchased again in
+                            approximately
+                            <strong>
+                                @Model.PredictedDaysUntilPurchase days
+                            </strong>.
+                        </p>
+
                     </div>
 
                 </div>
@@ -300,80 +1397,118 @@
 
                 <!-- DETAILS -->
 
-                <div class="result-item">
-
-                    <strong>
-                        Product
-                    </strong>
-
-                    <span class="float-end">
-                        @Model.ProductName
-                    </span>
-
-                </div>
+                <div class="result-details">
 
 
-                <div class="result-item">
+                    <div class="result-item">
 
-                    <strong>
-                        Current Stock
-                    </strong>
+                        <span class="result-item-label">
 
-                    <span class="float-end">
-                        @Model.CurrentStock
-                    </span>
+                            <i class="fas fa-box me-1"></i>
 
-                </div>
+                            Product
 
-
-                <div class="result-item">
-
-                    <strong>
-                        Average Daily Usage
-                    </strong>
-
-                    <span class="float-end">
-                        @Model.AverageDailyUsage
-                    </span>
-
-                </div>
-
-
-                <div class="result-item">
-
-                    <strong>
-                        Stock Status
-                    </strong>
-
-                    <span class="float-end">
-
-                        <span class="badge bg-@Model.StatusClass">
-                            @Model.StockStatus
                         </span>
 
-                    </span>
+                        <span class="result-item-value">
+
+                            @Model.ProductName
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="result-item">
+
+                        <span class="result-item-label">
+
+                            <i class="fas fa-layer-group me-1"></i>
+
+                            Current Stock
+
+                        </span>
+
+                        <span class="result-item-value">
+
+                            @Model.CurrentStock
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="result-item">
+
+                        <span class="result-item-label">
+
+                            <i class="fas fa-chart-simple me-1"></i>
+
+                            Average Daily Usage
+
+                        </span>
+
+                        <span class="result-item-value">
+
+                            @Model.AverageDailyUsage
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="result-item">
+
+                        <span class="result-item-label">
+
+                            <i class="fas fa-circle-check me-1"></i>
+
+                            Stock Status
+
+                        </span>
+
+                        <span class="result-item-value">
+
+                            <span class="badge bg-@Model.StatusClass">
+
+                                @Model.StockStatus
+
+                            </span>
+
+                        </span>
+
+                    </div>
+
 
                 </div>
 
 
                 <!-- RECOMMENDATION -->
 
-                <div class="alert alert-light border mt-4 mb-0">
+                <div class="recommendation-box">
 
-                    <strong>
-                        <i class="fas fa-lightbulb text-warning me-1"></i>
-                        Recommendation
-                    </strong>
+                    <div class="recommendation-title">
 
-                    <p class="mb-0 mt-1">
+                        <i class="fas fa-lightbulb"></i>
+
+                        SmartTrack Recommendation
+
+                    </div>
+
+
+                    <p class="recommendation-text">
+
                         @Model.Recommendation
+
                     </p>
 
                 </div>
 
+
             </div>
 
         </div>
+
     }
 
 </div>

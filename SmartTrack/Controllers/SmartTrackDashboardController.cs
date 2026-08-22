@@ -8,9 +8,11 @@ using SmartTrack.ViewModels;
 namespace SmartTrack.Controllers
 {
     [Authorize]
-    public class SmartTrackDashboardController : Controller
+    public class SmartTrackDashboardController
+        : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser>
+            _userManager;
 
         private readonly SmartTrackDashboardService
             _dashboardService;
@@ -23,6 +25,7 @@ namespace SmartTrack.Controllers
 
         private readonly SmartTrackStockService
             _stockService;
+
 
         public SmartTrackDashboardController(
             UserManager<ApplicationUser> userManager,
@@ -47,30 +50,43 @@ namespace SmartTrack.Controllers
                 stockService;
         }
 
+
+        // =========================================================
+        // DASHBOARD
+        // =========================================================
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             var user =
-                await _userManager.GetUserAsync(User);
+                await _userManager
+                    .GetUserAsync(User);
+
 
             if (user == null)
             {
                 return Challenge();
             }
 
+
             try
             {
                 var model =
                     await _dashboardService
-                        .GetDashboardAsync(user.Id);
+                        .GetDashboardAsync(
+                            user.Id);
+
 
                 return View(model);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(
-                    string.Empty,
-                    ex.Message);
+                // IMPORTANT:
+                // Do not silently show a dashboard full of zeros.
+
+                TempData["DashboardError"] =
+                    ex.Message;
+
 
                 return View(
                     new SmartTrackDashboardViewModel
@@ -81,22 +97,33 @@ namespace SmartTrack.Controllers
             }
         }
 
+
+        // =========================================================
+        // RECOMMENDATIONS
+        // =========================================================
+
         [HttpGet]
-        public async Task<IActionResult> Recommendations()
+        public async Task<IActionResult>
+            Recommendations()
         {
             var user =
-                await _userManager.GetUserAsync(User);
+                await _userManager
+                    .GetUserAsync(User);
+
 
             if (user == null)
             {
                 return Challenge();
             }
 
+
             try
             {
                 var model =
                     await _dashboardService
-                        .GetDashboardAsync(user.Id);
+                        .GetDashboardAsync(
+                            user.Id);
+
 
                 return View(
                     "Recommendations",
@@ -104,9 +131,9 @@ namespace SmartTrack.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(
-                    string.Empty,
-                    ex.Message);
+                TempData["DashboardError"] =
+                    ex.Message;
+
 
                 return View(
                     "Recommendations",
@@ -117,6 +144,11 @@ namespace SmartTrack.Controllers
                     });
             }
         }
+
+
+        // =========================================================
+        // PREDICTION GET
+        // =========================================================
 
         [HttpGet]
         public IActionResult Prediction()
@@ -125,10 +157,16 @@ namespace SmartTrack.Controllers
                 new SmartTrackPredictionViewModel());
         }
 
+
+        // =========================================================
+        // PREDICTION POST
+        // =========================================================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Prediction(
-            SmartTrackPredictionViewModel model)
+        public async Task<IActionResult>
+            Prediction(
+                SmartTrackPredictionViewModel model)
         {
             if (string.IsNullOrWhiteSpace(
                 model.ProductName))
@@ -140,20 +178,25 @@ namespace SmartTrack.Controllers
                 return View(model);
             }
 
+
             try
             {
                 var user =
                     await _userManager
                         .GetUserAsync(User);
 
+
                 if (user == null)
                 {
                     return Challenge();
                 }
 
+
                 var userHousehold =
                     await _purchaseHistoryService
-                        .GetUserHouseholdAsync(user.Id);
+                        .GetUserHouseholdAsync(
+                            user.Id);
+
 
                 if (userHousehold == null)
                 {
@@ -164,11 +207,18 @@ namespace SmartTrack.Controllers
                     return View(model);
                 }
 
+
                 Guid householdId =
                     userHousehold.HouseHoldId;
 
+
                 string productName =
                     model.ProductName.Trim();
+
+
+                // =================================================
+                // PURCHASE HISTORY
+                // =================================================
 
                 var productHistory =
                     await _purchaseHistoryService
@@ -176,6 +226,7 @@ namespace SmartTrack.Controllers
                             user.Id,
                             householdId,
                             productName);
+
 
                 if (productHistory == null ||
                     productHistory.Count == 0)
@@ -187,9 +238,10 @@ namespace SmartTrack.Controllers
                     return View(model);
                 }
 
-                // =====================================================
-                // REAL STOCK
-                // =====================================================
+
+                // =================================================
+                // STOCK
+                // =================================================
 
                 var stock =
                     await _stockService
@@ -199,44 +251,65 @@ namespace SmartTrack.Controllers
                             productName,
                             productHistory);
 
-                // =====================================================
-                // AI PREDICTION
-                // =====================================================
+
+                // =================================================
+                // AI
+                // =================================================
 
                 var prediction =
-                    await _aiService.PredictAsync(
-                        productName,
-                        "HIGH",
-                        productHistory);
+                    await _aiService
+                        .PredictAsync(
+                            productName,
+                            "HIGH",
+                            productHistory);
 
-                model.HasPrediction = true;
+
+                if (prediction == null)
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "The SmartTrack AI service returned no prediction.");
+
+                    return View(model);
+                }
+
+
+                model.HasPrediction =
+                    true;
+
 
                 model.PredictedDaysUntilPurchase =
                     prediction.DaysUntilPurchase ?? 0;
 
+
                 model.StockStatus =
-                    prediction.Status ?? "UNKNOWN";
+                    prediction.Status ??
+                    "UNKNOWN";
+
 
                 model.Recommendation =
-                    prediction.Recommendation
-                    ?? "No recommendation available.";
+                    prediction.Recommendation ??
+                    "No recommendation available.";
 
-                // =====================================================
-                // IMPORTANT:
-                // USE REAL STOCK, NOT LATEST PURCHASE QUANTITY
-                // =====================================================
+
+                // =================================================
+                // REAL STOCK
+                // =================================================
 
                 model.CurrentStock =
                     Convert.ToDouble(
                         stock.CurrentStock);
 
+
                 model.AverageDailyUsage =
                     Convert.ToDouble(
                         stock.AdaptiveConsumption);
 
+
                 model.LastPurchaseQuantity =
                     Convert.ToDouble(
                         stock.LastPurchaseQuantity);
+
 
                 model.DaysSinceLastPurchase =
                     Math.Max(
@@ -246,21 +319,24 @@ namespace SmartTrack.Controllers
                             stock.LastPurchaseDate.Date
                         ).Days);
 
-                // =====================================================
-                // STATUS
-                // =====================================================
+
+                // =================================================
+                // STATUS CLASS
+                // =================================================
 
                 if (stock.CurrentStock <= 0)
                 {
                     model.StatusClass =
                         "danger";
                 }
-                else if (stock.AdaptiveConsumption > 0)
+                else if (
+                    stock.AdaptiveConsumption > 0)
                 {
                     double stockDays =
                         Convert.ToDouble(
                             stock.CurrentStock /
                             stock.AdaptiveConsumption);
+
 
                     if (stockDays <= 3)
                     {
@@ -284,14 +360,15 @@ namespace SmartTrack.Controllers
                         "success";
                 }
 
+
                 return View(model);
             }
             catch (HttpRequestException ex)
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    "The SmartTrack AI service is unavailable: "
-                    + ex.Message);
+                    "The SmartTrack AI service is unavailable: " +
+                    ex.Message);
 
                 return View(model);
             }
@@ -299,12 +376,17 @@ namespace SmartTrack.Controllers
             {
                 ModelState.AddModelError(
                     string.Empty,
-                    "Unable to generate the prediction: "
-                    + ex.Message);
+                    "Unable to generate the prediction: " +
+                    ex.Message);
 
                 return View(model);
             }
         }
+
+
+        // =========================================================
+        // DEBUG HOUSEHOLD
+        // =========================================================
 
         [HttpGet]
         public async Task<IActionResult>
@@ -315,10 +397,12 @@ namespace SmartTrack.Controllers
                 await _userManager
                     .GetUserAsync(User);
 
+
             if (user == null)
             {
                 return Challenge();
             }
+
 
             if (string.IsNullOrWhiteSpace(
                 productName))
@@ -331,11 +415,13 @@ namespace SmartTrack.Controllers
                     });
             }
 
+
             var result =
                 await _purchaseHistoryService
                     .GetHouseholdDebugInfoAsync(
                         user.Id,
-                        productName);
+                        productName.Trim());
+
 
             return Json(result);
         }

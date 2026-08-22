@@ -33,7 +33,8 @@ namespace SmartTrack.Models
         // PURCHASE RECOMMENDATIONS
         // =====================================================
 
-        public List<PurchaseRecommendationViewModel> PurchaseRecommendations
+        public List<PurchaseRecommendationViewModel>
+            PurchaseRecommendations
         {
             get;
             set;
@@ -44,7 +45,8 @@ namespace SmartTrack.Models
         // STOCK ITEMS
         // =====================================================
 
-        public List<StockStatusViewModel> StockItems
+        public List<StockStatusViewModel>
+            StockItems
         {
             get;
             set;
@@ -55,7 +57,8 @@ namespace SmartTrack.Models
         // NOTIFICATIONS
         // =====================================================
 
-        public List<SmartTrackNotificationViewModel> Notifications
+        public List<SmartTrackNotificationViewModel>
+            Notifications
         {
             get;
             set;
@@ -66,7 +69,8 @@ namespace SmartTrack.Models
         // RECENT PURCHASES
         // =====================================================
 
-        public List<RecentPurchaseViewModel> RecentPurchases
+        public List<RecentPurchaseViewModel>
+            RecentPurchases
         {
             get;
             set;
@@ -101,9 +105,25 @@ namespace SmartTrack.Models
         public double AnomalyScore { get; set; }
 
         public string Priority { get; set; } = "NORMAL";
+
+
+        // Optional values useful for the UI
+        public double NormalConsumption { get; set; }
+
+        public double RecentConsumption { get; set; }
+
+        public double AdaptiveConsumption { get; set; }
+
+        public double NormalIntervalDays { get; set; }
+
+        public double RecentIntervalDays { get; set; }
+
+        public double AdaptiveIntervalDays { get; set; }
+
+        public string Adjustment { get; set; } = string.Empty;
+
+        public double AdjustmentFactor { get; set; }
     }
-
-
 
 
     // =========================================================
@@ -123,5 +143,35 @@ namespace SmartTrack.Models
         public double TotalPrice { get; set; }
 
         public string UserId { get; set; } = string.Empty;
+    }
+
+
+    // =========================================================
+    // STOCK STATUS VIEW MODEL
+    // =========================================================
+
+    public class StockStatusViewModel
+    {
+        public string Product { get; set; } = string.Empty;
+
+        public double LatestQuantity { get; set; }
+
+        public double AdaptiveConsumption { get; set; }
+
+        public double AdaptiveIntervalDays { get; set; }
+
+        public int DaysUntilPurchase { get; set; }
+
+        public string StockStatus { get; set; } = "OK";
+
+        public string StatusClass { get; set; } = "success";
+
+        public string Priority { get; set; } = "NORMAL";
+
+        public double CurrentStock { get; set; }
+
+        public double NormalDailyConsumption { get; set; }
+
+        public string LastAdjustmentType { get; set; } = "NORMAL";
     }
 }

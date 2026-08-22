@@ -6,50 +6,93 @@
 
 <style>
 
-    /* =========================================
-           MAIN CONTAINER
-           ========================================= */
+    /* =========================================================
+           SMARTTRACK MANUAL RECEIPT PAGE
+           ========================================================= */
 
     .manual-receipt-page {
-        max-width: 1200px;
-        margin: auto;
+        width: 100%;
+        max-width: 1250px;
+        margin: 0 auto;
     }
 
 
-    /* =========================================
+    /* =========================================================
+           PAGE HEADER
+           ========================================================= */
+
+    .manual-page-header {
+        margin-bottom: 28px;
+    }
+
+    .manual-page-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 30px;
+        font-weight: 700;
+        color: #198754;
+        margin-bottom: 8px;
+    }
+
+    .manual-page-title-icon {
+        width: 46px;
+        height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #198754, #157347);
+        color: #fff;
+        font-size: 21px;
+        box-shadow: 0 6px 18px rgba(25, 135, 84, 0.25);
+    }
+
+    .manual-page-description {
+        max-width: 650px;
+        margin: 0 auto;
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+
+    /* =========================================================
            BACK BUTTON
-           ========================================= */
+           ========================================================= */
 
     .manual-back-wrapper {
         display: flex;
         justify-content: flex-end;
-        margin-bottom: 25px;
+        margin-bottom: 22px;
     }
 
     .manual-back-btn {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
         padding: 10px 20px;
-        background: #ffffff;
+        background: #fff;
         color: #198754;
         border: 1.5px solid #198754;
         border-radius: 30px;
         text-decoration: none;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
         transition: all 0.25s ease;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
     }
 
         .manual-back-btn:hover {
             background: #198754;
-            color: white;
+            color: #fff;
             transform: translateY(-2px);
         }
 
     .back-arrow {
-        font-size: 20px;
+        font-size: 19px;
         transition: transform 0.25s ease;
     }
 
@@ -58,135 +101,449 @@
     }
 
 
-    /* =========================================
-           ITEM CARD - MOBILE STYLE
-           ========================================= */
+    /* =========================================================
+           COMMON CARD
+           ========================================================= */
 
-    .mobile-item-card {
+    .manual-card {
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        margin-bottom: 24px;
+        transition: all 0.3s ease;
+    }
+
+        .manual-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+    .manual-card-body {
+        padding: 28px;
+    }
+
+
+    /* =========================================================
+           SECTION HEADER
+           ========================================================= */
+
+    .manual-section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .manual-section-icon {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e8f5ee;
+        color: #198754;
+        font-size: 18px;
+    }
+
+    .manual-section-title {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .manual-section-subtitle {
+        margin: 3px 0 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+           FORM
+           ========================================================= */
+
+    .manual-form-label {
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 7px;
+    }
+
+    .manual-form-control {
+        height: 45px;
+        border-radius: 11px;
+        border: 1px solid #dbe3e8;
+        font-size: 14px;
+    }
+
+        .manual-form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.12);
+        }
+
+
+    /* =========================================================
+           ITEMS HEADER
+           ========================================================= */
+
+    .items-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 22px;
+    }
+
+    .add-item-btn {
+        min-width: 135px;
+        border-radius: 12px !important;
+        font-weight: 600;
+        transition: all 0.25s ease;
+    }
+
+        .add-item-btn:hover {
+            transform: translateY(-2px);
+        }
+
+
+    /* =========================================================
+           DESKTOP TABLE
+           ========================================================= */
+
+    .desktop-items-table {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+        .desktop-items-table table {
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+        .desktop-items-table thead th {
+            background: #e8f5ee;
+            color: #14532d;
+            border-bottom: 1px solid #cfe8d9;
+            padding: 13px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .desktop-items-table tbody td {
+            padding: 11px 10px;
+            border-color: #eef1f3;
+            vertical-align: middle;
+        }
+
+        .desktop-items-table tbody tr:hover {
+            background: #f8fcf9;
+        }
+
+        .desktop-items-table input {
+            min-height: 42px;
+            border-radius: 9px;
+            font-size: 13px;
+        }
+
+            .desktop-items-table input:focus {
+                border-color: #198754;
+                box-shadow: 0 0 0 0.15rem rgba(25, 135, 84, 0.10);
+            }
+
+    .remove-item {
+        width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px !important;
+    }
+
+
+    /* =========================================================
+           MOBILE ITEMS
+           ========================================================= */
+
+    .mobile-items-container {
         display: none;
     }
 
+    .mobile-item-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 17px;
+        margin-bottom: 14px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
 
-    /* =========================================
-           TOTAL BOX
-           ========================================= */
+    .mobile-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 12px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eef1f3;
+    }
+
+    .mobile-item-title {
+        color: #198754;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .mobile-field {
+        margin-bottom: 14px;
+    }
+
+        .mobile-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .mobile-field label {
+            display: block;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .mobile-field input {
+            width: 100%;
+            height: 45px;
+            border-radius: 10px;
+            border: 1px solid #dbe3e8;
+            font-size: 13px;
+        }
+
+            .mobile-field input:focus {
+                border-color: #198754;
+                box-shadow: 0 0 0 0.15rem rgba(25, 135, 84, 0.10);
+            }
+
+
+    /* =========================================================
+           TOTAL
+           ========================================================= */
+
+    .receipt-total-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 22px;
+    }
 
     .receipt-total-box {
+        min-width: 230px;
+        padding: 17px 22px;
+        border-radius: 15px;
         background: #f8fff9;
         border: 1px solid #d8f3df;
-        border-radius: 15px;
-        padding: 18px 25px;
-        min-width: 220px;
+        text-align: right;
+    }
+
+    .receipt-total-label {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .receipt-total-value {
+        color: #198754;
+        font-size: 22px;
+        font-weight: 800;
     }
 
 
-    /* =========================================
+    /* =========================================================
            ACTION BUTTONS
-           ========================================= */
+           ========================================================= */
 
     .action-buttons {
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 15px;
+        margin-top: 25px;
+    }
+
+        .action-buttons .btn {
+            min-height: 44px;
+            border-radius: 12px !important;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+
+            .action-buttons .btn:hover {
+                transform: translateY(-2px);
+            }
+
+
+    /* =========================================================
+           VALIDATION
+           ========================================================= */
+
+    .validation-summary {
+        border-radius: 12px;
     }
 
 
-    /* =========================================
-           MOBILE RESPONSIVE
-           ========================================= */
+    /* =========================================================
+           TABLET
+           ========================================================= */
+
+    @@media (max-width: 992px) {
+
+        .manual-receipt-page {
+            max-width: 100%;
+        }
+
+        .manual-card-body {
+            padding: 22px;
+        }
+
+        .manual-page-title {
+            font-size: 27px;
+        }
+
+        .desktop-items-table {
+            overflow-x: auto;
+        }
+
+            .desktop-items-table table {
+                min-width: 850px;
+            }
+    }
+
+
+    /* =========================================================
+           MOBILE
+           ========================================================= */
 
     @@media (max-width: 767px) {
 
-        .manual-receipt-page {
-            padding: 0 5px;
+        .container-fluid {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
         }
 
+        .manual-receipt-page {
+            width: 100%;
+        }
+
+        .manual-page-header {
+            margin-bottom: 22px;
+        }
+
+        .manual-page-title {
+            font-size: 23px;
+            gap: 8px;
+        }
+
+        .manual-page-title-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 18px;
+        }
+
+        .manual-page-description {
+            padding: 0 8px;
+            font-size: 13px;
+        }
+        /* Back button */
+
         .manual-back-wrapper {
+            width: 100%;
             justify-content: stretch;
+            margin-bottom: 18px;
         }
 
         .manual-back-btn {
             width: 100%;
-            justify-content: center;
         }
+        /* Cards */
 
-        .page-title {
-            font-size: 24px;
-        }
-
-        .card-body {
-            padding: 18px !important;
-        }
-        /* Hide desktop table */
-        .desktop-items-table {
-            display: none;
-        }
-        /* Show mobile cards */
-        .mobile-item-card {
-            display: block;
-            background: #ffffff;
-            border: 1px solid #e1e1e1;
-            border-radius: 16px;
-            padding: 18px;
+        .manual-card {
+            border-radius: 17px;
             margin-bottom: 18px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
         }
 
-        .mobile-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #eeeeee;
+        .manual-card-body {
+            padding: 17px;
+        }
+        /* Section */
+
+        .manual-section-header {
+            margin-bottom: 17px;
         }
 
-        .mobile-item-title {
-            font-weight: 700;
-            color: #198754;
+        .manual-section-icon {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            font-size: 16px;
+        }
+
+        .manual-section-title {
             font-size: 17px;
         }
 
-        .mobile-field {
-            margin-bottom: 15px;
+        .manual-section-subtitle {
+            font-size: 12px;
         }
+        /* Date */
 
-            .mobile-field label {
-                display: block;
-                font-weight: 600;
-                margin-bottom: 6px;
-                color: #555;
-                font-size: 14px;
-            }
-
-            .mobile-field input {
-                width: 100%;
-                height: 46px;
-                border-radius: 10px;
-            }
+        .manual-form-control {
+            height: 44px;
+        }
+        /* Items header */
 
         .items-header {
             flex-direction: column;
-            align-items: stretch !important;
-            gap: 15px;
+            align-items: stretch;
+            gap: 14px;
         }
 
         .add-item-btn {
             width: 100%;
         }
+        /* Hide desktop */
+
+        .desktop-items-table {
+            display: none;
+        }
+        /* Show mobile */
+
+        .mobile-items-container {
+            display: block;
+        }
+        /* Total */
 
         .receipt-total-wrapper {
-            justify-content: stretch !important;
+            justify-content: stretch;
         }
 
         .receipt-total-box {
             width: 100%;
+            min-width: 0;
             text-align: right;
         }
+        /* Buttons */
 
         .action-buttons {
             flex-direction: column-reverse;
+            width: 100%;
+            gap: 10px;
         }
 
             .action-buttons .btn {
@@ -195,26 +552,49 @@
     }
 
 
-    /* =========================================
-           EXTRA SMALL MOBILE
-           ========================================= */
+    /* =========================================================
+           SMALL MOBILE
+           ========================================================= */
 
     @@media (max-width: 480px) {
 
-        .page-title {
+        .container-fluid {
+            padding-left: 7px !important;
+            padding-right: 7px !important;
+        }
+
+        .manual-page-title {
             font-size: 21px;
         }
 
-        .section-title {
-            font-size: 19px;
+        .manual-page-title-icon {
+            width: 37px;
+            height: 37px;
+            font-size: 16px;
+        }
+
+        .manual-page-description {
+            font-size: 12px;
+        }
+
+        .manual-card-body {
+            padding: 14px;
         }
 
         .mobile-item-card {
-            padding: 15px;
+            padding: 14px;
         }
 
         .mobile-field input {
             height: 44px;
+        }
+
+        .receipt-total-box {
+            padding: 15px;
+        }
+
+        .receipt-total-value {
+            font-size: 20px;
         }
     }
 
@@ -225,10 +605,9 @@
 
     <div class="manual-receipt-page">
 
-
-        <!-- =====================================
+        <!-- =====================================================
              BACK BUTTON
-             ===================================== -->
+        ====================================================== -->
 
         <div class="manual-back-wrapper">
 
@@ -236,9 +615,7 @@
                asp-controller="Receipt"
                class="manual-back-btn">
 
-                <span class="back-arrow">
-                    ←
-                </span>
+                <span class="back-arrow">←</span>
 
                 <span>
                     Back to Scan Receipt
@@ -249,21 +626,25 @@
         </div>
 
 
-        <!-- =====================================
-             HEADER
-             ===================================== -->
+        <!-- =====================================================
+             PAGE HEADER
+        ====================================================== -->
 
-        <div class="text-center mb-4">
+        <div class="manual-page-header text-center">
 
-            <h2 class="fw-bold text-success page-title">
+            <h2 class="manual-page-title">
 
-                <i class="bi bi-pencil-square me-2"></i>
+                <span class="manual-page-title-icon">
+
+                    <i class="fas fa-pen-to-square"></i>
+
+                </span>
 
                 Manual Receipt Entry
 
             </h2>
 
-            <p class="text-muted">
+            <p class="manual-page-description">
 
                 Enter your receipt details manually.
 
@@ -272,9 +653,9 @@
         </div>
 
 
-        <!-- =====================================
+        <!-- =====================================================
              FORM
-             ===================================== -->
+        ====================================================== -->
 
         <form asp-action="ManualEntry"
               asp-controller="Receipt"
@@ -283,28 +664,42 @@
             @Html.AntiForgeryToken()
 
 
-            <!-- Validation messages -->
+            <!-- VALIDATION -->
 
             <div asp-validation-summary="All"
-                 class="text-danger mb-3">
+                 class="text-danger mb-3 validation-summary">
             </div>
 
 
-            <!-- =================================
+            <!-- =================================================
                  RECEIPT INFORMATION
-                 ================================= -->
+            ================================================== -->
 
-            <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="manual-card">
 
-                <div class="card-body p-4">
+                <div class="manual-card-body">
 
-                    <h4 class="fw-bold text-success mb-4">
+                    <div class="manual-section-header">
 
-                        <i class="bi bi-receipt me-2"></i>
+                        <div class="manual-section-icon">
 
-                        Receipt Information
+                            <i class="fas fa-receipt"></i>
 
-                    </h4>
+                        </div>
+
+                        <div>
+
+                            <h4 class="manual-section-title">
+                                Receipt Information
+                            </h4>
+
+                            <p class="manual-section-subtitle">
+                                Enter the basic information for this receipt.
+                            </p>
+
+                        </div>
+
+                    </div>
 
 
                     <div class="row">
@@ -312,7 +707,7 @@
                         <div class="col-12 col-md-6">
 
                             <label asp-for="Date"
-                                   class="form-label fw-semibold">
+                                   class="form-label manual-form-label">
 
                                 Purchase Date
 
@@ -320,7 +715,7 @@
 
                             <input asp-for="Date"
                                    type="date"
-                                   class="form-control" />
+                                   class="form-control manual-form-control" />
 
                             <span asp-validation-for="Date"
                                   class="text-danger">
@@ -335,43 +730,50 @@
             </div>
 
 
-            <!-- =================================
-                 ITEMS CARD
-                 ================================= -->
+            <!-- =================================================
+                 RECEIPT ITEMS
+            ================================================== -->
 
-            <div class="card shadow-sm border-0 rounded-4">
+            <div class="manual-card">
 
-                <div class="card-body p-4">
-
+                <div class="manual-card-body">
 
                     <!-- HEADER -->
 
-                    <div class="d-flex justify-content-between align-items-center mb-4 items-header">
+                    <div class="items-header">
 
                         <div>
 
-                            <h4 class="fw-bold text-success mb-1">
+                            <div class="manual-section-header mb-0">
 
-                                <i class="bi bi-cart-check me-2"></i>
+                                <div class="manual-section-icon">
 
-                                Receipt Items
+                                    <i class="fas fa-cart-shopping"></i>
 
-                            </h4>
+                                </div>
 
-                            <p class="text-muted mb-0">
+                                <div>
 
-                                Add all items purchased.
+                                    <h4 class="manual-section-title">
+                                        Receipt Items
+                                    </h4>
 
-                            </p>
+                                    <p class="manual-section-subtitle">
+                                        Add all items purchased.
+                                    </p>
+
+                                </div>
+
+                            </div>
 
                         </div>
 
 
                         <button type="button"
                                 id="addItem"
-                                class="btn btn-success rounded-pill px-4 add-item-btn">
+                                class="btn btn-success add-item-btn">
 
-                            <i class="bi bi-plus-circle me-1"></i>
+                            <i class="fas fa-plus me-1"></i>
 
                             Add Item
 
@@ -380,15 +782,15 @@
                     </div>
 
 
-                    <!-- =================================
+                    <!-- =================================================
                          DESKTOP TABLE
-                         ================================= -->
+                    ================================================== -->
 
-                    <div class="table-responsive desktop-items-table">
+                    <div class="desktop-items-table">
 
-                        <table class="table table-bordered align-middle">
+                        <table class="table align-middle">
 
-                            <thead class="table-success">
+                            <thead>
 
                                 <tr>
 
@@ -412,7 +814,8 @@
                                         Total Price
                                     </th>
 
-                                    <th width="80">
+                                    <th width="80"
+                                        class="text-center">
                                         Action
                                     </th>
 
@@ -438,7 +841,6 @@
 
                                         </td>
 
-
                                         <td>
 
                                             <input asp-for="Items[i].Quantity"
@@ -450,7 +852,6 @@
 
                                         </td>
 
-
                                         <td>
 
                                             <input asp-for="Items[i].Unit"
@@ -458,7 +859,6 @@
                                                    placeholder="kg, pcs..." />
 
                                         </td>
-
 
                                         <td>
 
@@ -470,7 +870,6 @@
                                                    placeholder="0.00" />
 
                                         </td>
-
 
                                         <td>
 
@@ -484,13 +883,12 @@
 
                                         </td>
 
-
                                         <td class="text-center">
 
                                             <button type="button"
-                                                    class="btn btn-sm btn-danger remove-item">
+                                                    class="btn btn-danger remove-item">
 
-                                                <i class="bi bi-trash"></i>
+                                                <i class="fas fa-trash"></i>
 
                                             </button>
 
@@ -507,11 +905,12 @@
                     </div>
 
 
-                    <!-- =================================
-                         MOBILE ITEM CARDS
-                         ================================= -->
+                    <!-- =================================================
+                         MOBILE ITEMS
+                    ================================================== -->
 
-                    <div id="mobileItemsBody">
+                    <div id="mobileItemsBody"
+                         class="mobile-items-container">
 
                         @for (int i = 0; i < Model.Items.Count; i++)
                         {
@@ -523,24 +922,23 @@
 
                                     <span class="mobile-item-title">
 
-                                        <i class="bi bi-cart3 me-1"></i>
+                                        <i class="fas fa-cart-shopping me-1"></i>
 
                                         Item @(i + 1)
 
                                     </span>
 
-
                                     <button type="button"
-                                            class="btn btn-sm btn-danger remove-item">
+                                            class="btn btn-danger remove-item">
 
-                                        <i class="bi bi-trash"></i>
+                                        <i class="fas fa-trash"></i>
 
                                     </button>
 
                                 </div>
 
 
-                                <!-- Name -->
+                                <!-- ITEM NAME -->
 
                                 <div class="mobile-field">
 
@@ -557,7 +955,7 @@
                                 </div>
 
 
-                                <!-- Quantity -->
+                                <!-- QUANTITY -->
 
                                 <div class="mobile-field">
 
@@ -576,7 +974,7 @@
                                 </div>
 
 
-                                <!-- Unit -->
+                                <!-- UNIT -->
 
                                 <div class="mobile-field">
 
@@ -592,7 +990,7 @@
                                 </div>
 
 
-                                <!-- Unit Price -->
+                                <!-- UNIT PRICE -->
 
                                 <div class="mobile-field">
 
@@ -611,9 +1009,9 @@
                                 </div>
 
 
-                                <!-- Total -->
+                                <!-- TOTAL -->
 
-                                <div class="mobile-field mb-0">
+                                <div class="mobile-field">
 
                                     <label>
                                         Total Price
@@ -623,7 +1021,6 @@
                                            value="@Model.Items[i].Price"
                                            type="number"
                                            step="0.01"
-                                           min="0"
                                            class="form-control mobile-total-price"
                                            placeholder="0.00"
                                            readonly />
@@ -637,46 +1034,40 @@
                     </div>
 
 
-                    <!-- =================================
+                    <!-- =================================================
                          GRAND TOTAL
-                         ================================= -->
+                    ================================================== -->
 
-                    <div class="d-flex justify-content-end mt-4 receipt-total-wrapper">
+                    <div class="receipt-total-wrapper">
 
-                        <div class="text-end receipt-total-box">
+                        <div class="receipt-total-box">
 
-                            <h6 class="text-muted mb-1">
-
+                            <div class="receipt-total-label">
                                 Receipt Total
+                            </div>
 
-                            </h6>
+                            <div class="receipt-total-value">
 
-                            <h3 class="fw-bold text-success mb-0">
+                                Rs <span id="grandTotal">0.00</span>
 
-                                Rs
-
-                                <span id="grandTotal">
-                                    0.00
-                                </span>
-
-                            </h3>
+                            </div>
 
                         </div>
 
                     </div>
 
 
-                    <!-- =================================
-                         BUTTONS
-                         ================================= -->
+                    <!-- =================================================
+                         ACTION BUTTONS
+                    ================================================== -->
 
-                    <div class="action-buttons mt-4">
+                    <div class="action-buttons">
 
                         <a asp-action="ViewSavedReceipts"
                            asp-controller="Receipt"
-                           class="btn btn-secondary rounded-pill px-4">
+                           class="btn btn-secondary">
 
-                            <i class="bi bi-arrow-left me-1"></i>
+                            <i class="fas fa-arrow-left me-1"></i>
 
                             Cancel
 
@@ -685,9 +1076,9 @@
 
                         <button type="submit"
                                 id="saveReceiptBtn"
-                                class="btn btn-success rounded-pill px-5">
+                                class="btn btn-success">
 
-                            <i class="bi bi-save me-1"></i>
+                            <i class="fas fa-floppy-disk me-1"></i>
 
                             Save Receipt
 
@@ -711,16 +1102,18 @@
     let itemIndex = @Model.Items.Count;
 
 
-    // =========================================
-    // ENABLE ONLY VISIBLE FORM INPUTS
-    // =========================================
+    /* =========================================================
+       ENABLE ONLY CURRENT DEVICE INPUTS
+    ========================================================= */
 
     function updateFormInputs() {
 
         const isMobile = window.innerWidth <= 767;
 
 
-        // Desktop inputs
+        /*
+         * Desktop inputs
+         */
 
         document
             .querySelectorAll("#desktopItemsBody input")
@@ -731,8 +1124,6 @@
             });
 
 
-        // Desktop remove buttons
-
         document
             .querySelectorAll("#desktopItemsBody .remove-item")
             .forEach(function (button) {
@@ -742,7 +1133,9 @@
             });
 
 
-        // Mobile inputs
+        /*
+         * Mobile inputs
+         */
 
         document
             .querySelectorAll("#mobileItemsBody input")
@@ -752,8 +1145,6 @@
 
             });
 
-
-        // Mobile remove buttons
 
         document
             .querySelectorAll("#mobileItemsBody .remove-item")
@@ -766,26 +1157,24 @@
     }
 
 
-    // =========================================
-    // ADD ITEM
-    // =========================================
+    /* =========================================================
+       ADD ITEM
+    ========================================================= */
 
     document
         .getElementById("addItem")
         .addEventListener("click", function () {
 
-
             const desktopBody =
                 document.getElementById("desktopItemsBody");
-
 
             const mobileBody =
                 document.getElementById("mobileItemsBody");
 
 
-            // -----------------------------
-            // DESKTOP ROW
-            // -----------------------------
+            /*
+             * DESKTOP ROW
+             */
 
             const desktopRow =
                 document.createElement("tr");
@@ -856,9 +1245,9 @@
                 <td class="text-center">
 
                     <button type="button"
-                            class="btn btn-sm btn-danger remove-item">
+                            class="btn btn-danger remove-item">
 
-                        <i class="bi bi-trash"></i>
+                        <i class="fas fa-trash"></i>
 
                     </button>
 
@@ -870,19 +1259,17 @@
             desktopBody.appendChild(desktopRow);
 
 
-            // -----------------------------
-            // MOBILE CARD
-            // -----------------------------
+            /*
+             * MOBILE CARD
+             */
 
             const mobileCard =
                 document.createElement("div");
-
 
             mobileCard.classList.add(
                 "mobile-item-card",
                 "item-row"
             );
-
 
             mobileCard.setAttribute(
                 "data-index",
@@ -896,17 +1283,16 @@
 
                     <span class="mobile-item-title">
 
-                        <i class="bi bi-cart3 me-1"></i>
+                        <i class="fas fa-cart-shopping me-1"></i>
 
                         Item ${itemIndex + 1}
 
                     </span>
 
-
                     <button type="button"
-                            class="btn btn-sm btn-danger remove-item">
+                            class="btn btn-danger remove-item">
 
-                        <i class="bi bi-trash"></i>
+                        <i class="fas fa-trash"></i>
 
                     </button>
 
@@ -974,7 +1360,7 @@
                 </div>
 
 
-                <div class="mobile-field mb-0">
+                <div class="mobile-field">
 
                     <label>
                         Total Price
@@ -996,26 +1382,23 @@
 
             itemIndex++;
 
-
-            // Enable correct inputs
-
             updateFormInputs();
+
+            calculateTotal();
 
         });
 
 
-    // =========================================
-    // REMOVE ITEM
-    // =========================================
+    /* =========================================================
+       REMOVE ITEM
+    ========================================================= */
 
     document.addEventListener(
         "click",
         function (event) {
 
-
             const button =
                 event.target.closest(".remove-item");
-
 
             if (!button)
                 return;
@@ -1024,7 +1407,6 @@
             const item =
                 button.closest(".item-row");
 
-
             if (!item)
                 return;
 
@@ -1032,12 +1414,13 @@
             const index =
                 item.getAttribute("data-index");
 
-
             if (index === null)
                 return;
 
 
-            // Remove desktop version
+            /*
+             * Remove desktop version
+             */
 
             document
                 .querySelectorAll(
@@ -1056,7 +1439,9 @@
                 });
 
 
-            // Remove mobile version
+            /*
+             * Remove mobile version
+             */
 
             document
                 .querySelectorAll(
@@ -1083,41 +1468,38 @@
     );
 
 
-    // =========================================
-    // INPUT CALCULATION
-    // =========================================
+    /* =========================================================
+       INPUT CALCULATION
+    ========================================================= */
 
     document.addEventListener(
         "input",
         function (event) {
 
 
-            // Desktop
+            /*
+             * DESKTOP
+             */
 
             if (
                 event.target.classList.contains("quantity") ||
                 event.target.classList.contains("unit-price")
             ) {
 
-
                 const row =
                     event.target.closest("tr");
 
-
                 if (row) {
-
 
                     const quantity =
                         parseFloat(
                             row.querySelector(".quantity").value
                         ) || 0;
 
-
                     const unitPrice =
                         parseFloat(
                             row.querySelector(".unit-price").value
                         ) || 0;
-
 
                     row.querySelector(".total-price").value =
                         (quantity * unitPrice).toFixed(2);
@@ -1127,20 +1509,19 @@
             }
 
 
-            // Mobile
+            /*
+             * MOBILE
+             */
 
             if (
                 event.target.classList.contains("mobile-quantity") ||
                 event.target.classList.contains("mobile-unit-price")
             ) {
 
-
                 const card =
                     event.target.closest(".mobile-item-card");
 
-
                 if (card) {
-
 
                     const quantity =
                         parseFloat(
@@ -1149,14 +1530,12 @@
                             ).value
                         ) || 0;
 
-
                     const unitPrice =
                         parseFloat(
                             card.querySelector(
                                 ".mobile-unit-price"
                             ).value
                         ) || 0;
-
 
                     card.querySelector(
                         ".mobile-total-price"
@@ -1174,22 +1553,19 @@
     );
 
 
-    // =========================================
-    // CALCULATE GRAND TOTAL
-    // =========================================
+    /* =========================================================
+       CALCULATE GRAND TOTAL
+    ========================================================= */
 
     function calculateTotal() {
 
-
         let total = 0;
-
 
         const isMobile =
             window.innerWidth <= 767;
 
 
         if (isMobile) {
-
 
             document
                 .querySelectorAll(
@@ -1205,7 +1581,6 @@
         }
         else {
 
-
             document
                 .querySelectorAll(
                     "#desktopItemsBody .total-price"
@@ -1220,17 +1595,23 @@
         }
 
 
-        document
-            .getElementById("grandTotal")
-            .innerText =
-            total.toFixed(2);
+        const grandTotal =
+            document.getElementById("grandTotal");
+
+
+        if (grandTotal) {
+
+            grandTotal.innerText =
+                total.toFixed(2);
+
+        }
 
     }
 
 
-    // =========================================
-    // SCREEN SIZE CHANGE
-    // =========================================
+    /* =========================================================
+       SCREEN SIZE CHANGE
+    ========================================================= */
 
     window.addEventListener(
         "resize",
@@ -1244,9 +1625,9 @@
     );
 
 
-    // =========================================
-    // INITIAL LOAD
-    // =========================================
+    /* =========================================================
+       INITIAL LOAD
+    ========================================================= */
 
     updateFormInputs();
 

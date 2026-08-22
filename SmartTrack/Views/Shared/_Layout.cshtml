@@ -1,5 +1,8 @@
 ﻿@{
-    // Get user information from session
+    // ============================================================
+    // USER INFORMATION
+    // ============================================================
+
     string userName = Context.Session.GetString("UserName") ?? "Guest";
     string userRole = Context.Session.GetString("UserRole") ?? "User";
 
@@ -7,12 +10,19 @@
         ? userName.Substring(0, 1).ToUpper()
         : "?";
 
-    // Current controller/action
-    string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-    string currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    // ============================================================
+    // CURRENT CONTROLLER / ACTION
+    // ============================================================
+
+    string currentController =
+        ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+
+    string currentAction =
+        ViewContext.RouteData.Values["action"]?.ToString() ?? "";
 }
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -27,17 +37,26 @@
     </title>
 
 
-    <!-- Bootstrap -->
+    <!-- ========================================================
+         BOOTSTRAP
+         ======================================================== -->
+
     <link rel="stylesheet"
           href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
 
-    <!-- Font Awesome -->
+    <!-- ========================================================
+         FONT AWESOME
+         ======================================================== -->
+
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
 
-    <!-- Google Font -->
+    <!-- ========================================================
+         GOOGLE FONT
+         ======================================================== -->
+
     <link rel="preconnect"
           href="https://fonts.googleapis.com" />
 
@@ -45,11 +64,14 @@
           href="https://fonts.gstatic.com"
           crossorigin />
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
           rel="stylesheet" />
 
 
-    <!-- Site CSS -->
+    <!-- ========================================================
+         SITE CSS
+         ======================================================== -->
+
     <link rel="stylesheet"
           href="~/css/site.css"
           asp-append-version="true" />
@@ -61,36 +83,44 @@
 
     <style>
 
+        /* ============================================================
+                   ROOT VARIABLES
+                   ============================================================ */
+
         :root {
             --primary-green: #198754;
-            --primary-green-hover: #157347;
+            --primary-green-dark: #157347;
+            --primary-green-light: #dff6e9;
             --primary-blue: #0d6efd;
             --dark-blue: #084298;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
-            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+            --sidebar-bg: #242424;
+            --sidebar-bg-light: #2c2c2c;
+            --sidebar-hover: #343434;
+            --sidebar-text: #f5f5f5;
+            --sidebar-muted: #999;
+            --sidebar-width: 270px;
+            --sidebar-collapsed-width: 72px;
+            --body-bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+            --shadow-md: 0 8px 25px rgba(0,0,0,.08);
+            --shadow-lg: 0 15px 45px rgba(0,0,0,.15);
             --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-            --sidebar-width: 260px;
-            --sidebar-collapsed-width: 60px;
-            --sidebar-bg: #2d2d2d;
-            --sidebar-text: #ffffff;
-            --sidebar-muted: #a0a0a0;
-            --sidebar-hover: #3d3d3d;
-            --sidebar-active-bg: var(--primary-green);
-            --sidebar-active-text: #ffffff;
-            --logo-bg: #e8e8e8;
-            --body-bg: #f5f5f5;
-            --footer-bg: rgba(160,160,160,0.4);
-            --header-height: 64px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --transition: all .28s cubic-bezier(.4,0,.2,1);
+            --header-height: 68px;
         }
 
 
-        * {
-            margin: 0;
-            padding: 0;
+        /* ============================================================
+                   GLOBAL
+                   ============================================================ */
+
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
         }
 
@@ -98,13 +128,15 @@
         html,
         body {
             min-height: 100%;
+            margin: 0;
+            padding: 0;
         }
 
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--body-bg);
-            color: #0f172a;
+            color: #111827;
             overflow-x: hidden;
             min-height: 100vh;
         }
@@ -116,19 +148,28 @@
         }
 
 
-        /* ==========================================================
-                   MAIN APP
-                   ========================================================== */
-
-        .app-wrapper {
-            display: flex;
-            min-height: 100vh;
+        button,
+        input,
+        select,
+        textarea {
+            font-family: inherit;
         }
 
 
-        /* ==========================================================
+        /* ============================================================
+                   APP WRAPPER
+                   ============================================================ */
+
+        .app-wrapper {
+            min-height: 100vh;
+            display: flex;
+            width: 100%;
+        }
+
+
+        /* ============================================================
                    SIDEBAR
-                   ========================================================== */
+                   ============================================================ */
 
         .sidebar {
             position: fixed;
@@ -136,54 +177,63 @@
             left: 0;
             bottom: 0;
             width: var(--sidebar-width);
-            background: var(--sidebar-bg);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            box-shadow: var(--shadow-sm);
+            background: linear-gradient( 180deg, #272727 0%, #222222 100% );
+            color: var(--sidebar-text);
             z-index: 1050;
             display: flex;
             flex-direction: column;
-            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), width 0.35s cubic-bezier(0.4,0,0.2,1);
-            overflow-x: hidden;
-            overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,.05);
+            box-shadow: 5px 0 25px rgba(0,0,0,.08);
+            overflow: hidden;
+            transition: width .3s ease, transform .3s ease;
         }
 
 
-        /* ==========================================================
-                   LOGO
-                   ========================================================== */
+        /* ============================================================
+                   LOGO AREA
+                   ============================================================ */
 
         .logo-section {
-            background: var(--logo-bg);
-            padding: 14px 16px;
             min-height: var(--header-height);
+            padding: 12px 15px;
             display: flex;
             align-items: center;
-            justify-content: flex-start;
             gap: 12px;
+            background: #eeeeee;
+            border-bottom: 1px solid rgba(0,0,0,.08);
             flex-shrink: 0;
-            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+
+
+        .logo-wrapper {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
 
         .smart-logo {
-            height: 34px;
+            height: 38px;
             width: auto;
+            max-width: 180px;
+            object-fit: contain;
             display: block;
-            flex-shrink: 0;
         }
 
 
         .toggle-sidebar-btn {
             width: 36px;
             height: 36px;
-            border-radius: 50%;
             border: none;
+            border-radius: 10px;
             background: transparent;
-            color: #2d2d2d;
-            font-size: 18px;
+            color: #333;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 17px;
             cursor: pointer;
             transition: var(--transition);
             flex-shrink: 0;
@@ -191,108 +241,132 @@
 
 
             .toggle-sidebar-btn:hover {
-                background: rgba(0,0,0,0.08);
-                color: #000;
+                background: rgba(0,0,0,.08);
+                transform: scale(1.05);
             }
 
 
-        /* ==========================================================
+        /* ============================================================
                    SIDEBAR NAVIGATION
-                   ========================================================== */
+                   ============================================================ */
 
         .sidebar-nav {
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 16px 10px 20px;
-            background: var(--sidebar-bg);
+            padding: 18px 12px 20px;
             scrollbar-width: thin;
-            scrollbar-color: #444 transparent;
+            scrollbar-color: #4b4b4b transparent;
         }
 
 
             .sidebar-nav::-webkit-scrollbar {
-                width: 4px;
+                width: 5px;
+            }
+
+
+            .sidebar-nav::-webkit-scrollbar-track {
+                background: transparent;
             }
 
 
             .sidebar-nav::-webkit-scrollbar-thumb {
-                background: #555;
-                border-radius: 10px;
+                background: #4b4b4b;
+                border-radius: 20px;
             }
 
 
+        /* ============================================================
+                   SECTION TITLE
+                   ============================================================ */
+
         .nav-label {
-            font-size: 11px;
+            padding: 8px 11px 10px;
+            color: #888;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
-            font-weight: 600;
-            color: var(--sidebar-muted);
-            padding: 18px 8px 8px;
             white-space: nowrap;
         }
 
 
         .sidebar-nav ul {
             list-style: none;
-            padding: 0;
             margin: 0;
+            padding: 0;
         }
 
 
         .sidebar-nav .nav-item {
-            list-style: none;
+            margin-bottom: 4px;
         }
 
 
+        /* ============================================================
+                   NAV LINK
+                   ============================================================ */
+
         .sidebar-nav .nav-link {
+            position: relative;
+            min-height: 44px;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 8px 10px;
-            border-radius: var(--radius-sm);
-            color: var(--sidebar-text);
+            gap: 13px;
+            border-radius: 11px;
+            color: #d7d7d7;
+            font-size: 13px;
             font-weight: 500;
-            font-size: 14px;
-            transition: var(--transition);
             white-space: nowrap;
             overflow: hidden;
-            margin-bottom: 2px;
-            position: relative;
+            transition: var(--transition);
         }
 
 
             .sidebar-nav .nav-link i {
-                width: 20px;
-                min-width: 20px;
-                font-size: 16px;
+                width: 21px;
+                min-width: 21px;
                 text-align: center;
-                color: var(--sidebar-muted);
-                transition: color 0.25s ease;
+                font-size: 16px;
+                color: #929292;
+                transition: var(--transition);
             }
 
 
             .sidebar-nav .nav-link .link-text {
-                color: var(--sidebar-text);
+                overflow: hidden;
+                text-overflow: ellipsis;
                 opacity: 1;
-                transition: opacity 0.25s ease;
+                transition: opacity .2s ease, transform .2s ease;
             }
 
 
+            /* ============================================================
+                   HOVER
+                   ============================================================ */
+
             .sidebar-nav .nav-link:hover {
                 background: var(--sidebar-hover);
+                color: #fff;
+                transform: translateX(2px);
             }
 
 
                 .sidebar-nav .nav-link:hover i {
                     color: #fff;
+                    transform: scale(1.08);
                 }
 
 
+            /* ============================================================
+                   ACTIVE LINK
+                   ============================================================ */
+
             .sidebar-nav .nav-link.active {
-                background: var(--sidebar-active-bg);
-                color: var(--sidebar-active-text);
-                box-shadow: 0 4px 14px rgba(25,135,84,0.30);
+                background: linear-gradient( 135deg, #198754, #157347 );
+                color: #fff;
+                box-shadow: 0 6px 18px rgba(25,135,84,.25);
             }
 
 
@@ -301,41 +375,57 @@
                 }
 
 
-                .sidebar-nav .nav-link.active:hover {
-                    background: var(--primary-green-hover);
+                .sidebar-nav .nav-link.active::before {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    top: 8px;
+                    bottom: 8px;
+                    width: 3px;
+                    border-radius: 0 4px 4px 0;
+                    background: #fff;
                 }
 
 
-        /* ==========================================================
+        /* ============================================================
                    SIDEBAR FOOTER
-                   ========================================================== */
+                   ============================================================ */
 
         .sidebar-footer {
-            border-top: 1px solid rgba(255,255,255,0.06);
-            padding: 12px 16px;
-            min-height: 64px;
+            min-height: 76px;
+            padding: 13px 14px;
             display: flex;
             align-items: center;
             gap: 10px;
-            background: var(--sidebar-bg);
+            background: rgba(0,0,0,.16);
+            border-top: 1px solid rgba(255,255,255,.06);
             flex-shrink: 0;
         }
 
 
+        /* ============================================================
+                   AVATAR
+                   ============================================================ */
+
         .avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: linear-gradient( 135deg, var(--primary-blue), var(--dark-blue) );
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 12px;
+            background: linear-gradient( 135deg, #0d6efd, #084298 );
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
-            font-weight: 600;
             font-size: 14px;
-            flex-shrink: 0;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(13,110,253,.25);
         }
 
+
+        /* ============================================================
+                   USER INFORMATION
+                   ============================================================ */
 
         .user-info {
             flex: 1;
@@ -344,107 +434,130 @@
 
 
             .user-info .name {
-                font-weight: 600;
-                font-size: 13px;
+                display: block;
                 color: #fff;
+                font-size: 12px;
+                font-weight: 700;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                margin-bottom: 3px;
             }
+
+
+                .user-info .name:hover {
+                    color: #7ee2a8;
+                }
 
 
             .user-info .role {
-                font-size: 11px;
-                color: var(--sidebar-muted);
+                color: #8f8f8f;
+                font-size: 10px;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
 
 
+        /* ============================================================
+                   LOGOUT
+                   ============================================================ */
+
         .logout-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
             border: none;
+            border-radius: 10px;
             background: transparent;
-            color: var(--sidebar-muted);
-            cursor: pointer;
+            color: #999;
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
             transition: var(--transition);
-            flex-shrink: 0;
         }
 
 
             .logout-btn:hover {
-                background: #fee2e2;
-                color: #dc2626;
+                background: rgba(220,53,69,.15);
+                color: #ff6b7a;
+                transform: scale(1.05);
             }
 
 
-        /* ==========================================================
-                   MAIN CONTENT
-                   ========================================================== */
+        /* ============================================================
+                   MAIN AREA
+                   ============================================================ */
 
         .main-area {
             flex: 1;
-            margin-left: var(--sidebar-width);
+            min-width: 0;
             min-height: 100vh;
+            margin-left: var(--sidebar-width);
             display: flex;
             flex-direction: column;
             background: var(--body-bg);
-            transition: margin-left 0.35s cubic-bezier(0.4,0,0.2,1);
+            transition: margin-left .3s ease;
         }
 
+
+        /* ============================================================
+                   PAGE CONTENT
+                   ============================================================ */
 
         .page-content {
             flex: 1;
-            padding: 28px 32px 40px;
+            width: 100%;
+            min-height: calc(100vh - 70px);
+            padding: 30px 34px 42px;
             background: var(--body-bg);
-            min-height: 400px;
         }
 
 
-        /* ==========================================================
+        /* ============================================================
                    FOOTER
-                   ========================================================== */
+                   ============================================================ */
 
         .main-footer {
-            background: var(--footer-bg);
-            backdrop-filter: blur(2px);
-            border-top: 1px solid rgba(0,0,0,0.05);
-            padding: 14px 28px;
-            text-align: center;
-            font-size: 13px;
-            color: #1e1e1e;
-            flex-shrink: 0;
             width: 100%;
+            padding: 15px 25px;
+            background: rgba(255,255,255,.75);
+            border-top: 1px solid var(--border-color);
+            color: #64748b;
+            font-size: 12px;
+            text-align: center;
+            flex-shrink: 0;
         }
+
+
+            .main-footer strong {
+                color: #334155;
+            }
 
 
             .main-footer a {
-                color: #0b5e7c;
-                font-weight: 500;
+                color: var(--primary-green);
+                font-weight: 600;
                 transition: var(--transition);
             }
 
 
                 .main-footer a:hover {
-                    color: #084298;
+                    color: var(--primary-green-dark);
                     text-decoration: underline;
                 }
 
 
             .main-footer .fa-heart {
                 color: #dc3545;
+                margin: 0 3px;
             }
 
 
-        /* ==========================================================
+        /* ============================================================
                    COLLAPSED DESKTOP SIDEBAR
-                   ========================================================== */
+                   ============================================================ */
 
         .sidebar.collapsed {
             width: var(--sidebar-collapsed-width);
@@ -454,47 +567,55 @@
             .sidebar.collapsed .logo-section {
                 padding: 10px 0;
                 justify-content: center;
-                align-items: center;
             }
 
 
-            .sidebar.collapsed .smart-logo {
+            .sidebar.collapsed .logo-wrapper {
                 display: none;
             }
 
 
             .sidebar.collapsed .toggle-sidebar-btn {
-                margin: 0;
-                width: 32px;
-                height: 32px;
+                margin: auto;
             }
 
 
-            .sidebar.collapsed .nav-label,
-            .sidebar.collapsed .link-text,
-            .sidebar.collapsed .user-info {
+            .sidebar.collapsed .nav-label {
                 opacity: 0;
-                pointer-events: none;
-                width: 0;
+                height: 0;
+                padding: 0;
                 overflow: hidden;
+            }
+
+
+            .sidebar.collapsed .link-text {
+                opacity: 0;
+                width: 0;
+                transform: translateX(-10px);
+                pointer-events: none;
             }
 
 
             .sidebar.collapsed .nav-link {
                 justify-content: center;
                 gap: 0;
-                padding: 8px 0;
+                padding: 10px 0;
             }
 
 
                 .sidebar.collapsed .nav-link i {
-                    width: 32px;
-                    min-width: 32px;
-                    height: 32px;
+                    width: 38px;
+                    min-width: 38px;
+                    height: 38px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    border-radius: 6px;
+                    border-radius: 10px;
+                }
+
+
+                .sidebar.collapsed .nav-link:hover i {
+                    background: var(--sidebar-hover);
                 }
 
 
@@ -504,10 +625,14 @@
                 }
 
 
+                    .sidebar.collapsed .nav-link.active::before {
+                        display: none;
+                    }
+
+
                     .sidebar.collapsed .nav-link.active i {
-                        background: var(--primary-green);
-                        color: #fff;
-                        box-shadow: 0 4px 10px rgba(25,135,84,0.30);
+                        background: linear-gradient( 135deg, #198754, #157347 );
+                        box-shadow: 0 5px 15px rgba(25,135,84,.25);
                     }
 
 
@@ -517,14 +642,15 @@
             }
 
 
-            .sidebar.collapsed .avatar {
+            .sidebar.collapsed .avatar,
+            .sidebar.collapsed .user-info {
                 display: none;
             }
 
 
             .sidebar.collapsed .logout-btn {
-                width: 30px;
-                height: 30px;
+                width: 38px;
+                height: 38px;
             }
 
 
@@ -533,42 +659,48 @@
         }
 
 
-        /* ==========================================================
-                   MOBILE
-                   ========================================================== */
+        /* ============================================================
+                   MOBILE FLOATING BUTTON
+                   ============================================================ */
 
         .floating-toggle {
             display: none;
             position: fixed;
             top: 14px;
             left: 14px;
-            z-index: 1060;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
+            width: 44px;
+            height: 44px;
             border: none;
-            background: #2d2d2d;
+            border-radius: 12px;
+            background: linear-gradient( 135deg, #242424, #353535 );
             color: #fff;
-            font-size: 20px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            font-size: 18px;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            z-index: 1060;
+            box-shadow: 0 8px 22px rgba(0,0,0,.25);
+            transition: var(--transition);
         }
 
 
             .floating-toggle:hover {
-                background: #3d3d3d;
+                transform: translateY(-2px);
+                background: linear-gradient( 135deg, #198754, #157347 );
             }
 
+
+        /* ============================================================
+                   MOBILE BACKDROP
+                   ============================================================ */
 
         .sidebar-backdrop {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.40);
-            z-index: 1045;
+            background: rgba(0,0,0,.48);
             backdrop-filter: blur(3px);
+            z-index: 1045;
         }
 
 
@@ -577,16 +709,16 @@
             }
 
 
-        /* ==========================================================
-                   TABLET / MOBILE
-                   ========================================================== */
+        /* ============================================================
+                   TABLET
+                   ============================================================ */
 
         @@media (max-width: 992px) {
 
             .sidebar {
-                transform: translateX(-100%);
                 width: 280px;
-                box-shadow: var(--shadow-lg);
+                transform: translateX(-100%);
+                box-shadow: 10px 0 35px rgba(0,0,0,.18);
             }
 
 
@@ -595,18 +727,14 @@
                 }
 
 
-            .main-area {
+            .main-area,
+            .main-area.expanded {
                 margin-left: 0 !important;
             }
 
 
             .page-content {
-                padding: 20px 18px 30px;
-            }
-
-
-            .main-footer {
-                padding: 12px 20px;
+                padding: 24px 22px 34px;
             }
 
 
@@ -615,14 +743,14 @@
             }
 
 
-            .logo-section .toggle-sidebar-btn {
-                display: none;
-            }
-
-
             .logo-section {
                 justify-content: center;
             }
+
+
+                .logo-section .toggle-sidebar-btn {
+                    display: none;
+                }
 
 
             .sidebar.collapsed {
@@ -637,69 +765,90 @@
         }
 
 
-        /* ==========================================================
-                   SMALL MOBILE
-                   ========================================================== */
+        /* ============================================================
+                   MOBILE
+                   ============================================================ */
 
         @@media (max-width: 576px) {
 
             .page-content {
-                padding: 16px 14px 24px;
+                padding: 18px 14px 28px;
             }
 
 
             .sidebar {
-                width: 260px;
+                width: 270px;
             }
 
 
             .logo-section {
-                padding: 10px 12px;
-                min-height: 56px;
+                min-height: 60px;
+                padding: 10px 14px;
             }
 
 
             .smart-logo {
-                height: 28px;
+                height: 31px;
+                max-width: 170px;
             }
 
 
             .sidebar-nav {
-                padding: 10px 6px 14px;
+                padding: 14px 10px 18px;
             }
 
 
                 .sidebar-nav .nav-link {
-                    padding: 7px 8px;
+                    min-height: 46px;
+                    padding: 10px 11px;
                     font-size: 13px;
                 }
 
 
             .sidebar-footer {
-                padding: 10px 12px;
-                min-height: 56px;
+                min-height: 70px;
+                padding: 11px 13px;
             }
 
 
             .avatar {
-                width: 30px;
-                height: 30px;
-                font-size: 12px;
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                border-radius: 10px;
             }
 
 
             .main-footer {
-                padding: 10px 14px;
-                font-size: 12px;
+                padding: 12px 14px;
+                font-size: 11px;
             }
 
 
             .floating-toggle {
+                width: 40px;
+                height: 40px;
                 top: 10px;
                 left: 10px;
-                width: 38px;
-                height: 38px;
-                font-size: 17px;
+                border-radius: 11px;
+                font-size: 16px;
+            }
+        }
+
+
+        /* ============================================================
+                   EXTRA SMALL DEVICES
+                   ============================================================ */
+
+        @@media (max-width: 380px) {
+
+            .sidebar {
+                width: 255px;
+            }
+
+
+            .page-content {
+                padding: 16px 11px 24px;
             }
         }
 
@@ -713,26 +862,34 @@
     <div class="app-wrapper">
 
 
-        <!-- ======================================================
+        <!-- ============================================================
              SIDEBAR
-             ====================================================== -->
+             ============================================================ -->
 
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar"
+               id="sidebar">
 
 
-            <!-- Logo -->
+            <!-- ========================================================
+                 LOGO
+                 ======================================================== -->
 
             <div class="logo-section">
 
-                <img src="~/image/logo1.png"
-                     class="smart-logo"
-                     alt="SmartTrack Logo" />
+                <div class="logo-wrapper">
+
+                    <img src="~/image/logo1.png"
+                         class="smart-logo"
+                         alt="SmartTrack Logo" />
+
+                </div>
 
 
                 <button type="button"
-                        class="toggle-sidebar-btn ms-auto"
+                        class="toggle-sidebar-btn"
                         id="sidebarToggleBtn"
-                        aria-label="Toggle sidebar">
+                        aria-label="Toggle sidebar"
+                        title="Collapse sidebar">
 
                     <i class="fas fa-bars"></i>
 
@@ -741,28 +898,33 @@
             </div>
 
 
-            <!-- Navigation -->
+            <!-- ========================================================
+                 NAVIGATION
+                 ======================================================== -->
 
             <nav class="sidebar-nav">
 
                 <div class="nav-label">
-                    Main
+                    Main Menu
                 </div>
 
 
                 <ul>
 
 
-                    <!-- Dashboard -->
+                    <!-- ==================================================
+                         DASHBOARD
+                         ================================================== -->
 
                     <li class="nav-item">
 
                         <a class="nav-link @(currentController == "SmartTrackDashboard" && currentAction == "Index" ? "active" : "")"
                            asp-area=""
                            asp-controller="SmartTrackDashboard"
-                           asp-action="Index">
+                           asp-action="Index"
+                           title="Dashboard">
 
-                            <i class="fas fa-th-large"></i>
+                            <i class="fas fa-chart-pie"></i>
 
                             <span class="link-text">
                                 Dashboard
@@ -773,16 +935,22 @@
                     </li>
 
 
-                    <!-- Receipt Scanner -->
+                    <!-- ==================================================
+                         OWNER / FAMILY MEMBER OPTIONS
+                         ================================================== -->
                     @if (User.IsInRole("FamilyMembers") ||
-                        User.IsInRole("HouseholdOwner"))
+                                        User.IsInRole("HouseholdOwner"))
                     {
+
+                        <!-- ADD RECEIPT -->
+
                         <li class="nav-item">
 
                             <a class="nav-link @(currentController == "Receipt" && currentAction == "Scan" ? "active" : "")"
-                            asp-area=""
-                            asp-controller="Receipt"
-                            asp-action="Scan">
+                               asp-area=""
+                               asp-controller="Receipt"
+                               asp-action="Scan"
+                               title="Add Receipt">
 
                                 <i class="fas fa-receipt"></i>
 
@@ -795,78 +963,117 @@
                         </li>
 
 
-                        <!-- Saved Receipts -->
-
-                        <li class="nav-item">
-
-                            <a class="nav-link @(currentController == "Receipt" && currentAction == "ViewSavedReceipts" ? "active" : "")"
-                            asp-area=""
-                            asp-controller="Receipt"
-                            asp-action="ViewSavedReceipts">
-
-                                <i class="fas fa-folder-open"></i>
-
-                                <span class="link-text">
-                                    View Receipts
-                                </span>
-
-                            </a>
-
-                        </li>
-
-
-                        <li class="nav-item">
-
-                            <a class="nav-link @(currentController == "SmartTrackDashboard" && currentAction == "Recommendations" ? "active" : "")"
-                               asp-area=""
-                               asp-controller="SmartTrackDashboard"
-                               asp-action="Recommendations">
-
-                                <i class="fas fa-th-large"></i>
-
-                                <span class="link-text">
-                                    Purchase Recommendations
-                                </span>
-
-                            </a>
-
-                        </li>
-
+                        <!-- SHOPPING LIST -->
 
                         <li class="nav-item">
 
                             <a class="nav-link @(currentController == "ShoppingList" && currentAction == "Index" ? "active" : "")"
                                asp-area=""
                                asp-controller="ShoppingList"
-                               asp-action="Index">
+                               asp-action="Index"
+                               title="Shopping List">
 
-                                <i class="fas fa-th-large"></i>
+                                <i class="fas fa-cart-shopping"></i>
 
                                 <span class="link-text">
-									Shopping List
+                                    Shopping List
                                 </span>
 
                             </a>
 
                         </li>
+
+
+                        <!-- DAILY USAGE -->
+
+                        <li class="nav-item">
+
+                            <a class="nav-link @(currentController == "SmartTrackStock" && currentAction == "Index" ? "active" : "")"
+                               asp-area=""
+                               asp-controller="SmartTrackStock"
+                               asp-action="Index"
+                               title="Daily Usage">
+
+                                <i class="fas fa-chart-line"></i>
+
+                                <span class="link-text">
+                                    Daily Usage
+                                </span>
+
+                            </a>
+
+                        </li>
+
                     }
+
+
+                    <!-- ==================================================
+                         VIEW RECEIPTS
+                         ================================================== -->
+
+                    <li class="nav-item">
+
+                        <a class="nav-link @(currentController == "Receipt" && currentAction == "ViewSavedReceipts" ? "active" : "")"
+                           asp-area=""
+                           asp-controller="Receipt"
+                           asp-action="ViewSavedReceipts"
+                           title="View Receipts">
+
+                            <i class="fas fa-folder-open"></i>
+
+                            <span class="link-text">
+                                View Receipts
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    <!-- ==================================================
+                         PURCHASE RECOMMENDATIONS
+                         ================================================== -->
+
+                    <li class="nav-item">
+
+                        <a class="nav-link @(currentController == "SmartTrackDashboard" && currentAction == "Recommendations" ? "active" : "")"
+                           asp-area=""
+                           asp-controller="SmartTrackDashboard"
+                           asp-action="Recommendations"
+                           title="Purchase Recommendations">
+
+                            <i class="fas fa-lightbulb"></i>
+
+                            <span class="link-text">
+                                Purchase Recommendations
+                            </span>
+
+                        </a>
+
+                    </li>
 
                 </ul>
 
             </nav>
 
 
-            <!-- ==================================================
+            <!-- ========================================================
                  USER FOOTER
-                 ================================================== -->
+                 ======================================================== -->
 
             <div class="sidebar-footer">
 
 
+                <!-- AVATAR -->
+
                 <div class="avatar">
+
                     @userInitial
+
                 </div>
 
+
+                <!-- USER DETAILS -->
 
                 <div class="user-info">
 
@@ -878,7 +1085,6 @@
 
                     </a>
 
-
                     <div class="role">
 
                         @userRole
@@ -888,7 +1094,7 @@
                 </div>
 
 
-                <!-- Logout -->
+                <!-- LOGOUT -->
 
                 <form asp-controller="Account"
                       asp-action="Logout"
@@ -899,10 +1105,10 @@
 
                     <button type="button"
                             class="logout-btn"
-                            title="Logout"
-                            id="logoutButton">
+                            id="logoutButton"
+                            title="Logout">
 
-                        <i class="fas fa-sign-out-alt"></i>
+                        <i class="fas fa-right-from-bracket"></i>
 
                     </button>
 
@@ -913,30 +1119,32 @@
         </aside>
 
 
-        <!-- ======================================================
-             MOBILE FLOATING BUTTON
-             ====================================================== -->
+        <!-- ============================================================
+             MOBILE MENU BUTTON
+             ============================================================ -->
 
         <button type="button"
                 class="floating-toggle"
                 id="floatingToggleBtn"
-                aria-label="Open sidebar">
+                aria-label="Open navigation menu">
 
             <i class="fas fa-bars"></i>
 
         </button>
 
 
-        <!-- Backdrop -->
+        <!-- ============================================================
+             BACKDROP
+             ============================================================ -->
 
         <div class="sidebar-backdrop"
              id="sidebarBackdrop">
         </div>
 
 
-        <!-- ======================================================
-             MAIN AREA
-             ====================================================== -->
+        <!-- ============================================================
+             MAIN CONTENT AREA
+             ============================================================ -->
 
         <div class="main-area"
              id="mainArea">
@@ -949,7 +1157,9 @@
             </main>
 
 
-            <!-- Footer -->
+            <!-- ========================================================
+                 FOOTER
+                 ======================================================== -->
 
             <footer class="main-footer">
 
@@ -959,7 +1169,7 @@
 
                 &mdash;
 
-                Built with
+                Smart household consumption management
 
                 <i class="fas fa-heart"></i>
 
@@ -979,9 +1189,9 @@
     </div>
 
 
-    <!-- ==========================================================
-         SCRIPTS
-         ========================================================== -->
+    <!-- ================================================================
+         JAVASCRIPT
+         ================================================================ -->
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
@@ -997,6 +1207,10 @@
 
             'use strict';
 
+
+            /* ============================================================
+               ELEMENTS
+               ============================================================ */
 
             const sidebar =
                 document.getElementById('sidebar');
@@ -1020,12 +1234,20 @@
                 document.getElementById('logoutForm');
 
 
+            /* ============================================================
+               MOBILE CHECK
+               ============================================================ */
+
             function isMobile() {
 
                 return window.innerWidth <= 992;
 
             }
 
+
+            /* ============================================================
+               OPEN MOBILE SIDEBAR
+               ============================================================ */
 
             function openMobileSidebar() {
 
@@ -1035,8 +1257,16 @@
 
                 document.body.style.overflow = 'hidden';
 
+
+                floatingToggle.innerHTML =
+                    '<i class="fas fa-xmark"></i>';
+
             }
 
+
+            /* ============================================================
+               CLOSE MOBILE SIDEBAR
+               ============================================================ */
 
             function closeMobileSidebar() {
 
@@ -1046,18 +1276,31 @@
 
                 document.body.style.overflow = '';
 
+
+                floatingToggle.innerHTML =
+                    '<i class="fas fa-bars"></i>';
+
             }
 
+
+            /* ============================================================
+               TOGGLE SIDEBAR
+               ============================================================ */
 
             function toggleSidebar() {
 
                 if (isMobile()) {
 
-                    if (sidebar.classList.contains('mobile-open')) {
+                    if (
+                        sidebar.classList.contains(
+                            'mobile-open'
+                        )
+                    ) {
 
                         closeMobileSidebar();
 
-                    } else {
+                    }
+                    else {
 
                         openMobileSidebar();
 
@@ -1066,24 +1309,78 @@
                 }
                 else {
 
-                    sidebar.classList.toggle('collapsed');
+                    sidebar.classList.toggle(
+                        'collapsed'
+                    );
 
-                    mainArea.classList.toggle('expanded');
+                    mainArea.classList.toggle(
+                        'expanded'
+                    );
+
+
+                    const collapsed =
+                        sidebar.classList.contains(
+                            'collapsed'
+                        );
 
 
                     localStorage.setItem(
                         'smarttrack-sidebar-collapsed',
-                        sidebar.classList.contains('collapsed')
+                        collapsed
                             ? 'true'
                             : 'false'
                     );
+
+
+                    updateDesktopToggleIcon();
 
                 }
 
             }
 
 
-            /* Desktop sidebar */
+            /* ============================================================
+               DESKTOP ICON
+               ============================================================ */
+
+            function updateDesktopToggleIcon() {
+
+                if (isMobile()) {
+
+                    return;
+
+                }
+
+
+                if (
+                    sidebar.classList.contains(
+                        'collapsed'
+                    )
+                ) {
+
+                    sidebarToggle.innerHTML =
+                        '<i class="fas fa-chevron-right"></i>';
+
+                    sidebarToggle.title =
+                        'Expand sidebar';
+
+                }
+                else {
+
+                    sidebarToggle.innerHTML =
+                        '<i class="fas fa-bars"></i>';
+
+                    sidebarToggle.title =
+                        'Collapse sidebar';
+
+                }
+
+            }
+
+
+            /* ============================================================
+               EVENTS
+               ============================================================ */
 
             sidebarToggle?.addEventListener(
                 'click',
@@ -1091,15 +1388,11 @@
             );
 
 
-            /* Mobile sidebar */
-
             floatingToggle?.addEventListener(
                 'click',
                 toggleSidebar
             );
 
-
-            /* Backdrop */
 
             backdrop?.addEventListener(
                 'click',
@@ -1107,7 +1400,9 @@
             );
 
 
-            /* Escape */
+            /* ============================================================
+               ESCAPE KEY
+               ============================================================ */
 
             document.addEventListener(
                 'keydown',
@@ -1116,7 +1411,9 @@
                     if (
                         event.key === 'Escape' &&
                         isMobile() &&
-                        sidebar.classList.contains('mobile-open')
+                        sidebar.classList.contains(
+                            'mobile-open'
+                        )
                     ) {
 
                         closeMobileSidebar();
@@ -1127,13 +1424,43 @@
             );
 
 
-            /* Logout */
+            /* ============================================================
+               AUTO CLOSE MOBILE AFTER CLICKING NAVIGATION
+               ============================================================ */
+
+            document
+                .querySelectorAll('.sidebar-nav .nav-link')
+                .forEach(function (link) {
+
+                    link.addEventListener(
+                        'click',
+                        function () {
+
+                            if (isMobile()) {
+
+                                closeMobileSidebar();
+
+                            }
+
+                        }
+                    );
+
+                });
+
+
+            /* ============================================================
+               LOGOUT
+               ============================================================ */
 
             logoutButton?.addEventListener(
                 'click',
                 function () {
 
-                    if (confirm('Logout from SmartTrack?')) {
+                    if (
+                        confirm(
+                            'Are you sure you want to logout from SmartTrack?'
+                        )
+                    ) {
 
                         this.disabled = true;
 
@@ -1148,7 +1475,9 @@
             );
 
 
-            /* Restore desktop sidebar state */
+            /* ============================================================
+               RESTORE SIDEBAR STATE
+               ============================================================ */
 
             function restoreSidebarState() {
 
@@ -1162,25 +1491,40 @@
 
                     if (stored === 'true') {
 
-                        sidebar.classList.add('collapsed');
+                        sidebar.classList.add(
+                            'collapsed'
+                        );
 
-                        mainArea.classList.add('expanded');
+                        mainArea.classList.add(
+                            'expanded'
+                        );
 
                     }
                     else {
 
-                        sidebar.classList.remove('collapsed');
+                        sidebar.classList.remove(
+                            'collapsed'
+                        );
 
-                        mainArea.classList.remove('expanded');
+                        mainArea.classList.remove(
+                            'expanded'
+                        );
 
                     }
+
+
+                    updateDesktopToggleIcon();
 
                 }
                 else {
 
-                    sidebar.classList.remove('collapsed');
+                    sidebar.classList.remove(
+                        'collapsed'
+                    );
 
-                    mainArea.classList.remove('expanded');
+                    mainArea.classList.remove(
+                        'expanded'
+                    );
 
                     closeMobileSidebar();
 
@@ -1189,10 +1533,16 @@
             }
 
 
+            /* ============================================================
+               INITIALIZE
+               ============================================================ */
+
             restoreSidebarState();
 
 
-            /* Handle resize */
+            /* ============================================================
+               RESPONSIVE RESIZE
+               ============================================================ */
 
             let resizeTimer;
 
@@ -1201,7 +1551,9 @@
                 'resize',
                 function () {
 
-                    clearTimeout(resizeTimer);
+                    clearTimeout(
+                        resizeTimer
+                    );
 
 
                     resizeTimer = setTimeout(

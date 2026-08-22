@@ -1,0 +1,1122 @@
+﻿@model SmartTrack.Models.SmartTrackDashboardViewModel
+
+@{
+    ViewData["Title"] = "Daily Usage";
+}
+
+<style>
+
+    /* =========================================================
+           SMARTTRACK DAILY USAGE THEME
+           Matches SmartTrack Dashboard
+        ========================================================= */
+
+    :root {
+        --primary-green: #198754;
+        --dark-green: #146c43;
+        --primary-blue: #0d6efd;
+        --dark-blue: #084298;
+        --primary-yellow: #ffc107;
+        --dark-yellow: #d39e00;
+        --primary-red: #dc3545;
+        --dark-red: #b02a37;
+        --light-green: #eaf7ef;
+        --light-blue: #eaf2ff;
+        --light-yellow: #fff8df;
+        --light-red: #fff0f0;
+        --text-dark: #212529;
+        --text-muted: #6c757d;
+        --border-light: #e9ecef;
+        --shadow-sm: 0 4px 20px rgba(0, 0, 0, .08);
+        --shadow-md: 0 10px 35px rgba(0, 0, 0, .12);
+        --radius-sm: 12px;
+        --radius-md: 20px;
+        --radius-lg: 26px;
+        --transition: all .3s cubic-bezier(.4, 0, .2, 1);
+    }
+
+
+    /* =========================================================
+           GLOBAL
+        ========================================================= */
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    .daily-usage-page {
+        width: 100%;
+        max-width: 100%;
+        padding: 24px;
+    }
+
+
+    /* =========================================================
+           HERO
+        ========================================================= */
+    .usage-hero {
+        position: relative;
+        width: 100%;
+        padding: 28px 30px;
+        margin-bottom: 22px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        /* SmartTrack Green Header */
+        background: linear-gradient( 135deg, #198754 0%, #146c43 100% );
+        box-shadow: 0 12px 35px rgba(25, 135, 84, .22);
+    }
+
+        .usage-hero::before {
+            content: "";
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            right: -80px;
+            top: -120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.08);
+        }
+
+        .usage-hero::after {
+            content: "";
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            right: 180px;
+            bottom: -100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.06);
+        }
+
+    .usage-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .usage-hero-icon {
+        width: 58px;
+        height: 58px;
+        flex: 0 0 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        background: rgba(255,255,255,.15);
+        border: 1px solid rgba(255,255,255,.18);
+        color: #fff;
+        font-size: 1.3rem;
+    }
+
+    .usage-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        margin-bottom: 6px;
+        border-radius: 20px;
+        background: rgba(255,255,255,.13);
+        color: rgba(255,255,255,.92);
+        font-size: .62rem;
+        font-weight: 700;
+        letter-spacing: .3px;
+    }
+
+    .usage-hero h2 {
+        color: #fff;
+        font-size: 1.65rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0 0 5px;
+    }
+
+    .usage-hero p {
+        color: rgba(255,255,255,.82);
+        font-size: .76rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+
+    /* =========================================================
+           ERROR
+        ========================================================= */
+
+    .usage-error {
+        border: 0;
+        border-radius: var(--radius-sm);
+        font-size: .72rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+
+    /* =========================================================
+           MAIN CARD
+        ========================================================= */
+
+    .daily-usage-card {
+        width: 100%;
+        border: 0 !important;
+        border-radius: var(--radius-md) !important;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+        .daily-usage-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+
+    /* =========================================================
+           CARD HEADER
+        ========================================================= */
+
+    .daily-usage-header {
+        padding: 20px 23px;
+        background: #fff;
+        border-bottom: 1px solid #f1f3f5 !important;
+    }
+
+    .daily-usage-header-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .daily-usage-header-icon {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        font-size: .85rem;
+    }
+
+    .daily-usage-header h4 {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .daily-usage-header p {
+        font-size: .65rem;
+        margin: 3px 0 0;
+    }
+
+
+    /* =========================================================
+           CARD BODY
+        ========================================================= */
+
+    .daily-usage-body {
+        padding: 25px;
+    }
+
+
+    /* =========================================================
+           FORM SECTIONS
+        ========================================================= */
+
+    .usage-form-section {
+        margin-bottom: 22px;
+    }
+
+    .usage-form-label {
+        display: block;
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 7px;
+    }
+
+    .usage-input-wrapper {
+        position: relative;
+    }
+
+    .usage-input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-blue);
+        font-size: .82rem;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .usage-input {
+        width: 100%;
+        min-height: 47px;
+        padding-left: 40px;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        transition: var(--transition);
+    }
+
+        .usage-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 .2rem rgba(13,110,253,.10);
+        }
+
+    .usage-help {
+        display: block;
+        margin-top: 6px;
+        color: var(--text-muted);
+        font-size: .62rem;
+        line-height: 1.4;
+    }
+
+
+    /* =========================================================
+           USAGE TYPE SECTION
+        ========================================================= */
+
+    .usage-type-heading {
+        margin-bottom: 10px;
+    }
+
+        .usage-type-heading strong {
+            display: block;
+            font-size: .8rem;
+            margin-bottom: 3px;
+        }
+
+        .usage-type-heading span {
+            display: block;
+            color: var(--text-muted);
+            font-size: .62rem;
+        }
+
+    .usage-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .usage-option {
+        display: block;
+        cursor: pointer;
+        margin: 0;
+    }
+
+        .usage-option input {
+            display: none;
+        }
+
+
+    /* =========================================================
+           USAGE CARDS
+        ========================================================= */
+
+    .usage-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+        min-height: 145px;
+        padding: 18px 12px;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        background: #fff;
+        transition: var(--transition);
+    }
+
+        .usage-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+
+    /* =========================================================
+           USAGE ICON
+        ========================================================= */
+
+    .usage-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-bottom: 10px;
+        font-size: 21px;
+        background: #f8f9fa;
+    }
+
+
+    /* LOW */
+
+    .usage-option:nth-child(1) .usage-icon {
+        background: var(--light-green);
+    }
+
+    .usage-option:nth-child(1) .usage-card:hover {
+        border-color: var(--primary-green);
+        background: #fbfffc;
+    }
+
+    .usage-option:nth-child(1) input:checked + .usage-card {
+        border-color: var(--primary-green);
+        background: var(--light-green);
+        box-shadow: 0 0 0 2px rgba(25,135,84,.10), 0 8px 25px rgba(25,135,84,.10);
+    }
+
+
+    /* MEDIUM */
+
+    .usage-option:nth-child(2) .usage-icon {
+        background: var(--light-yellow);
+    }
+
+    .usage-option:nth-child(2) .usage-card:hover {
+        border-color: var(--primary-yellow);
+        background: #fffdf5;
+    }
+
+    .usage-option:nth-child(2) input:checked + .usage-card {
+        border-color: var(--primary-yellow);
+        background: var(--light-yellow);
+        box-shadow: 0 0 0 2px rgba(255,193,7,.12), 0 8px 25px rgba(255,193,7,.10);
+    }
+
+
+    /* HIGH */
+
+    .usage-option:nth-child(3) .usage-icon {
+        background: var(--light-red);
+    }
+
+    .usage-option:nth-child(3) .usage-card:hover {
+        border-color: var(--primary-red);
+        background: #fffafa;
+    }
+
+    .usage-option:nth-child(3) input:checked + .usage-card {
+        border-color: var(--primary-red);
+        background: var(--light-red);
+        box-shadow: 0 0 0 2px rgba(220,53,69,.10), 0 8px 25px rgba(220,53,69,.10);
+    }
+
+
+    /* =========================================================
+           USAGE CONTENT
+        ========================================================= */
+
+    .usage-content strong {
+        display: block;
+        font-size: .84rem;
+        margin-bottom: 5px;
+    }
+
+    .usage-content small {
+        display: block;
+        color: var(--text-muted);
+        font-size: .62rem;
+        line-height: 1.45;
+    }
+
+
+    /* =========================================================
+           INFORMATION BOX
+        ========================================================= */
+
+    .usage-info {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 18px;
+        padding: 13px;
+        border-radius: 10px;
+        background: #f8f9fa;
+        border: 1px solid #f0f1f2;
+    }
+
+    .usage-info-icon {
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        font-size: .7rem;
+    }
+
+    .usage-info-text {
+        min-width: 0;
+    }
+
+        .usage-info-text strong {
+            display: block;
+            font-size: .7rem;
+            margin-bottom: 2px;
+        }
+
+        .usage-info-text span {
+            display: block;
+            color: var(--text-muted);
+            font-size: .62rem;
+            line-height: 1.45;
+        }
+
+
+    /* =========================================================
+           BUTTONS
+        ========================================================= */
+
+    .usage-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 22px;
+        padding-top: 20px;
+        border-top: 1px solid #f1f3f5;
+    }
+
+    .usage-save-btn {
+        min-height: 46px;
+        padding: 9px 22px;
+        border: 0;
+        border-radius: var(--radius-sm);
+        background: linear-gradient( 135deg, var(--primary-green), var(--dark-green) );
+        font-size: .78rem;
+        font-weight: 700;
+        box-shadow: 0 6px 18px rgba(25,135,84,.20);
+        transition: var(--transition);
+    }
+
+        .usage-save-btn:hover {
+            background: linear-gradient( 135deg, var(--dark-green), #0f5132 );
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(25,135,84,.28);
+        }
+
+    .usage-cancel-btn {
+        min-height: 46px;
+        padding: 9px 20px;
+        border-radius: var(--radius-sm);
+        font-size: .78rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    /* =========================================================
+           MOBILE
+        ========================================================= */
+
+    @@media (max-width: 767.98px) {
+
+        .daily-usage-page {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 12px 10px !important;
+        }
+        /* HERO */
+
+        .usage-hero {
+            padding: 19px 16px;
+            border-radius: 14px;
+            margin-bottom: 17px;
+        }
+
+        .usage-hero-content {
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .usage-hero-icon {
+            width: 45px;
+            height: 45px;
+            flex-basis: 45px;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+
+        .usage-hero-badge {
+            font-size: .55rem;
+            padding: 4px 8px;
+        }
+
+        .usage-hero h2 {
+            font-size: 1.3rem;
+        }
+
+        .usage-hero p {
+            font-size: .65rem;
+        }
+        /* CARD */
+
+        .daily-usage-card {
+            border-radius: 13px !important;
+        }
+
+        .daily-usage-header {
+            padding: 14px !important;
+        }
+
+        .daily-usage-body {
+            padding: 14px !important;
+        }
+
+        .daily-usage-header-icon {
+            width: 34px;
+            height: 34px;
+        }
+
+        .daily-usage-header h4 {
+            font-size: .88rem;
+        }
+
+        .daily-usage-header p {
+            font-size: .6rem;
+        }
+        /* INPUT */
+
+        .usage-form-label {
+            font-size: .7rem;
+        }
+
+        .usage-input {
+            min-height: 43px;
+            font-size: .76rem;
+        }
+
+        .usage-help {
+            font-size: .58rem;
+        }
+        /* USAGE OPTIONS */
+
+        .usage-options {
+            grid-template-columns: 1fr;
+            gap: 9px;
+        }
+
+        .usage-card {
+            min-height: auto;
+            flex-direction: row;
+            justify-content: flex-start;
+            text-align: left;
+            padding: 13px;
+        }
+
+        .usage-icon {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            margin-bottom: 0;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .usage-content strong {
+            font-size: .78rem;
+        }
+
+        .usage-content small {
+            font-size: .58rem;
+        }
+        /* INFO */
+
+        .usage-info {
+            padding: 11px;
+        }
+
+        .usage-info-icon {
+            width: 27px;
+            height: 27px;
+            flex-basis: 27px;
+        }
+
+        .usage-info-text strong {
+            font-size: .64rem;
+        }
+
+        .usage-info-text span {
+            font-size: .57rem;
+        }
+        /* BUTTONS */
+
+        .usage-buttons {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .usage-save-btn,
+        .usage-cancel-btn {
+            width: 100%;
+            min-height: 43px;
+            font-size: .72rem;
+        }
+    }
+
+
+    /* =========================================================
+           VERY SMALL PHONES
+        ========================================================= */
+
+    @@media (max-width: 400px) {
+
+        .daily-usage-page {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+        }
+
+        .usage-hero {
+            padding: 16px 13px;
+        }
+
+        .usage-hero-icon {
+            width: 40px;
+            height: 40px;
+            flex-basis: 40px;
+        }
+
+        .usage-hero h2 {
+            font-size: 1.18rem;
+        }
+
+        .usage-hero p {
+            font-size: .6rem;
+        }
+
+        .daily-usage-header {
+            padding: 12px !important;
+        }
+
+        .daily-usage-body {
+            padding: 12px !important;
+        }
+
+        .usage-card {
+            padding: 11px;
+        }
+
+        .usage-icon {
+            width: 39px;
+            height: 39px;
+            min-width: 39px;
+        }
+
+        .usage-content strong {
+            font-size: .74rem;
+        }
+
+        .usage-content small {
+            font-size: .55rem;
+        }
+    }
+
+</style>
+
+
+<div class="daily-usage-page">
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <div class="usage-hero">
+
+        <div class="usage-hero-content">
+
+            <div class="usage-hero-icon">
+
+                <i class="fas fa-chart-column"></i>
+
+            </div>
+
+
+            <div>
+
+                <div class="usage-hero-badge">
+
+                    <i class="fas fa-chart-line"></i>
+
+                    SMARTTRACK USAGE
+
+                </div>
+
+
+                <h2>
+                    Daily Usage
+                </h2>
+
+
+                <p>
+                    Tell SmartTrack how your household used a
+                    product today to improve future predictions.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ERRORS
+    ====================================================== -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+
+        <div class="alert alert-danger usage-error mb-3">
+
+            <i class="fas fa-circle-exclamation me-2"></i>
+
+            <strong>
+                Please check the information entered.
+            </strong>
+
+            <div class="mt-2">
+
+                @foreach (var error in ViewData.ModelState.Values
+                            .SelectMany(v => v.Errors))
+                {
+                    <div>
+                        @error.ErrorMessage
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    }
+
+
+    <!-- =====================================================
+         MAIN FORM CARD
+    ====================================================== -->
+
+    <div class="card daily-usage-card">
+
+
+        <!-- HEADER -->
+
+        <div class="card-header daily-usage-header">
+
+            <div class="daily-usage-header-content">
+
+                <div class="daily-usage-header-icon">
+
+                    <i class="fas fa-sliders"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h4 class="fw-semibold">
+                        Record Daily Usage
+                    </h4>
+
+                    <p class="text-muted">
+                        Provide today's product usage information.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- BODY -->
+
+        <div class="card-body daily-usage-body">
+
+            <form asp-controller="SmartTrackStock"
+                  asp-action="SetAdjustment"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+
+                <!-- =================================================
+                     PRODUCT
+                ================================================== -->
+
+                <div class="usage-form-section">
+
+                    <label class="usage-form-label">
+                        Product
+                    </label>
+
+
+                    <div class="usage-input-wrapper">
+
+                        <i class="fas fa-box usage-input-icon"></i>
+
+                        <input type="text"
+                               name="productName"
+                               class="form-control usage-input"
+                               placeholder="Example: Rice"
+                               autocomplete="off"
+                               required />
+
+                    </div>
+
+
+                    <span class="usage-help">
+
+                        <i class="fas fa-circle-info me-1"></i>
+
+                        Enter the product exactly as it appears
+                        in your household purchase history.
+
+                    </span>
+
+                </div>
+
+
+                <!-- =================================================
+                     DATE
+                ================================================== -->
+
+                <div class="usage-form-section">
+
+                    <label class="usage-form-label">
+
+                        Usage Date
+
+                    </label>
+
+
+                    <div class="usage-input-wrapper">
+
+                        <i class="fas fa-calendar-day usage-input-icon"></i>
+
+                        <input type="date"
+                               name="date"
+                               class="form-control usage-input"
+                               value="@DateTime.Today.ToString("yyyy-MM-dd")"
+                               max="@DateTime.Today.ToString("yyyy-MM-dd")"
+                               required />
+
+                    </div>
+
+
+                    <span class="usage-help">
+
+                        <i class="fas fa-clock me-1"></i>
+
+                        Select the date when this usage occurred.
+
+                    </span>
+
+                </div>
+
+
+                <!-- =================================================
+                     USAGE TYPE
+                ================================================== -->
+
+                <div class="usage-form-section">
+
+
+                    <div class="usage-type-heading">
+
+                        <strong>
+                            How was the usage today?
+                        </strong>
+
+                        <span>
+                            Select the option that best represents
+                            your household's usage.
+                        </span>
+
+                    </div>
+
+
+                    <div class="usage-options">
+
+
+                        <!-- LOW -->
+
+                        <label class="usage-option">
+
+                            <input type="radio"
+                                   name="adjustmentType"
+                                   value="LOW"
+                                   required />
+
+                            <span class="usage-card">
+
+                                <span class="usage-icon">
+                                    🟢
+                                </span>
+
+                                <span class="usage-content">
+
+                                    <strong>
+                                        Low Usage
+                                    </strong>
+
+                                    <small>
+                                        Less than normal household usage
+                                    </small>
+
+                                </span>
+
+                            </span>
+
+                        </label>
+
+
+                        <!-- MEDIUM -->
+
+                        <label class="usage-option">
+
+                            <input type="radio"
+                                   name="adjustmentType"
+                                   value="MEDIUM" />
+
+                            <span class="usage-card">
+
+                                <span class="usage-icon">
+                                    🟡
+                                </span>
+
+                                <span class="usage-content">
+
+                                    <strong>
+                                        Medium Usage
+                                    </strong>
+
+                                    <small>
+                                        Normal or average household usage
+                                    </small>
+
+                                </span>
+
+                            </span>
+
+                        </label>
+
+
+                        <!-- HIGH -->
+
+                        <label class="usage-option">
+
+                            <input type="radio"
+                                   name="adjustmentType"
+                                   value="HIGH" />
+
+                            <span class="usage-card">
+
+                                <span class="usage-icon">
+                                    🔴
+                                </span>
+
+                                <span class="usage-content">
+
+                                    <strong>
+                                        High Usage
+                                    </strong>
+
+                                    <small>
+                                        More than normal household usage
+                                    </small>
+
+                                </span>
+
+                            </span>
+
+                        </label>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     INFORMATION
+                ================================================== -->
+
+                <div class="usage-info">
+
+                    <div class="usage-info-icon">
+
+                        <i class="fas fa-brain"></i>
+
+                    </div>
+
+
+                    <div class="usage-info-text">
+
+                        <strong>
+                            Why does this matter?
+                        </strong>
+
+                        <span>
+                            SmartTrack uses your daily usage adjustments
+                            to improve product consumption estimates and
+                            make future purchase predictions more accurate.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     BUTTONS
+                ================================================== -->
+
+                <div class="usage-buttons">
+
+
+                    <button type="submit"
+                            class="btn btn-success usage-save-btn">
+
+                        <i class="fas fa-save me-1"></i>
+
+                        Save Daily Usage
+
+                    </button>
+
+
+                    <a asp-controller="SmartTrackDashboard"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary usage-cancel-btn">
+
+                        <i class="fas fa-arrow-left me-1"></i>
+
+                        Back to Dashboard
+
+                    </a>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

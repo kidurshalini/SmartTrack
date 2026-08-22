@@ -7,6 +7,34 @@
 <style>
 
     /* =========================================================
+           SMARTTRACK DASHBOARD THEME
+        ========================================================= */
+
+    :root {
+        --primary-green: #198754;
+        --dark-green: #146c43;
+        --primary-blue: #0d6efd;
+        --dark-blue: #084298;
+        --primary-yellow: #ffc107;
+        --light-green: #eaf7ef;
+        --light-blue: #eaf2ff;
+        --light-yellow: #fff8df;
+        --light-red: #fff0f0;
+        --text-dark: #212529;
+        --text-muted: #6c757d;
+        --border-light: #e9ecef;
+        --dashboard-bg: #f5f8fb;
+        --shadow-sm: 0 4px 20px rgba(0,0,0,.08);
+        --shadow-md: 0 12px 40px rgba(0,0,0,.12);
+        --shadow-lg: 0 25px 70px rgba(0,0,0,.16);
+        --radius-sm: 12px;
+        --radius-md: 20px;
+        --radius-lg: 28px;
+        --transition: all .3s cubic-bezier(.4,0,.2,1);
+    }
+
+
+    /* =========================================================
            GLOBAL
         ========================================================= */
 
@@ -14,7 +42,10 @@
     body {
         width: 100%;
         max-width: 100%;
+        margin: 0;
+        padding: 0;
         overflow-x: hidden !important;
+        background: var(--dashboard-bg);
     }
 
     *,
@@ -23,16 +54,17 @@
         box-sizing: border-box;
     }
 
+
+    /* =========================================================
+           MAIN DASHBOARD BACKGROUND
+        ========================================================= */
+
     .smarttrack-dashboard {
         width: 100%;
-        max-width: 100%;
-    }
-
-    .summary-card,
-    .dashboard-card {
-        border-radius: 12px;
-        width: 100%;
-        overflow: hidden;
+        max-width: none !important;
+        min-height: calc(100vh - 60px);
+        padding: 28px 32px !important;
+        background: radial-gradient( circle at top right, rgba(13,110,253,.07), transparent 28% ), radial-gradient( circle at top left, rgba(25,135,84,.06), transparent 25% ), var(--dashboard-bg);
     }
 
 
@@ -42,24 +74,273 @@
 
     .dashboard-header {
         width: 100%;
+        padding: 8px 0 22px;
     }
 
-        .dashboard-header h2 {
-            font-size: 1.7rem;
+    .dashboard-title-area {
+        min-width: 0;
+    }
+
+    .dashboard-title {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .dashboard-title-icon {
+        width: 52px;
+        height: 52px;
+        flex: 0 0 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: linear-gradient( 135deg, var(--primary-green), var(--dark-green) );
+        color: white;
+        font-size: 1.15rem;
+        box-shadow: 0 8px 20px rgba(25,135,84,.25);
+    }
+
+    .dashboard-header h2 {
+        font-size: 1.8rem;
+        color: var(--text-dark);
+        letter-spacing: -.4px;
+    }
+
+    .dashboard-header p {
+        font-size: .78rem;
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+           CHECK PRODUCT BUTTON
+        ========================================================= */
+
+    .check-product-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 48px;
+        padding: 11px 20px;
+        border: none !important;
+        border-radius: 14px;
+        background: linear-gradient( 135deg, var(--primary-blue), var(--dark-blue) );
+        color: white !important;
+        font-size: .78rem;
+        font-weight: 700;
+        box-shadow: 0 8px 22px rgba(13,110,253,.22);
+        transition: var(--transition);
+    }
+
+        .check-product-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 30px rgba(13,110,253,.30);
         }
 
 
     /* =========================================================
-           SUMMARY CARDS
+           SUMMARY SECTION
         ========================================================= */
 
-    .summary-card {
-        min-height: 125px;
+    .summary-row {
+        width: 100%;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 
-        .summary-card .card-body {
-            padding: 1rem;
+    .summary-column {
+        min-width: 0;
+    }
+
+    .summary-card {
+        position: relative;
+        width: 100%;
+        min-height: 155px;
+        border: 0 !important;
+        border-radius: var(--radius-md) !important;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
         }
+
+        .summary-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+    .summary-danger::before {
+        background: #dc3545;
+    }
+
+    .summary-warning::before {
+        background: var(--primary-yellow);
+    }
+
+    .summary-info::before {
+        background: var(--primary-blue);
+    }
+
+    .summary-success::before {
+        background: var(--primary-green);
+    }
+
+    .summary-card .card-body {
+        padding: 22px;
+    }
+
+    .summary-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        margin-bottom: 13px;
+        font-size: .95rem;
+    }
+
+    .summary-label {
+        display: block;
+        font-size: .65rem;
+        letter-spacing: .7px;
+        font-weight: 800;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+
+    .summary-number {
+        font-size: 1.9rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 5px;
+    }
+
+    .summary-description {
+        display: block;
+        color: var(--text-muted);
+        font-size: .7rem;
+    }
+
+
+    /* COLORS */
+
+    .summary-danger .summary-icon {
+        background: var(--light-red);
+        color: #dc3545;
+    }
+
+    .summary-danger .summary-number {
+        color: #dc3545;
+    }
+
+    .summary-warning .summary-icon {
+        background: var(--light-yellow);
+        color: #d39e00;
+    }
+
+    .summary-warning .summary-number {
+        color: #d39e00;
+    }
+
+    .summary-info .summary-icon {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+    }
+
+    .summary-info .summary-number {
+        color: var(--primary-blue);
+    }
+
+    .summary-success .summary-icon {
+        background: var(--light-green);
+        color: var(--primary-green);
+    }
+
+    .summary-success .summary-number {
+        color: var(--primary-green);
+    }
+
+
+    /* =========================================================
+           GENERAL DASHBOARD CARDS
+        ========================================================= */
+
+    .dashboard-card {
+        width: 100%;
+        border: 0 !important;
+        border-radius: var(--radius-md) !important;
+        background: #fff;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+    }
+
+        .dashboard-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .dashboard-card .card-header {
+            padding: 18px 22px;
+            background: #fff;
+            border-bottom: 1px solid #f0f2f4 !important;
+        }
+
+        .dashboard-card .card-body {
+            padding: 22px;
+        }
+
+    .dashboard-card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-icon {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        font-size: .9rem;
+    }
+
+    .section-icon-blue {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+    }
+
+    .section-icon-green {
+        background: var(--light-green);
+        color: var(--primary-green);
+    }
+
+    .section-icon-yellow {
+        background: var(--light-yellow);
+        color: #d39e00;
+    }
+
+    .dashboard-card h5 {
+        font-size: .95rem;
+    }
+
+    .section-subtitle {
+        font-size: .64rem;
+        color: var(--text-muted);
+    }
 
 
     /* =========================================================
@@ -67,15 +348,70 @@
         ========================================================= */
 
     .alert-item {
-        min-width: 0;
+        display: flex;
+        align-items: flex-start;
         width: 100%;
+        gap: 13px;
+        padding: 14px;
+        margin-bottom: 10px;
+        border-radius: 14px;
+        background: #fafbfc;
+        border: 1px solid #f0f2f4;
+        transition: var(--transition);
+    }
+
+        .alert-item:hover {
+            background: #fff;
+            transform: translateX(3px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .alert-item:last-child {
+            margin-bottom: 0;
+        }
+
+    .alert-icon {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: var(--light-yellow);
+        color: #d39e00;
     }
 
     .alert-content {
-        min-width: 0;
         flex: 1;
+        min-width: 0;
         overflow-wrap: anywhere;
-        word-break: break-word;
+    }
+
+        .alert-content strong {
+            display: block;
+            font-size: .78rem;
+            margin-bottom: 3px;
+        }
+
+        .alert-content p {
+            font-size: .7rem;
+            line-height: 1.45;
+            margin-bottom: 4px !important;
+            color: var(--text-muted);
+        }
+
+        .alert-content small {
+            font-size: .6rem;
+            color: #9aa0a6;
+        }
+
+    .dismiss-btn {
+        flex: 0 0 28px;
+        width: 28px;
+        height: 28px;
+        padding: 0 !important;
+        border-radius: 50% !important;
     }
 
 
@@ -83,24 +419,89 @@
            STOCK
         ========================================================= */
 
+    .stock-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .recommendation-btn {
+        min-height: 38px;
+        border-radius: 10px;
+        font-size: .68rem;
+        padding: 7px 13px;
+        white-space: nowrap;
+    }
+
     .stock-item {
         width: 100%;
+        padding: 14px;
+        margin-bottom: 12px;
+        border-radius: 14px;
+        background: #fafbfc;
+        border: 1px solid #f0f2f4;
+        transition: var(--transition);
+    }
+
+        .stock-item:hover {
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stock-item:last-child {
+            margin-bottom: 0;
+        }
+
+    .stock-header {
+        display: flex;
+        width: 100%;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 9px;
     }
 
     .stock-product {
-        min-width: 0;
         flex: 1;
-        overflow-wrap: anywhere;
-        word-break: break-word;
+        min-width: 0;
     }
 
-    .stock-header {
-        width: 100%;
+        .stock-product strong {
+            display: block;
+            font-size: .78rem;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+        }
+
+    .stock-header .badge {
+        flex: 0 0 auto;
+        font-size: .58rem;
+        padding: 5px 9px;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+
+    .stock-progress {
+        height: 8px !important;
+        border-radius: 20px;
+        background: #edf0f2;
+        overflow: hidden;
+    }
+
+        .stock-progress .progress-bar {
+            border-radius: 20px;
+        }
+
+    .stock-days {
+        display: block;
+        margin-top: 7px;
+        font-size: .65rem;
     }
 
 
     /* =========================================================
-           DESKTOP PURCHASE TABLE
+           PURCHASE TABLE
         ========================================================= */
 
     .purchase-table-wrapper {
@@ -112,16 +513,34 @@
     .purchase-table {
         width: 100%;
         min-width: 600px;
+        font-size: .72rem;
     }
 
-        .purchase-table th,
+        .purchase-table th {
+            font-size: .65rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 13px;
+        }
+
         .purchase-table td {
+            padding: 14px 13px;
             vertical-align: middle;
         }
 
+        .purchase-table tbody tr {
+            transition: var(--transition);
+        }
+
+            .purchase-table tbody tr:hover {
+                background: var(--light-blue);
+            }
+
 
     /* =========================================================
-           MOBILE PURCHASE CARDS
+           MOBILE PURCHASE
         ========================================================= */
 
     .mobile-purchase-list {
@@ -130,269 +549,254 @@
 
 
     /* =========================================================
+           EMPTY STATE
+        ========================================================= */
+
+    .empty-state {
+        text-align: center;
+        padding: 35px 15px;
+    }
+
+    .empty-state-icon {
+        width: 58px;
+        height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 13px;
+        border-radius: 50%;
+        background: var(--light-green);
+        color: var(--primary-green);
+        font-size: 1.1rem;
+    }
+
+    .empty-state p {
+        font-size: .7rem;
+        margin-bottom: 0;
+    }
+
+
+    /* =========================================================
+           DESKTOP SPACING
+        ========================================================= */
+
+    .smarttrack-dashboard > .dashboard-card {
+        margin-bottom: 24px !important;
+    }
+
+    .summary-row {
+        margin-bottom: 24px !important;
+    }
+
+
+    /* =========================================================
+           TABLET
+        ========================================================= */
+
+    @@media (max-width: 991.98px) {
+
+        .smarttrack-dashboard {
+            padding: 22px 20px !important;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.55rem;
+        }
+
+        .summary-card {
+            min-height: 145px;
+        }
+    }
+
+
+    /* =========================================================
            MOBILE
         ========================================================= */
 
     @@media (max-width: 767.98px) {
-        /* -----------------------------------------------------
-               PAGE
-            ----------------------------------------------------- */
 
-        .container-fluid.smarttrack-dashboard {
+        html,
+        body {
+            overflow-x: hidden !important;
+        }
+
+        .smarttrack-dashboard {
             width: 100% !important;
             max-width: 100% !important;
+            min-height: 100vh;
             margin: 0 !important;
-            padding: 12px 10px !important;
+            padding: 15px 10px !important;
         }
-        /* -----------------------------------------------------
-               HEADER
-            ----------------------------------------------------- */
+        /* HEADER */
 
         .dashboard-header {
             display: flex !important;
             flex-direction: column !important;
             align-items: stretch !important;
-            width: 100%;
-            gap: 12px;
+            gap: 13px;
             margin-bottom: 18px !important;
         }
 
             .dashboard-header > div {
                 width: 100% !important;
-                max-width: 100%;
             }
 
-            .dashboard-header h2 {
-                font-size: 1.45rem;
-                line-height: 1.2;
-                margin-bottom: 5px !important;
-            }
+        .dashboard-title {
+            gap: 10px;
+        }
 
-            .dashboard-header p {
-                font-size: 0.78rem;
-                line-height: 1.45;
-                margin: 0 !important;
-            }
+        .dashboard-title-icon {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+            border-radius: 13px;
+        }
 
-            .dashboard-header .btn {
-                display: block;
-                width: 100%;
-                min-height: 42px;
-                padding: 9px 12px;
-                font-size: 0.85rem;
-            }
-        /* -----------------------------------------------------
-               SUMMARY ROW
-            ----------------------------------------------------- */
+        .dashboard-header h2 {
+            font-size: 1.35rem;
+            line-height: 1.2;
+        }
+
+        .dashboard-header p {
+            font-size: .67rem;
+            line-height: 1.45;
+        }
+
+        .check-product-btn {
+            width: 100%;
+            min-height: 45px;
+        }
+        /* SUMMARY */
 
         .summary-row {
             display: flex !important;
             flex-direction: column !important;
-            width: 100%;
-            margin: 0 0 18px 0 !important;
             gap: 10px;
+            margin-bottom: 16px !important;
         }
 
         .summary-column {
             width: 100% !important;
             max-width: 100% !important;
             flex: 0 0 100% !important;
-            margin: 0 !important;
             padding: 0 !important;
+            margin: 0 !important;
         }
 
         .summary-card {
-            width: 100% !important;
-            min-height: 0 !important;
-            height: auto !important;
-            margin: 0 !important;
+            min-height: 0;
+            border-radius: 15px !important;
         }
 
             .summary-card .card-body {
-                padding: 13px 14px !important;
+                padding: 15px;
             }
 
-            .summary-card small {
-                display: block;
-                font-size: 0.68rem;
-                line-height: 1.2;
-                margin-bottom: 4px;
-            }
+        .summary-icon {
+            width: 36px;
+            height: 36px;
+            margin-bottom: 9px;
+        }
 
-            .summary-card h2 {
-                font-size: 1.5rem;
-                line-height: 1.1;
-                margin-bottom: 4px !important;
-            }
+        .summary-label {
+            font-size: .58rem;
+        }
 
-            .summary-card span {
-                display: block;
-                font-size: 0.74rem;
-                line-height: 1.3;
-            }
-        /* -----------------------------------------------------
-               GENERAL DASHBOARD CARDS
-            ----------------------------------------------------- */
+        .summary-number {
+            font-size: 1.5rem;
+        }
+
+        .summary-description {
+            font-size: .63rem;
+        }
+        /* CARDS */
 
         .dashboard-card {
             width: 100% !important;
             max-width: 100% !important;
-            margin-bottom: 16px !important;
+            margin-bottom: 14px !important;
+            border-radius: 15px !important;
         }
 
             .dashboard-card .card-header {
-                padding: 13px !important;
+                padding: 14px !important;
             }
 
             .dashboard-card .card-body {
-                padding: 13px !important;
+                padding: 14px !important;
             }
 
             .dashboard-card h5 {
-                font-size: 0.95rem;
-                line-height: 1.3;
+                font-size: .86rem;
             }
 
-            .dashboard-card .text-muted.small {
-                font-size: 0.68rem;
-            }
-        /* -----------------------------------------------------
-               RECENT ALERTS
-            ----------------------------------------------------- */
+        .section-icon {
+            width: 35px;
+            height: 35px;
+            flex: 0 0 35px;
+        }
+
+        .section-subtitle {
+            font-size: .57rem;
+        }
+        /* ALERTS */
 
         .alert-item {
-            display: flex !important;
-            width: 100%;
-            align-items: flex-start !important;
-            gap: 8px;
-            padding-bottom: 12px !important;
-            margin-bottom: 12px !important;
+            gap: 9px;
+            padding: 11px;
+            margin-bottom: 9px;
         }
 
-            .alert-item > div:first-child {
-                flex: 0 0 34px;
-                width: 34px;
-                margin: 0 !important;
-            }
-
-                .alert-item > div:first-child .rounded-circle {
-                    width: 34px !important;
-                    height: 34px !important;
-                }
-
-        .alert-content {
-            flex: 1 1 auto;
-            min-width: 0;
-            width: auto;
+        .alert-icon {
+            width: 34px;
+            height: 34px;
+            flex-basis: 34px;
         }
 
-            .alert-content strong {
-                display: block;
-                font-size: 0.8rem;
-                line-height: 1.25;
-                overflow-wrap: anywhere;
-            }
-
-            .alert-content p {
-                font-size: 0.73rem;
-                line-height: 1.4;
-                margin-bottom: 4px !important;
-                overflow-wrap: anywhere;
-                word-break: break-word;
-            }
-
-            .alert-content small {
-                font-size: 0.62rem;
-            }
-
-        .alert-item button {
-            flex: 0 0 28px;
-            width: 28px;
-            height: 28px;
-            margin: 0 !important;
+        .alert-content strong {
+            font-size: .71rem;
         }
-        /* -----------------------------------------------------
-               STOCK HEADER
-            ----------------------------------------------------- */
+
+        .alert-content p {
+            font-size: .64rem;
+        }
+
+        .alert-content small {
+            font-size: .55rem;
+        }
+        /* STOCK */
 
         .stock-card-header {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: stretch !important;
-            gap: 9px;
-            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
         }
 
-            .stock-card-header h5 {
-                margin-bottom: 0 !important;
-            }
-
-            .stock-card-header .btn {
-                display: block;
-                width: 100%;
-                min-height: 38px;
-                font-size: 0.76rem;
-                padding: 8px 10px;
-            }
-        /* -----------------------------------------------------
-               STOCK ITEMS
-            ----------------------------------------------------- */
+        .recommendation-btn {
+            width: 100%;
+        }
 
         .stock-item {
-            width: 100%;
-            margin-bottom: 17px !important;
+            padding: 11px;
         }
 
-        .stock-header {
-            display: flex !important;
-            width: 100%;
-            justify-content: space-between !important;
-            align-items: flex-start !important;
-            gap: 8px;
-            margin-bottom: 8px !important;
+        .stock-product strong {
+            font-size: .71rem;
         }
-
-        .stock-product {
-            flex: 1;
-            min-width: 0;
-            padding-right: 4px;
-        }
-
-            .stock-product strong {
-                display: block;
-                font-size: 0.8rem;
-                line-height: 1.35;
-                overflow-wrap: anywhere;
-                word-break: break-word;
-            }
 
         .stock-header .badge {
-            flex: 0 0 auto;
-            font-size: 0.58rem;
-            line-height: 1.2;
-            padding: 5px 7px;
-            white-space: nowrap;
+            font-size: .53rem;
         }
 
-        .stock-item small {
-            display: block;
-            font-size: 0.67rem;
-            line-height: 1.3;
+        .stock-days {
+            font-size: .59rem;
         }
+        /* PURCHASE TABLE */
 
-        .progress {
-            width: 100%;
-            height: 7px !important;
-            overflow: hidden;
-        }
-        /* -----------------------------------------------------
-               PURCHASES
-            ----------------------------------------------------- */
-        /* Hide desktop table on mobile */
         .purchase-table-wrapper {
             display: none !important;
         }
-        /* Show mobile purchase cards */
+
         .mobile-purchase-list {
             display: block;
             width: 100%;
@@ -400,24 +804,29 @@
 
         .mobile-purchase-item {
             width: 100%;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 11px;
             padding: 12px;
-            margin-bottom: 10px;
+            margin-bottom: 9px;
             background: #fff;
+            transition: var(--transition);
         }
+
+            .mobile-purchase-item:hover {
+                box-shadow: var(--shadow-sm);
+            }
 
             .mobile-purchase-item:last-child {
                 margin-bottom: 0;
             }
 
         .mobile-purchase-product {
-            font-size: 0.86rem;
-            font-weight: 600;
+            font-size: .78rem;
+            font-weight: 700;
             line-height: 1.3;
             overflow-wrap: anywhere;
-            word-break: break-word;
-            margin-bottom: 9px;
+            margin-bottom: 7px;
+            color: var(--text-dark);
         }
 
         .mobile-purchase-row {
@@ -430,14 +839,13 @@
         }
 
         .mobile-purchase-label {
-            color: #6c757d;
-            font-size: 0.7rem;
-            flex: 0 0 auto;
+            color: var(--text-muted);
+            font-size: .62rem;
         }
 
         .mobile-purchase-value {
             text-align: right;
-            font-size: 0.72rem;
+            font-size: .65rem;
             font-weight: 500;
             min-width: 0;
             overflow-wrap: anywhere;
@@ -445,24 +853,24 @@
 
         .mobile-purchase-total {
             font-weight: 700;
-            font-size: 0.8rem;
+            color: var(--primary-green);
         }
-        /* -----------------------------------------------------
-               EMPTY STATES
-            ----------------------------------------------------- */
+        /* EMPTY */
 
-        .dashboard-card .text-center {
-            padding-top: 20px !important;
-            padding-bottom: 20px !important;
+        .empty-state {
+            padding: 23px 10px;
         }
 
-            .dashboard-card .text-center p {
-                font-size: 0.75rem;
-                line-height: 1.4;
-            }
-        /* -----------------------------------------------------
-               REMOVE BOOTSTRAP ROW NEGATIVE MARGIN PROBLEMS
-            ----------------------------------------------------- */
+        .empty-state-icon {
+            width: 46px;
+            height: 46px;
+            font-size: .9rem;
+        }
+
+        .empty-state p {
+            font-size: .64rem;
+        }
+        /* REMOVE BOOTSTRAP GUTTERS */
 
         .smarttrack-dashboard .row {
             --bs-gutter-x: 0;
@@ -473,37 +881,29 @@
 
     /* =========================================================
            VERY SMALL PHONES
-           ========================================================= */
+        ========================================================= */
 
     @@media (max-width: 400px) {
 
-        .container-fluid.smarttrack-dashboard {
+        .smarttrack-dashboard {
             padding-left: 8px !important;
             padding-right: 8px !important;
         }
 
         .dashboard-header h2 {
-            font-size: 1.3rem;
+            font-size: 1.22rem;
         }
 
         .dashboard-header p {
-            font-size: 0.73rem;
+            font-size: .62rem;
         }
 
         .summary-card .card-body {
-            padding: 11px 12px !important;
+            padding: 12px;
         }
 
-        .summary-card small {
-            font-size: 0.62rem;
-        }
-
-        .summary-card h2 {
+        .summary-number {
             font-size: 1.35rem;
-        }
-
-        .summary-card span {
-            font-size: 0.69rem;
         }
 
         .dashboard-card .card-header {
@@ -513,68 +913,62 @@
         .dashboard-card .card-body {
             padding: 11px !important;
         }
-
-        .dashboard-card h5 {
-            font-size: 0.88rem;
-        }
-
-        .alert-content strong {
-            font-size: 0.76rem;
-        }
-
-        .alert-content p {
-            font-size: 0.69rem;
-        }
-
-        .stock-product strong {
-            font-size: 0.76rem;
-        }
-
-        .mobile-purchase-item {
-            padding: 10px;
-        }
-
-        .mobile-purchase-product {
-            font-size: 0.8rem;
-        }
-
-        .mobile-purchase-label,
-        .mobile-purchase-value {
-            font-size: 0.68rem;
-        }
     }
 
 </style>
 
 
-<div class="container-fluid py-4 smarttrack-dashboard">
+<!-- =========================================================
+     SMARTTRACK DASHBOARD
+========================================================== -->
+
+<div class="container-fluid smarttrack-dashboard">
+
 
     <!-- =====================================================
          HEADER
     ====================================================== -->
 
-    <div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
+    <div class="dashboard-header d-flex justify-content-between align-items-center">
 
-        <div>
+        <div class="dashboard-title-area">
 
-            <h2 class="fw-bold mb-1">
-                SmartTrack
-            </h2>
+            <div class="dashboard-title">
 
-            <p class="text-muted mb-0">
-                Welcome back, @Model.UserName.
-                Here's what your household needs attention on.
-            </p>
+                <div class="dashboard-title-icon">
+
+                    <i class="fas fa-chart-line"></i>
+
+                </div>
+
+                <div>
+
+                    <h2 class="fw-bold mb-1">
+                        SmartTrack
+                    </h2>
+
+                    <p class="text-muted mb-0">
+
+                        Welcome back, @Model.UserName.
+                        Here's what your household needs attention on.
+
+                    </p>
+
+                </div>
+
+            </div>
 
         </div>
+
 
         <div>
 
             <a asp-controller="SmartTrackDashboard"
                asp-action="Prediction"
-               class="btn btn-primary">
+               class="btn check-product-btn">
 
-                <i class="fas fa-search me-1"></i>
+                <i class="fas fa-wand-magic-sparkles"></i>
+
                 Check Product
 
             </a>
@@ -588,26 +982,32 @@
          SUMMARY CARDS
     ====================================================== -->
 
-    <div class="row g-3 mb-4 summary-row">
+    <div class="row g-3 summary-row">
 
 
         <!-- DUE NOW -->
 
         <div class="col-12 col-md-3 summary-column">
 
-            <div class="card shadow-sm border-0 summary-card">
+            <div class="card summary-card summary-danger">
 
                 <div class="card-body">
 
-                    <small class="text-muted fw-semibold">
+                    <div class="summary-icon">
+
+                        <i class="fas fa-triangle-exclamation"></i>
+
+                    </div>
+
+                    <span class="summary-label">
                         DUE NOW
-                    </small>
+                    </span>
 
-                    <h2 class="text-danger fw-bold mb-1">
+                    <div class="summary-number">
                         @Model.DueNowCount
-                    </h2>
+                    </div>
 
-                    <span class="text-muted">
+                    <span class="summary-description">
                         Purchase required
                     </span>
 
@@ -622,19 +1022,25 @@
 
         <div class="col-12 col-md-3 summary-column">
 
-            <div class="card shadow-sm border-0 summary-card">
+            <div class="card summary-card summary-warning">
 
                 <div class="card-body">
 
-                    <small class="text-muted fw-semibold">
+                    <div class="summary-icon">
+
+                        <i class="fas fa-clock"></i>
+
+                    </div>
+
+                    <span class="summary-label">
                         DUE SOON
-                    </small>
+                    </span>
 
-                    <h2 class="text-warning fw-bold mb-1">
+                    <div class="summary-number">
                         @Model.DueSoonCount
-                    </h2>
+                    </div>
 
-                    <span class="text-muted">
+                    <span class="summary-description">
                         Within 3 days
                     </span>
 
@@ -649,19 +1055,25 @@
 
         <div class="col-12 col-md-3 summary-column">
 
-            <div class="card shadow-sm border-0 summary-card">
+            <div class="card summary-card summary-info">
 
                 <div class="card-body">
 
-                    <small class="text-muted fw-semibold">
+                    <div class="summary-icon">
+
+                        <i class="fas fa-calendar-days"></i>
+
+                    </div>
+
+                    <span class="summary-label">
                         UPCOMING
-                    </small>
+                    </span>
 
-                    <h2 class="text-info fw-bold mb-1">
+                    <div class="summary-number">
                         @Model.UpcomingCount
-                    </h2>
+                    </div>
 
-                    <span class="text-muted">
+                    <span class="summary-description">
                         Within 7 days
                     </span>
 
@@ -676,19 +1088,25 @@
 
         <div class="col-12 col-md-3 summary-column">
 
-            <div class="card shadow-sm border-0 summary-card">
+            <div class="card summary-card summary-success">
 
                 <div class="card-body">
 
-                    <small class="text-muted fw-semibold">
+                    <div class="summary-icon">
+
+                        <i class="fas fa-chart-pie"></i>
+
+                    </div>
+
+                    <span class="summary-label">
                         ANOMALIES
-                    </small>
+                    </span>
 
-                    <h2 class="text-secondary fw-bold mb-1">
+                    <div class="summary-number">
                         @Model.AnomalyCount
-                    </h2>
+                    </div>
 
-                    <span class="text-muted">
+                    <span class="summary-description">
                         Unusual activity
                     </span>
 
@@ -705,19 +1123,26 @@
          RECENT ALERTS
     ====================================================== -->
 
-    <div class="card shadow-sm border-0 mb-4 dashboard-card">
+    <div class="card dashboard-card">
 
-        <div class="card-header bg-white border-0 py-3">
 
-            <div class="d-flex justify-content-between align-items-center">
+        <div class="card-header">
+
+            <div class="dashboard-card-title">
+
+                <div class="section-icon section-icon-yellow">
+
+                    <i class="fas fa-bell"></i>
+
+                </div>
 
                 <div>
 
                     <h5 class="mb-0 fw-semibold">
-                        🔔 Recent Alerts
+                        Recent Alerts
                     </h5>
 
-                    <span class="text-muted small">
+                    <span class="section-subtitle">
                         Latest household activity
                     </span>
 
@@ -733,50 +1158,51 @@
             @if (Model.Notifications == null ||
                         Model.Notifications.Count == 0)
             {
-                <div class="text-center py-3">
 
-                    <i class="fas fa-check-circle text-success fs-3 mb-2"></i>
+                <div class="empty-state">
 
-                    <p class="text-muted mb-0">
-                        No recent alerts. Your household is looking good.
+                    <div class="empty-state-icon">
+
+                        <i class="fas fa-check"></i>
+
+                    </div>
+
+                    <p class="text-muted">
+                        No recent alerts.
+                        Your household is looking good.
                     </p>
 
                 </div>
+
             }
             else
             {
+
                 @foreach (var notification in Model.Notifications.Take(5))
                 {
 
-                    <div class="alert-item d-flex align-items-start
-                                        border-bottom pb-3 mb-3"
+                    <div class="alert-item"
                          id="alert-@notification.NotificationId">
 
-                        <div class="me-3">
 
-                            <div class="rounded-circle bg-light
-                                                d-flex align-items-center
-                                                justify-content-center"
-                                 style="width:40px;height:40px;">
+                        <div class="alert-icon">
 
-                                <i class="fas fa-bell text-warning"></i>
-
-                            </div>
+                            <i class="fas fa-bell"></i>
 
                         </div>
 
 
-                        <div class="flex-grow-1 alert-content">
+                        <div class="alert-content">
 
                             <strong>
                                 @notification.ProductName
                             </strong>
 
-                            <p class="mb-1 text-muted">
+                            <p>
                                 @notification.Message
                             </p>
 
-                            <small class="text-muted">
+                            <small>
                                 @notification.CreatedOn
                             </small>
 
@@ -784,9 +1210,7 @@
 
 
                         <button type="button"
-                                class="btn btn-sm btn-light text-muted
-                                               border-0 rounded-circle ms-2"
-                                style="width:28px;height:28px;padding:0;"
+                                class="btn btn-sm btn-light border-0 dismiss-btn"
                                 title="Dismiss alert"
                                 onclick="dismissAlert('alert-@notification.NotificationId')">
 
@@ -797,6 +1221,7 @@
                     </div>
 
                 }
+
             }
 
         </div>
@@ -808,22 +1233,43 @@
          LOW STOCK
     ====================================================== -->
 
-    <div class="card shadow-sm border-0 mb-4 dashboard-card">
+    <div class="card dashboard-card">
 
-        <div class="card-header bg-white border-0 py-3">
 
-            <div class="d-flex justify-content-between align-items-center
-                        stock-card-header">
+        <div class="card-header">
 
-                <h5 class="mb-0 fw-semibold">
-                    📦 Stock Getting Low
-                </h5>
+            <div class="stock-card-header">
+
+                <div class="dashboard-card-title">
+
+                    <div class="section-icon section-icon-green">
+
+                        <i class="fas fa-boxes-stacked"></i>
+
+                    </div>
+
+                    <div>
+
+                        <h5 class="mb-0 fw-semibold">
+                            Stock Getting Low
+                        </h5>
+
+                        <span class="section-subtitle">
+                            Products approaching their purchase point
+                        </span>
+
+                    </div>
+
+                </div>
+
 
                 <a asp-controller="SmartTrackDashboard"
                    asp-action="Recommendations"
-                   class="btn btn-sm btn-outline-primary">
+                   class="btn btn-outline-success recommendation-btn">
 
-                    View Recommendations
+                    <i class="fas fa-lightbulb me-1"></i>
+
+                    Recommendations
 
                 </a>
 
@@ -835,53 +1281,66 @@
         <div class="card-body">
 
             @{
+
                 var lowStockItems =
                 Model.StockItems?
                 .Where(x => x.DaysUntilPurchase <= 7)
                 .OrderBy(x => x.DaysUntilPurchase)
                 .ToList();
+
             }
 
 
             @if (lowStockItems == null ||
                         lowStockItems.Count == 0)
             {
-                <div class="text-center py-4">
 
-                    <i class="fas fa-box-open text-success fs-2 mb-2"></i>
+                <div class="empty-state">
 
-                    <p class="text-muted mb-0">
+                    <div class="empty-state-icon">
+
+                        <i class="fas fa-box-open"></i>
+
+                    </div>
+
+                    <p class="text-muted">
                         No low-stock items at the moment.
                     </p>
 
                 </div>
+
             }
             else
             {
+
                 @foreach (var item in lowStockItems)
                 {
 
-                    <div class="mb-4 stock-item">
+                    <div class="stock-item">
 
-                        <div class="d-flex justify-content-between
-                                            align-items-center mb-2 stock-header">
+
+                        <div class="stock-header">
 
                             <div class="stock-product">
 
-                                <strong class="d-block">
+                                <strong>
                                     @item.Product
                                 </strong>
 
                             </div>
 
+
                             <span class="badge bg-@item.StatusClass">
+
                                 @item.StockStatus
+
                             </span>
 
                         </div>
 
 
                         @{
+
                             var width = item.DaysUntilPurchase <= 0
                             ? 5
                             : Math.Max(
@@ -891,11 +1350,11 @@
                             item.DaysUntilPurchase * 4
                             )
                             );
+
                         }
 
 
-                        <div class="progress"
-                             style="height:8px;">
+                        <div class="progress stock-progress">
 
                             <div class="progress-bar bg-@item.StatusClass"
                                  role="progressbar"
@@ -908,36 +1367,45 @@
                         </div>
 
 
-                        <div class="mt-2">
+                        @if (item.DaysUntilPurchase <= 0)
+                        {
 
-                            @if (item.DaysUntilPurchase <= 0)
-                            {
-                                <small class="text-danger fw-semibold">
+                            <small class="text-danger fw-semibold stock-days">
 
-                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                <i class="fas fa-circle-exclamation me-1"></i>
 
-                                    Purchase now
+                                Purchase now
 
-                                </small>
-                            }
-                            else if (item.DaysUntilPurchase == 1)
-                            {
-                                <small class="text-warning fw-semibold">
-                                    1 day remaining
-                                </small>
-                            }
-                            else
-                            {
-                                <small class="text-muted">
-                                    @item.DaysUntilPurchase days remaining
-                                </small>
-                            }
+                            </small>
 
-                        </div>
+                        }
+                        else if (item.DaysUntilPurchase == 1)
+                        {
+
+                            <small class="text-warning fw-semibold stock-days">
+
+                                <i class="fas fa-clock me-1"></i>
+
+                                1 day remaining
+
+                            </small>
+
+                        }
+                        else
+                        {
+
+                            <small class="text-muted stock-days">
+
+                                @item.DaysUntilPurchase days remaining
+
+                            </small>
+
+                        }
 
                     </div>
 
                 }
+
             }
 
         </div>
@@ -946,22 +1414,29 @@
 
 
     <!-- =====================================================
-         RECENT HOUSEHOLD PURCHASES
+         RECENT PURCHASES
     ====================================================== -->
 
-    <div class="card shadow-sm border-0 dashboard-card">
+    <div class="card dashboard-card">
 
-        <div class="card-header bg-white border-0 py-3">
 
-            <div class="d-flex justify-content-between align-items-center">
+        <div class="card-header">
+
+            <div class="dashboard-card-title">
+
+                <div class="section-icon section-icon-blue">
+
+                    <i class="fas fa-receipt"></i>
+
+                </div>
 
                 <div>
 
                     <h5 class="mb-0 fw-semibold">
-                        🧾 Recent Household Purchases
+                        Recent Household Purchases
                     </h5>
 
-                    <span class="text-muted small">
+                    <span class="section-subtitle">
                         Latest purchases
                     </span>
 
@@ -974,25 +1449,30 @@
 
         <div class="card-body">
 
+
             @if (Model.RecentPurchases == null ||
                         Model.RecentPurchases.Count == 0)
             {
-                <div class="text-center py-4">
 
-                    <i class="fas fa-receipt text-muted fs-2 mb-2"></i>
+                <div class="empty-state">
 
-                    <p class="text-muted mb-0">
+                    <div class="empty-state-icon">
+
+                        <i class="fas fa-receipt"></i>
+
+                    </div>
+
+                    <p class="text-muted">
                         No recent household purchases.
                     </p>
 
                 </div>
+
             }
             else
             {
 
-                <!-- =================================================
-                     DESKTOP TABLE
-                ================================================== -->
+                <!-- DESKTOP TABLE -->
 
                 <div class="purchase-table-wrapper">
 
@@ -1025,9 +1505,11 @@
                                 <tr>
 
                                     <td>
+
                                         <strong>
                                             @purchase.Product
                                         </strong>
+
                                     </td>
 
                                     <td>
@@ -1043,9 +1525,13 @@
                                     </td>
 
                                     <td>
-                                        <strong>
+
+                                        <strong class="text-success">
+
                                             @purchase.TotalPrice.ToString("0.00")
+
                                         </strong>
+
                                     </td>
 
                                 </tr>
@@ -1059,9 +1545,7 @@
                 </div>
 
 
-                <!-- =================================================
-                     MOBILE PURCHASE CARDS
-                ================================================== -->
+                <!-- MOBILE -->
 
                 <div class="mobile-purchase-list">
 
@@ -1123,7 +1607,9 @@
                                 </span>
 
                                 <span class="mobile-purchase-value mobile-purchase-total">
+
                                     @purchase.TotalPrice.ToString("0.00")
+
                                 </span>
 
                             </div>
@@ -1143,10 +1629,6 @@
 </div>
 
 
-<!-- =========================================================
-     ALERT DISMISS SCRIPT
-========================================================== -->
-
 <script>
 
     function dismissAlert(alertId) {
@@ -1157,7 +1639,7 @@
         if (alertElement) {
 
             alertElement.style.transition =
-                "opacity 0.25s ease, transform 0.25s ease";
+                "opacity .25s ease, transform .25s ease";
 
             alertElement.style.opacity = "0";
 
