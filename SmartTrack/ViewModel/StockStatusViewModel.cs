@@ -1,15 +1,9 @@
-﻿public class StockStatusViewModel
+﻿
+public class StockStatusViewModel
 {
-    public string Product { get; set; }
-        = string.Empty;
+    public string Product { get; set; } = string.Empty;
 
-    // Latest quantity purchased
     public double LatestQuantity { get; set; }
-
-    // REAL calculated current stock
-    public double CurrentStock { get; set; }
-
-    public double NormalDailyConsumption { get; set; }
 
     public double AdaptiveConsumption { get; set; }
 
@@ -17,15 +11,14 @@
 
     public int DaysUntilPurchase { get; set; }
 
-    public string StockStatus { get; set; }
-        = "OK";
+    public string StockStatus { get; set; } = "OK";
 
-    public string StatusClass { get; set; }
-        = "success";
+    public string StatusClass { get; set; } = "success";
 
-    public string Priority { get; set; }
-        = "NORMAL";
-
-    public string LastAdjustmentType { get; set; }
-        = "NORMAL";
+    // IMPORTANT:
+    // Your Dashboard.cshtml uses item.Priority.
+    public string Priority { get; set; } = "NORMAL";
+    public double CurrentStock { get; internal set; }
+    public double NormalDailyConsumption { get; internal set; }
+    public string LastAdjustmentType { get; internal set; }
 }

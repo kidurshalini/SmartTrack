@@ -10,8 +10,7 @@ namespace SmartTrack.Controllers
     [Authorize]
     public class SmartTrackDashboardController : Controller
     {
-        private readonly UserManager<ApplicationUser>
-            _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         private readonly SmartTrackDashboardService
             _dashboardService;
@@ -22,16 +21,15 @@ namespace SmartTrack.Controllers
         private readonly SmartTrackAIService
             _aiService;
 
-
-        // =========================================================
-        // CONSTRUCTOR
-        // =========================================================
+        private readonly SmartTrackStockService
+            _stockService;
 
         public SmartTrackDashboardController(
             UserManager<ApplicationUser> userManager,
             SmartTrackDashboardService dashboardService,
             SmartTrackPurchaseHistoryService purchaseHistoryService,
-            SmartTrackAIService aiService)
+            SmartTrackAIService aiService,
+            SmartTrackStockService stockService)
         {
             _userManager =
                 userManager;
@@ -44,12 +42,10 @@ namespace SmartTrack.Controllers
 
             _aiService =
                 aiService;
+
+            _stockService =
+                stockService;
         }
-
-
-        // =========================================================
-        // DASHBOARD
-        // =========================================================
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -85,18 +81,11 @@ namespace SmartTrack.Controllers
             }
         }
 
-
-        // =========================================================
-        // RECOMMENDATIONS
-        // =========================================================
-
         [HttpGet]
-        public async Task<IActionResult>
-            Recommendations()
+        public async Task<IActionResult> Recommendations()
         {
             var user =
-                await _userManager
-                    .GetUserAsync(User);
+                await _userManager.GetUserAsync(User);
 
             if (user == null)
             {
@@ -129,11 +118,6 @@ namespace SmartTrack.Controllers
             }
         }
 
-
-        // =========================================================
-        // PREDICTION GET
-        // =========================================================
-
         [HttpGet]
         public IActionResult Prediction()
         {
@@ -141,17 +125,13 @@ namespace SmartTrack.Controllers
                 new SmartTrackPredictionViewModel());
         }
 
-
-        // =========================================================
-        // PREDICTION POST
-        // =========================================================
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Prediction(
-     SmartTrackPredictionViewModel model)
+            SmartTrackPredictionViewModel model)
         {
-            if (string.IsNullOrWhiteSpace(model.ProductName))
+            if (string.IsNullOrWhiteSpace(
+                model.ProductName))
             {
                 ModelState.AddModelError(
                     nameof(model.ProductName),
@@ -162,22 +142,14 @@ namespace SmartTrack.Controllers
 
             try
             {
-                // =====================================================
-                // GET LOGGED-IN USER
-                // =====================================================
-
                 var user =
-                    await _userManager.GetUserAsync(User);
+                    await _userManager
+                        .GetUserAsync(User);
 
                 if (user == null)
                 {
                     return Challenge();
                 }
-
-
-                // =====================================================
-                // FIND USER HOUSEHOLD
-                // =====================================================
 
                 var userHousehold =
                     await _purchaseHistoryService
@@ -192,56 +164,50 @@ namespace SmartTrack.Controllers
                     return View(model);
                 }
 
-
-                // =====================================================
-                // GET HOUSEHOLD ID
-                // =====================================================
-
-                var householdId =
+                Guid householdId =
                     userHousehold.HouseHoldId;
 
-
-                // =====================================================
-                // GET PRODUCT HISTORY
-                // =====================================================
+                string productName =
+                    model.ProductName.Trim();
 
                 var productHistory =
                     await _purchaseHistoryService
                         .GetProductPurchaseHistoryAsync(
                             user.Id,
                             householdId,
-                            model.ProductName.Trim());
-
-
-                // =====================================================
-                // CHECK HISTORY
-                // =====================================================
+                            productName);
 
                 if (productHistory == null ||
                     productHistory.Count == 0)
                 {
                     ModelState.AddModelError(
                         nameof(model.ProductName),
-                        $"No purchase history was found for {model.ProductName} in your household.");
+                        $"No purchase history was found for {productName} in your household.");
 
                     return View(model);
                 }
 
+                // =====================================================
+                // REAL STOCK
+                // =====================================================
+
+                var stock =
+                    await _stockService
+                        .ProcessStockAsync(
+                            user.Id,
+                            householdId,
+                            productName,
+                            productHistory);
 
                 // =====================================================
-                // CALL PYTHON AI SERVICE
+                // AI PREDICTION
                 // =====================================================
 
                 var prediction =
                     await _aiService.PredictAsync(
-                        model.ProductName.Trim(),
+                        productName,
                         "HIGH",
                         productHistory);
-
-
-                // =====================================================
-                // MAP BASIC RESULT
-                // =====================================================
 
                 model.HasPrediction = true;
 
@@ -255,74 +221,68 @@ namespace SmartTrack.Controllers
                     prediction.Recommendation
                     ?? "No recommendation available.";
 
-
                 // =====================================================
                 // IMPORTANT:
-                // MAP PYTHON VALUES TO FRONTEND
+                // USE REAL STOCK, NOT LATEST PURCHASE QUANTITY
                 // =====================================================
 
                 model.CurrentStock =
-                    prediction.LatestQuantity ?? 0;
+                    Convert.ToDouble(
+                        stock.CurrentStock);
 
                 model.AverageDailyUsage =
-                    prediction.AdaptiveConsumption ?? 0;
-
-
-                // =====================================================
-                // LAST PURCHASE QUANTITY
-                // =====================================================
+                    Convert.ToDouble(
+                        stock.AdaptiveConsumption);
 
                 model.LastPurchaseQuantity =
-                    prediction.LatestQuantity ?? 0;
+                    Convert.ToDouble(
+                        stock.LastPurchaseQuantity);
 
+                model.DaysSinceLastPurchase =
+                    Math.Max(
+                        0,
+                        (
+                            DateTime.Today -
+                            stock.LastPurchaseDate.Date
+                        ).Days);
 
                 // =====================================================
-                // DAYS SINCE LAST PURCHASE
+                // STATUS
                 // =====================================================
 
-                model.DaysSinceLastPurchase = 0;
-
-                if (!string.IsNullOrWhiteSpace(
-                    prediction.LastPurchaseDate))
+                if (stock.CurrentStock <= 0)
                 {
-                    if (DateTime.TryParse(
-                        prediction.LastPurchaseDate,
-                        out DateTime lastPurchaseDate))
+                    model.StatusClass =
+                        "danger";
+                }
+                else if (stock.AdaptiveConsumption > 0)
+                {
+                    double stockDays =
+                        Convert.ToDouble(
+                            stock.CurrentStock /
+                            stock.AdaptiveConsumption);
+
+                    if (stockDays <= 3)
                     {
-                        model.DaysSinceLastPurchase =
-                            (int)Math.Max(
-                                0,
-                                (DateTime.Now.Date -
-                                 lastPurchaseDate.Date).TotalDays);
+                        model.StatusClass =
+                            "warning";
                     }
-                }
-
-
-                // =====================================================
-                // STATUS CSS
-                // =====================================================
-
-                if (model.PredictedDaysUntilPurchase <= 0)
-                {
-                    model.StatusClass = "danger";
-                }
-                else if (model.PredictedDaysUntilPurchase <= 3)
-                {
-                    model.StatusClass = "warning";
-                }
-                else if (model.PredictedDaysUntilPurchase <= 7)
-                {
-                    model.StatusClass = "info";
+                    else if (stockDays <= 7)
+                    {
+                        model.StatusClass =
+                            "info";
+                    }
+                    else
+                    {
+                        model.StatusClass =
+                            "success";
+                    }
                 }
                 else
                 {
-                    model.StatusClass = "success";
+                    model.StatusClass =
+                        "success";
                 }
-
-
-                // =====================================================
-                // RETURN VIEW
-                // =====================================================
 
                 return View(model);
             }
@@ -346,10 +306,6 @@ namespace SmartTrack.Controllers
             }
         }
 
-        // =========================================================
-        // DEBUG HOUSEHOLD
-        // =========================================================
-
         [HttpGet]
         public async Task<IActionResult>
             DebugHousehold(
@@ -364,22 +320,22 @@ namespace SmartTrack.Controllers
                 return Challenge();
             }
 
-            if (string.IsNullOrWhiteSpace(productName))
+            if (string.IsNullOrWhiteSpace(
+                productName))
             {
-                return BadRequest(new
-                {
-                    message =
-                        "productName is required."
-                });
+                return BadRequest(
+                    new
+                    {
+                        message =
+                            "productName is required."
+                    });
             }
-
 
             var result =
                 await _purchaseHistoryService
                     .GetHouseholdDebugInfoAsync(
                         user.Id,
                         productName);
-
 
             return Json(result);
         }

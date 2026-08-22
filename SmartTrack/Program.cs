@@ -91,10 +91,11 @@ builder.Services.AddHttpClient<SmartTrackAIService>(
 );
 builder.Services.AddScoped<SmartTrackPurchaseHistoryService>();
 builder.Services.AddScoped<SmartTrackNotificationService>();
+builder.Services.AddScoped<SmartTrackStockService>();
 builder.Services.AddScoped<SmartTrackDashboardService>();
 builder.Services.AddScoped<ShoppingListService>();
-builder.Services.AddScoped<SmartTrackStockBackgroundService>();
 
+builder.Services.AddHostedService<SmartTrackStockBackgroundService>();
 
 builder.Services.AddScoped<SmartTrackStockService>();
 // Add services

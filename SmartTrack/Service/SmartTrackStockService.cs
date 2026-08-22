@@ -20,9 +20,19 @@ namespace SmartTrack.Services
             _context = context;
         }
 
-        // =========================================================
-        // PROCESS STOCK
-        // =========================================================
+        public async Task<SmartTrackStockState?>
+            GetStockAsync(
+                Guid householdId,
+                string productName)
+        {
+            productName = productName.Trim();
+
+            return await _context.SmartTrackStockStates
+                .FirstOrDefaultAsync(x =>
+                    x.HouseholdId == householdId &&
+                    x.ProductName.ToLower() ==
+                    productName.ToLower());
+        }
 
         public async Task<SmartTrackStockState>
             ProcessStockAsync(
@@ -31,12 +41,6 @@ namespace SmartTrack.Services
                 string productName,
                 List<SmartTrackPurchaseHistoryDto> history)
         {
-            if (string.IsNullOrWhiteSpace(productName))
-            {
-                throw new ArgumentException(
-                    "Product name is required.");
-            }
-
             productName = productName.Trim();
 
             history ??=
@@ -75,24 +79,14 @@ namespace SmartTrack.Services
                 CalculateNormalDailyConsumption(
                     history);
 
-            if (normalConsumption < 0)
-            {
-                normalConsumption = 0;
-            }
-
             var stock =
                 await GetStockAsync(
                     householdId,
                     productName);
 
             // =====================================================
-            // NEW STOCK OR NEW PURCHASE
+            // CREATE STOCK
             // =====================================================
-
-            bool newPurchase =
-                stock == null ||
-                purchaseDate >
-                stock.LastPurchaseDate;
 
             if (stock == null)
             {
@@ -100,32 +94,56 @@ namespace SmartTrack.Services
                     new SmartTrackStockState
                     {
                         UserId = userId,
-                        HouseholdId = householdId,
-                        ProductName = productName,
-                        CurrentStock = purchaseQuantity,
+
+                        HouseholdId =
+                            householdId,
+
+                        ProductName =
+                            productName,
+
+                        CurrentStock =
+                            purchaseQuantity,
+
                         LastPurchaseQuantity =
                             purchaseQuantity,
+
                         LastPurchaseDate =
                             purchaseDate,
+
                         NormalDailyConsumption =
                             normalConsumption,
+
                         AdaptiveConsumption =
                             normalConsumption,
+
                         LastProcessedDate =
                             purchaseDate.Date,
+
                         LastAdjustmentType =
                             "NORMAL",
+
+                        LastAdjustmentDate =
+                            null,
+
                         UpdatedAt =
                             DateTime.Now
                     };
 
-                _context.SmartTrackStockStates.Add(stock);
+                _context.SmartTrackStockStates
+                    .Add(stock);
 
                 await _context.SaveChangesAsync();
             }
-            else if (newPurchase)
+
+            // =====================================================
+            // NEW PURCHASE
+            // =====================================================
+
+            else if (purchaseDate >
+                     stock.LastPurchaseDate)
             {
-                stock.UserId = userId;
+                stock.UserId =
+                    userId;
 
                 stock.CurrentStock =
                     purchaseQuantity;
@@ -154,7 +172,7 @@ namespace SmartTrack.Services
                 stock.UpdatedAt =
                     DateTime.Now;
 
-                await RemoveFutureDailyRecordsAsync(
+                await RemoveDailyRecordsAfterPurchaseAsync(
                     stock,
                     purchaseDate.Date);
 
@@ -167,11 +185,12 @@ namespace SmartTrack.Services
             }
 
             // =====================================================
-            // PROCESS COMPLETED DAYS
+            // PROCESS COMPLETED DAYS ONLY
             // =====================================================
 
             DateTime firstDay =
-                stock.LastProcessedDate.Date
+                stock.LastProcessedDate
+                    .Date
                     .AddDays(1);
 
             DateTime lastCompletedDay =
@@ -194,23 +213,23 @@ namespace SmartTrack.Services
             }
 
             // =====================================================
-            // CURRENT DAY
+            // TODAY'S BEHAVIOUR
             // =====================================================
             //
-            // We do not permanently process today's full usage.
+            // Do NOT permanently subtract today's usage.
             //
-            // The user must have 24 hours before a normal daily
-            // reduction is committed.
+            // If there is a user adjustment today,
+            // display the adaptive rate.
             //
-            // This prevents the background service from reducing
-            // the same day repeatedly.
+            // Otherwise display NORMAL.
             //
+            // Tomorrow it becomes a completed day.
             // =====================================================
 
             string todayAdjustment =
                 await GetAdjustmentTypeAsync(
-                    stock.HouseholdId,
-                    stock.ProductName,
+                    householdId,
+                    productName,
                     DateTime.Today);
 
             decimal todayFactor =
@@ -232,28 +251,24 @@ namespace SmartTrack.Services
             return stock;
         }
 
-        // =========================================================
-        // PROCESS ONE COMPLETED DAY
-        // =========================================================
-
         private async Task ProcessSingleDayAsync(
             SmartTrackStockState stock,
             DateTime date)
         {
             date = date.Date;
 
-            var existingRecord =
+            var existing =
                 await _context.SmartTrackDailyUsages
                     .FirstOrDefaultAsync(x =>
                         x.HouseholdId ==
-                            stock.HouseholdId &&
+                        stock.HouseholdId &&
 
                         x.ProductName.ToLower() ==
-                            stock.ProductName.ToLower() &&
+                        stock.ProductName.ToLower() &&
 
                         x.UsageDate == date);
 
-            if (existingRecord != null)
+            if (existing != null)
             {
                 stock.LastProcessedDate =
                     date;
@@ -261,15 +276,41 @@ namespace SmartTrack.Services
                 return;
             }
 
-            string usageType =
-                await GetAdjustmentTypeAsync(
+            var adjustment =
+                await GetAdjustmentAsync(
                     stock.HouseholdId,
                     stock.ProductName,
                     date);
 
-            decimal factor =
-                GetAdjustmentFactor(
-                    usageType);
+            string usageType;
+            decimal factor;
+            bool automatic;
+
+            if (adjustment == null)
+            {
+                usageType = "NORMAL";
+                factor = NORMAL_FACTOR;
+                automatic = true;
+            }
+            else
+            {
+                usageType =
+                    adjustment.AdjustmentType
+                        .Trim()
+                        .ToUpperInvariant();
+
+                if (!IsValidAdjustment(
+                    usageType))
+                {
+                    usageType = "NORMAL";
+                }
+
+                factor =
+                    GetAdjustmentFactor(
+                        usageType);
+
+                automatic = false;
+            }
 
             decimal normalUsage =
                 stock.NormalDailyConsumption;
@@ -316,11 +357,7 @@ namespace SmartTrack.Services
                         stockAfter,
 
                     IsAutomatic =
-                        usageType == "NORMAL" &&
-                        !await HasUserAdjustmentAsync(
-                            stock.HouseholdId,
-                            stock.ProductName,
-                            date),
+                        automatic,
 
                     CreatedAt =
                         DateTime.Now
@@ -338,12 +375,6 @@ namespace SmartTrack.Services
             stock.LastAdjustmentType =
                 usageType;
 
-            var adjustment =
-                await GetAdjustmentAsync(
-                    stock.HouseholdId,
-                    stock.ProductName,
-                    date);
-
             stock.LastAdjustmentDate =
                 adjustment?.AdjustmentDate;
 
@@ -354,53 +385,6 @@ namespace SmartTrack.Services
                 DateTime.Now;
         }
 
-        // =========================================================
-        // GET STOCK
-        // =========================================================
-
-        public async Task<SmartTrackStockState?>
-            GetStockAsync(
-                Guid householdId,
-                string productName)
-        {
-            productName =
-                productName.Trim();
-
-            return await _context
-                .SmartTrackStockStates
-                .FirstOrDefaultAsync(x =>
-                    x.HouseholdId ==
-                        householdId &&
-
-                    x.ProductName.ToLower() ==
-                        productName.ToLower());
-        }
-
-        // =========================================================
-        // GET CURRENT STOCK
-        // =========================================================
-
-        public async Task<decimal>
-            GetCurrentStockAsync(
-                string userId,
-                Guid householdId,
-                string productName,
-                List<SmartTrackPurchaseHistoryDto> history)
-        {
-            var stock =
-                await ProcessStockAsync(
-                    userId,
-                    householdId,
-                    productName,
-                    history);
-
-            return stock.CurrentStock;
-        }
-
-        // =========================================================
-        // SAVE USER DAILY ADJUSTMENT
-        // =========================================================
-
         public async Task<bool>
             SetDailyAdjustmentAsync(
                 string userId,
@@ -409,7 +393,8 @@ namespace SmartTrack.Services
                 DateTime date,
                 string adjustmentType)
         {
-            if (string.IsNullOrWhiteSpace(productName))
+            if (string.IsNullOrWhiteSpace(
+                productName))
             {
                 return false;
             }
@@ -429,8 +414,7 @@ namespace SmartTrack.Services
             }
 
             bool belongsToHousehold =
-                await _context
-                    .UserHouseHoldDetails
+                await _context.UserHouseHoldDetails
                     .AnyAsync(x =>
                         x.UserId == userId &&
                         x.HouseHoldId ==
@@ -441,8 +425,7 @@ namespace SmartTrack.Services
                 return false;
             }
 
-            date =
-                date.Date;
+            date = date.Date;
 
             var existing =
                 await GetAdjustmentAsync(
@@ -474,8 +457,7 @@ namespace SmartTrack.Services
                             DateTime.Now
                     };
 
-                _context
-                    .SmartTrackStockAdjustments
+                _context.SmartTrackStockAdjustments
                     .Add(existing);
             }
             else
@@ -488,10 +470,6 @@ namespace SmartTrack.Services
             }
 
             await _context.SaveChangesAsync();
-
-            // =====================================================
-            // REBUILD STOCK
-            // =====================================================
 
             var history =
                 await GetProductHistoryAsync(
@@ -512,10 +490,6 @@ namespace SmartTrack.Services
 
             return true;
         }
-
-        // =========================================================
-        // REBUILD STOCK
-        // =========================================================
 
         private async Task RebuildStockAsync(
             SmartTrackStockState stock,
@@ -566,8 +540,6 @@ namespace SmartTrack.Services
             stock.LastAdjustmentDate =
                 null;
 
-            await _context.SaveChangesAsync();
-
             await RemoveDailyRecordsAfterPurchaseAsync(
                 stock,
                 purchaseDate.Date);
@@ -578,8 +550,7 @@ namespace SmartTrack.Services
             DateTime lastCompletedDay =
                 DateTime.Today.AddDays(-1);
 
-            while (processDate <=
-                   lastCompletedDay)
+            while (processDate <= lastCompletedDay)
             {
                 await ProcessSingleDayAsync(
                     stock,
@@ -589,20 +560,11 @@ namespace SmartTrack.Services
                     processDate.AddDays(1);
             }
 
-            stock.UpdatedAt =
-                DateTime.Now;
-
             await _context.SaveChangesAsync();
         }
 
-        // =========================================================
-        // NORMAL DAILY CONSUMPTION
-        // =========================================================
-
-        public decimal
-            CalculateNormalDailyConsumption(
-                List<SmartTrackPurchaseHistoryDto>
-                    history)
+        public decimal CalculateNormalDailyConsumption(
+            List<SmartTrackPurchaseHistoryDto> history)
         {
             if (history == null ||
                 history.Count < 2)
@@ -660,13 +622,8 @@ namespace SmartTrack.Services
                     continue;
                 }
 
-                decimal usage =
-                    previousQuantity / days;
-
-                if (usage > 0)
-                {
-                    values.Add(usage);
-                }
+                values.Add(
+                    previousQuantity / days);
             }
 
             if (values.Count == 0)
@@ -678,10 +635,6 @@ namespace SmartTrack.Services
                 values.Average(),
                 6);
         }
-
-        // =========================================================
-        // GET ADJUSTMENT
-        // =========================================================
 
         private async Task<string>
             GetAdjustmentTypeAsync(
@@ -732,59 +685,22 @@ namespace SmartTrack.Services
                         date.Date);
         }
 
-        private async Task<bool>
-            HasUserAdjustmentAsync(
-                Guid householdId,
-                string productName,
-                DateTime date)
-        {
-            return await _context
-                .SmartTrackStockAdjustments
-                .AnyAsync(x =>
-                    x.HouseholdId ==
-                        householdId &&
-
-                    x.ProductName.ToLower() ==
-                        productName.ToLower() &&
-
-                    x.AdjustmentDate ==
-                        date.Date);
-        }
-
-        // =========================================================
-        // FACTOR
-        // =========================================================
-
-        private decimal
-            GetAdjustmentFactor(
-                string type)
+        private decimal GetAdjustmentFactor(
+            string type)
         {
             return type switch
             {
-                "HIGH" =>
-                    HIGH_FACTOR,
-
-                "MEDIUM" =>
-                    MEDIUM_FACTOR,
-
-                "LOW" =>
-                    LOW_FACTOR,
-
-                "UNUSED" =>
-                    UNUSED_FACTOR,
-
-                _ =>
-                    NORMAL_FACTOR
+                "HIGH" => HIGH_FACTOR,
+                "MEDIUM" => MEDIUM_FACTOR,
+                "LOW" => LOW_FACTOR,
+                "UNUSED" => UNUSED_FACTOR,
+                "NORMAL" => NORMAL_FACTOR,
+                _ => NORMAL_FACTOR
             };
         }
 
-        // =========================================================
-        // VALID ADJUSTMENT
-        // =========================================================
-
-        private bool
-            IsValidAdjustment(
-                string type)
+        private bool IsValidAdjustment(
+            string type)
         {
             return type switch
             {
@@ -797,14 +713,9 @@ namespace SmartTrack.Services
             };
         }
 
-        // =========================================================
-        // LATEST PURCHASE
-        // =========================================================
-
         private SmartTrackPurchaseHistoryDto?
             GetLatestPurchase(
-                List<SmartTrackPurchaseHistoryDto>
-                    history)
+                List<SmartTrackPurchaseHistoryDto> history)
         {
             return history
                 .Where(x =>
@@ -817,12 +728,7 @@ namespace SmartTrack.Services
                 .FirstOrDefault();
         }
 
-        // =========================================================
-        // PRODUCT HISTORY
-        // =========================================================
-
-        private async Task<
-            List<SmartTrackPurchaseHistoryDto>>
+        private async Task<List<SmartTrackPurchaseHistoryDto>>
             GetProductHistoryAsync(
                 Guid householdId,
                 string productName)
@@ -832,34 +738,27 @@ namespace SmartTrack.Services
                     .UserHouseHoldDetails
                     .Where(x =>
                         x.HouseHoldId ==
-                            householdId)
-                    .Select(x =>
-                        x.UserId)
+                        householdId)
+                    .Select(x => x.UserId)
                     .Distinct()
                     .ToListAsync();
 
             return await (
-                from item
-                in _context.ReceiptItems
+                from item in _context.ReceiptItems
 
-                join receipt
-                in _context.Receipts
-                on item.ReceiptId
+                join receipt in _context.Receipts
+                    on item.ReceiptId
                     equals receipt.ReceiptId
 
-                where
-                    householdUsers.Contains(
-                        receipt.CreatedBy)
+                where householdUsers.Contains(
+                    receipt.CreatedBy)
 
-                where
-                    item.ItemName != null
+                where item.ItemName != null
 
-                where
-                    item.ItemName.ToLower() ==
-                    productName.Trim().ToLower()
+                where item.ItemName.ToLower() ==
+                      productName.Trim().ToLower()
 
-                orderby
-                    receipt.PurchaseDate
+                orderby receipt.PurchaseDate
 
                 select new SmartTrackPurchaseHistoryDto
                 {
@@ -870,9 +769,8 @@ namespace SmartTrack.Services
                         item.Quantity,
 
                     PurchaseDate =
-                        receipt.PurchaseDate
-                            .ToString(
-                                "yyyy-MM-ddTHH:mm:ss"),
+                        receipt.PurchaseDate.ToString(
+                            "yyyy-MM-ddTHH:mm:ss"),
 
                     UnitPrice =
                         (double)item.UnitPrice,
@@ -892,18 +790,13 @@ namespace SmartTrack.Services
             ).ToListAsync();
         }
 
-        // =========================================================
-        // REMOVE DAILY RECORDS AFTER PURCHASE
-        // =========================================================
-
         private async Task
             RemoveDailyRecordsAfterPurchaseAsync(
                 SmartTrackStockState stock,
                 DateTime purchaseDate)
         {
             var records =
-                await _context
-                    .SmartTrackDailyUsages
+                await _context.SmartTrackDailyUsages
                     .Where(x =>
                         x.HouseholdId ==
                             stock.HouseholdId &&
@@ -917,31 +810,13 @@ namespace SmartTrack.Services
 
             if (records.Count > 0)
             {
-                _context
-                    .SmartTrackDailyUsages
+                _context.SmartTrackDailyUsages
                     .RemoveRange(records);
-
-                await _context.SaveChangesAsync();
             }
         }
 
-        private async Task
-            RemoveFutureDailyRecordsAsync(
-                SmartTrackStockState stock,
-                DateTime purchaseDate)
-        {
-            await RemoveDailyRecordsAfterPurchaseAsync(
-                stock,
-                purchaseDate);
-        }
-
-        // =========================================================
-        // DATE PARSER
-        // =========================================================
-
-        private static DateTime?
-            ParseDate(
-                string? value)
+        private static DateTime? ParseDate(
+            string? value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
