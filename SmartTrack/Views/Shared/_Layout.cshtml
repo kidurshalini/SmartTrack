@@ -813,6 +813,42 @@
                             </a>
 
                         </li>
+
+
+                        <li class="nav-item">
+
+                            <a class="nav-link @(currentController == "SmartTrackDashboard" && currentAction == "Recommendations" ? "active" : "")"
+                               asp-area=""
+                               asp-controller="SmartTrackDashboard"
+                               asp-action="Recommendations">
+
+                                <i class="fas fa-th-large"></i>
+
+                                <span class="link-text">
+                                    Purchase Recommendations
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+                        <li class="nav-item">
+
+                            <a class="nav-link @(currentController == "ShoppingList" && currentAction == "Index" ? "active" : "")"
+                               asp-area=""
+                               asp-controller="ShoppingList"
+                               asp-action="Index">
+
+                                <i class="fas fa-th-large"></i>
+
+                                <span class="link-text">
+									Shopping List
+                                </span>
+
+                            </a>
+
+                        </li>
                     }
 
                 </ul>

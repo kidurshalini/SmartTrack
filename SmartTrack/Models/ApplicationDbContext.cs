@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace SmartTrack.Models
 {
@@ -91,6 +92,16 @@ namespace SmartTrack.Models
                 .WithMany()
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ShoppingListItem>()
+    .HasOne(x => x.ShoppingList)
+    .WithMany(x => x.Items)
+    .HasForeignKey(x => x.ShoppingListId)
+    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ShoppingListItem>()
+    .Property(x => x.Quantity)
+    .HasPrecision(10, 2);
         }
 
 
@@ -109,6 +120,9 @@ namespace SmartTrack.Models
         public DbSet<ReceiptItemModel> ReceiptItems { get; set; }
 
         public DbSet<SmartTrackNotification> SmartTrackNotifications { get; set; }
+        public DbSet<ShoppingList> ShoppingLists { get; set; }
+
+        public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
 
     }
 }

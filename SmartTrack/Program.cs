@@ -91,6 +91,7 @@ builder.Services.AddHttpClient<SmartTrackAIService>(
 builder.Services.AddScoped<SmartTrackPurchaseHistoryService>();
 builder.Services.AddScoped<SmartTrackNotificationService>();
 builder.Services.AddScoped<SmartTrackDashboardService>();
+builder.Services.AddScoped<ShoppingListService>();
 // Add services
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();

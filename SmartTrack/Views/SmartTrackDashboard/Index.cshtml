@@ -4,18 +4,560 @@
     ViewData["Title"] = "SmartTrack Dashboard";
 }
 
-<div class="container-fluid py-4">
+<style>
+
+    /* =========================================================
+           GLOBAL
+        ========================================================= */
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    .smarttrack-dashboard {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .summary-card,
+    .dashboard-card {
+        border-radius: 12px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+
+    /* =========================================================
+           HEADER
+        ========================================================= */
+
+    .dashboard-header {
+        width: 100%;
+    }
+
+        .dashboard-header h2 {
+            font-size: 1.7rem;
+        }
+
+
+    /* =========================================================
+           SUMMARY CARDS
+        ========================================================= */
+
+    .summary-card {
+        min-height: 125px;
+    }
+
+        .summary-card .card-body {
+            padding: 1rem;
+        }
+
+
+    /* =========================================================
+           ALERTS
+        ========================================================= */
+
+    .alert-item {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .alert-content {
+        min-width: 0;
+        flex: 1;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    /* =========================================================
+           STOCK
+        ========================================================= */
+
+    .stock-item {
+        width: 100%;
+    }
+
+    .stock-product {
+        min-width: 0;
+        flex: 1;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .stock-header {
+        width: 100%;
+    }
+
+
+    /* =========================================================
+           DESKTOP PURCHASE TABLE
+        ========================================================= */
+
+    .purchase-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .purchase-table {
+        width: 100%;
+        min-width: 600px;
+    }
+
+        .purchase-table th,
+        .purchase-table td {
+            vertical-align: middle;
+        }
+
+
+    /* =========================================================
+           MOBILE PURCHASE CARDS
+        ========================================================= */
+
+    .mobile-purchase-list {
+        display: none;
+    }
+
+
+    /* =========================================================
+           MOBILE
+        ========================================================= */
+
+    @@media (max-width: 767.98px) {
+        /* -----------------------------------------------------
+               PAGE
+            ----------------------------------------------------- */
+
+        .container-fluid.smarttrack-dashboard {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 12px 10px !important;
+        }
+        /* -----------------------------------------------------
+               HEADER
+            ----------------------------------------------------- */
+
+        .dashboard-header {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            width: 100%;
+            gap: 12px;
+            margin-bottom: 18px !important;
+        }
+
+            .dashboard-header > div {
+                width: 100% !important;
+                max-width: 100%;
+            }
+
+            .dashboard-header h2 {
+                font-size: 1.45rem;
+                line-height: 1.2;
+                margin-bottom: 5px !important;
+            }
+
+            .dashboard-header p {
+                font-size: 0.78rem;
+                line-height: 1.45;
+                margin: 0 !important;
+            }
+
+            .dashboard-header .btn {
+                display: block;
+                width: 100%;
+                min-height: 42px;
+                padding: 9px 12px;
+                font-size: 0.85rem;
+            }
+        /* -----------------------------------------------------
+               SUMMARY ROW
+            ----------------------------------------------------- */
+
+        .summary-row {
+            display: flex !important;
+            flex-direction: column !important;
+            width: 100%;
+            margin: 0 0 18px 0 !important;
+            gap: 10px;
+        }
+
+        .summary-column {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: 0 0 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .summary-card {
+            width: 100% !important;
+            min-height: 0 !important;
+            height: auto !important;
+            margin: 0 !important;
+        }
+
+            .summary-card .card-body {
+                padding: 13px 14px !important;
+            }
+
+            .summary-card small {
+                display: block;
+                font-size: 0.68rem;
+                line-height: 1.2;
+                margin-bottom: 4px;
+            }
+
+            .summary-card h2 {
+                font-size: 1.5rem;
+                line-height: 1.1;
+                margin-bottom: 4px !important;
+            }
+
+            .summary-card span {
+                display: block;
+                font-size: 0.74rem;
+                line-height: 1.3;
+            }
+        /* -----------------------------------------------------
+               GENERAL DASHBOARD CARDS
+            ----------------------------------------------------- */
+
+        .dashboard-card {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-bottom: 16px !important;
+        }
+
+            .dashboard-card .card-header {
+                padding: 13px !important;
+            }
+
+            .dashboard-card .card-body {
+                padding: 13px !important;
+            }
+
+            .dashboard-card h5 {
+                font-size: 0.95rem;
+                line-height: 1.3;
+            }
+
+            .dashboard-card .text-muted.small {
+                font-size: 0.68rem;
+            }
+        /* -----------------------------------------------------
+               RECENT ALERTS
+            ----------------------------------------------------- */
+
+        .alert-item {
+            display: flex !important;
+            width: 100%;
+            align-items: flex-start !important;
+            gap: 8px;
+            padding-bottom: 12px !important;
+            margin-bottom: 12px !important;
+        }
+
+            .alert-item > div:first-child {
+                flex: 0 0 34px;
+                width: 34px;
+                margin: 0 !important;
+            }
+
+                .alert-item > div:first-child .rounded-circle {
+                    width: 34px !important;
+                    height: 34px !important;
+                }
+
+        .alert-content {
+            flex: 1 1 auto;
+            min-width: 0;
+            width: auto;
+        }
+
+            .alert-content strong {
+                display: block;
+                font-size: 0.8rem;
+                line-height: 1.25;
+                overflow-wrap: anywhere;
+            }
+
+            .alert-content p {
+                font-size: 0.73rem;
+                line-height: 1.4;
+                margin-bottom: 4px !important;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            .alert-content small {
+                font-size: 0.62rem;
+            }
+
+        .alert-item button {
+            flex: 0 0 28px;
+            width: 28px;
+            height: 28px;
+            margin: 0 !important;
+        }
+        /* -----------------------------------------------------
+               STOCK HEADER
+            ----------------------------------------------------- */
+
+        .stock-card-header {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 9px;
+            width: 100%;
+        }
+
+            .stock-card-header h5 {
+                margin-bottom: 0 !important;
+            }
+
+            .stock-card-header .btn {
+                display: block;
+                width: 100%;
+                min-height: 38px;
+                font-size: 0.76rem;
+                padding: 8px 10px;
+            }
+        /* -----------------------------------------------------
+               STOCK ITEMS
+            ----------------------------------------------------- */
+
+        .stock-item {
+            width: 100%;
+            margin-bottom: 17px !important;
+        }
+
+        .stock-header {
+            display: flex !important;
+            width: 100%;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            gap: 8px;
+            margin-bottom: 8px !important;
+        }
+
+        .stock-product {
+            flex: 1;
+            min-width: 0;
+            padding-right: 4px;
+        }
+
+            .stock-product strong {
+                display: block;
+                font-size: 0.8rem;
+                line-height: 1.35;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+        .stock-header .badge {
+            flex: 0 0 auto;
+            font-size: 0.58rem;
+            line-height: 1.2;
+            padding: 5px 7px;
+            white-space: nowrap;
+        }
+
+        .stock-item small {
+            display: block;
+            font-size: 0.67rem;
+            line-height: 1.3;
+        }
+
+        .progress {
+            width: 100%;
+            height: 7px !important;
+            overflow: hidden;
+        }
+        /* -----------------------------------------------------
+               PURCHASES
+            ----------------------------------------------------- */
+        /* Hide desktop table on mobile */
+        .purchase-table-wrapper {
+            display: none !important;
+        }
+        /* Show mobile purchase cards */
+        .mobile-purchase-list {
+            display: block;
+            width: 100%;
+        }
+
+        .mobile-purchase-item {
+            width: 100%;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+
+            .mobile-purchase-item:last-child {
+                margin-bottom: 0;
+            }
+
+        .mobile-purchase-product {
+            font-size: 0.86rem;
+            font-weight: 600;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            margin-bottom: 9px;
+        }
+
+        .mobile-purchase-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 0;
+            border-top: 1px solid #f1f1f1;
+        }
+
+        .mobile-purchase-label {
+            color: #6c757d;
+            font-size: 0.7rem;
+            flex: 0 0 auto;
+        }
+
+        .mobile-purchase-value {
+            text-align: right;
+            font-size: 0.72rem;
+            font-weight: 500;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .mobile-purchase-total {
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        /* -----------------------------------------------------
+               EMPTY STATES
+            ----------------------------------------------------- */
+
+        .dashboard-card .text-center {
+            padding-top: 20px !important;
+            padding-bottom: 20px !important;
+        }
+
+            .dashboard-card .text-center p {
+                font-size: 0.75rem;
+                line-height: 1.4;
+            }
+        /* -----------------------------------------------------
+               REMOVE BOOTSTRAP ROW NEGATIVE MARGIN PROBLEMS
+            ----------------------------------------------------- */
+
+        .smarttrack-dashboard .row {
+            --bs-gutter-x: 0;
+            --bs-gutter-y: 0;
+        }
+    }
+
+
+    /* =========================================================
+           VERY SMALL PHONES
+           ========================================================= */
+
+    @@media (max-width: 400px) {
+
+        .container-fluid.smarttrack-dashboard {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.3rem;
+        }
+
+        .dashboard-header p {
+            font-size: 0.73rem;
+        }
+
+        .summary-card .card-body {
+            padding: 11px 12px !important;
+        }
+
+        .summary-card small {
+            font-size: 0.62rem;
+        }
+
+        .summary-card h2 {
+            font-size: 1.35rem;
+        }
+
+        .summary-card span {
+            font-size: 0.69rem;
+        }
+
+        .dashboard-card .card-header {
+            padding: 11px !important;
+        }
+
+        .dashboard-card .card-body {
+            padding: 11px !important;
+        }
+
+        .dashboard-card h5 {
+            font-size: 0.88rem;
+        }
+
+        .alert-content strong {
+            font-size: 0.76rem;
+        }
+
+        .alert-content p {
+            font-size: 0.69rem;
+        }
+
+        .stock-product strong {
+            font-size: 0.76rem;
+        }
+
+        .mobile-purchase-item {
+            padding: 10px;
+        }
+
+        .mobile-purchase-product {
+            font-size: 0.8rem;
+        }
+
+        .mobile-purchase-label,
+        .mobile-purchase-value {
+            font-size: 0.68rem;
+        }
+    }
+
+</style>
+
+
+<div class="container-fluid py-4 smarttrack-dashboard">
 
     <!-- =====================================================
          HEADER
     ====================================================== -->
 
-    <div class="d-flex justify-content-between
-                align-items-center mb-4">
+    <div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
 
         <div>
 
-            <h2 class="fw-bold">
+            <h2 class="fw-bold mb-1">
                 SmartTrack
             </h2>
 
@@ -28,10 +570,11 @@
 
         <div>
 
-            <a asp-controller="SmartTrack"
+            <a asp-controller="SmartTrackDashboard"
                asp-action="Prediction"
                class="btn btn-primary">
 
+                <i class="fas fa-search me-1"></i>
                 Check Product
 
             </a>
@@ -45,23 +588,26 @@
          SUMMARY CARDS
     ====================================================== -->
 
-    <div class="row g-3 mb-4">
+    <div class="row g-3 mb-4 summary-row">
 
-        <div class="col-md-3">
 
-            <div class="card shadow-sm border-0">
+        <!-- DUE NOW -->
+
+        <div class="col-12 col-md-3 summary-column">
+
+            <div class="card shadow-sm border-0 summary-card">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
+                    <small class="text-muted fw-semibold">
                         DUE NOW
                     </small>
 
-                    <h2 class="text-danger fw-bold">
+                    <h2 class="text-danger fw-bold mb-1">
                         @Model.DueNowCount
                     </h2>
 
-                    <span>
+                    <span class="text-muted">
                         Purchase required
                     </span>
 
@@ -72,21 +618,23 @@
         </div>
 
 
-        <div class="col-md-3">
+        <!-- DUE SOON -->
 
-            <div class="card shadow-sm border-0">
+        <div class="col-12 col-md-3 summary-column">
+
+            <div class="card shadow-sm border-0 summary-card">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
+                    <small class="text-muted fw-semibold">
                         DUE SOON
                     </small>
 
-                    <h2 class="text-warning fw-bold">
+                    <h2 class="text-warning fw-bold mb-1">
                         @Model.DueSoonCount
                     </h2>
 
-                    <span>
+                    <span class="text-muted">
                         Within 3 days
                     </span>
 
@@ -97,21 +645,23 @@
         </div>
 
 
-        <div class="col-md-3">
+        <!-- UPCOMING -->
 
-            <div class="card shadow-sm border-0">
+        <div class="col-12 col-md-3 summary-column">
+
+            <div class="card shadow-sm border-0 summary-card">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
+                    <small class="text-muted fw-semibold">
                         UPCOMING
                     </small>
 
-                    <h2 class="text-info fw-bold">
+                    <h2 class="text-info fw-bold mb-1">
                         @Model.UpcomingCount
                     </h2>
 
-                    <span>
+                    <span class="text-muted">
                         Within 7 days
                     </span>
 
@@ -122,21 +672,23 @@
         </div>
 
 
-        <div class="col-md-3">
+        <!-- ANOMALIES -->
 
-            <div class="card shadow-sm border-0">
+        <div class="col-12 col-md-3 summary-column">
+
+            <div class="card shadow-sm border-0 summary-card">
 
                 <div class="card-body">
 
-                    <small class="text-muted">
+                    <small class="text-muted fw-semibold">
                         ANOMALIES
                     </small>
 
-                    <h2 class="text-secondary fw-bold">
+                    <h2 class="text-secondary fw-bold mb-1">
                         @Model.AnomalyCount
                     </h2>
 
-                    <span>
+                    <span class="text-muted">
                         Unusual activity
                     </span>
 
@@ -150,185 +702,350 @@
 
 
     <!-- =====================================================
-         PURCHASE RECOMMENDATIONS
+         RECENT ALERTS
     ====================================================== -->
 
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card shadow-sm border-0 mb-4 dashboard-card">
 
-        <div class="card-header bg-white">
+        <div class="card-header bg-white border-0 py-3">
 
-            <h5 class="mb-0">
-                🛒 Purchase Recommendations
-            </h5>
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h5 class="mb-0 fw-semibold">
+                        🔔 Recent Alerts
+                    </h5>
+
+                    <span class="text-muted small">
+                        Latest household activity
+                    </span>
+
+                </div>
+
+            </div>
 
         </div>
 
+
         <div class="card-body">
 
-            @if (
-                        Model.PurchaseRecommendations.Count == 0)
+            @if (Model.Notifications == null ||
+                        Model.Notifications.Count == 0)
             {
-                <div class="alert alert-success">
-                    No purchase recommendations at the moment.
+                <div class="text-center py-3">
+
+                    <i class="fas fa-check-circle text-success fs-3 mb-2"></i>
+
+                    <p class="text-muted mb-0">
+                        No recent alerts. Your household is looking good.
+                    </p>
+
                 </div>
             }
             else
             {
-                <div class="table-responsive">
+                @foreach (var notification in Model.Notifications.Take(5))
+                {
 
-                    <table class="table align-middle">
+                    <div class="alert-item d-flex align-items-start
+                                        border-bottom pb-3 mb-3"
+                         id="alert-@notification.NotificationId">
+
+                        <div class="me-3">
+
+                            <div class="rounded-circle bg-light
+                                                d-flex align-items-center
+                                                justify-content-center"
+                                 style="width:40px;height:40px;">
+
+                                <i class="fas fa-bell text-warning"></i>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="flex-grow-1 alert-content">
+
+                            <strong>
+                                @notification.ProductName
+                            </strong>
+
+                            <p class="mb-1 text-muted">
+                                @notification.Message
+                            </p>
+
+                            <small class="text-muted">
+                                @notification.CreatedOn
+                            </small>
+
+                        </div>
+
+
+                        <button type="button"
+                                class="btn btn-sm btn-light text-muted
+                                               border-0 rounded-circle ms-2"
+                                style="width:28px;height:28px;padding:0;"
+                                title="Dismiss alert"
+                                onclick="dismissAlert('alert-@notification.NotificationId')">
+
+                            <i class="fas fa-times"></i>
+
+                        </button>
+
+                    </div>
+
+                }
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         LOW STOCK
+    ====================================================== -->
+
+    <div class="card shadow-sm border-0 mb-4 dashboard-card">
+
+        <div class="card-header bg-white border-0 py-3">
+
+            <div class="d-flex justify-content-between align-items-center
+                        stock-card-header">
+
+                <h5 class="mb-0 fw-semibold">
+                    📦 Stock Getting Low
+                </h5>
+
+                <a asp-controller="SmartTrackDashboard"
+                   asp-action="Recommendations"
+                   class="btn btn-sm btn-outline-primary">
+
+                    View Recommendations
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            @{
+                var lowStockItems =
+                Model.StockItems?
+                .Where(x => x.DaysUntilPurchase <= 7)
+                .OrderBy(x => x.DaysUntilPurchase)
+                .ToList();
+            }
+
+
+            @if (lowStockItems == null ||
+                        lowStockItems.Count == 0)
+            {
+                <div class="text-center py-4">
+
+                    <i class="fas fa-box-open text-success fs-2 mb-2"></i>
+
+                    <p class="text-muted mb-0">
+                        No low-stock items at the moment.
+                    </p>
+
+                </div>
+            }
+            else
+            {
+                @foreach (var item in lowStockItems)
+                {
+
+                    <div class="mb-4 stock-item">
+
+                        <div class="d-flex justify-content-between
+                                            align-items-center mb-2 stock-header">
+
+                            <div class="stock-product">
+
+                                <strong class="d-block">
+                                    @item.Product
+                                </strong>
+
+                            </div>
+
+                            <span class="badge bg-@item.StatusClass">
+                                @item.StockStatus
+                            </span>
+
+                        </div>
+
+
+                        @{
+                            var width = item.DaysUntilPurchase <= 0
+                            ? 5
+                            : Math.Max(
+                            5,
+                            Math.Min(
+                            100,
+                            item.DaysUntilPurchase * 4
+                            )
+                            );
+                        }
+
+
+                        <div class="progress"
+                             style="height:8px;">
+
+                            <div class="progress-bar bg-@item.StatusClass"
+                                 role="progressbar"
+                                 style="width:@width%;"
+                                 aria-valuenow="@width"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
+
+                        </div>
+
+
+                        <div class="mt-2">
+
+                            @if (item.DaysUntilPurchase <= 0)
+                            {
+                                <small class="text-danger fw-semibold">
+
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+
+                                    Purchase now
+
+                                </small>
+                            }
+                            else if (item.DaysUntilPurchase == 1)
+                            {
+                                <small class="text-warning fw-semibold">
+                                    1 day remaining
+                                </small>
+                            }
+                            else
+                            {
+                                <small class="text-muted">
+                                    @item.DaysUntilPurchase days remaining
+                                </small>
+                            }
+
+                        </div>
+
+                    </div>
+
+                }
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT HOUSEHOLD PURCHASES
+    ====================================================== -->
+
+    <div class="card shadow-sm border-0 dashboard-card">
+
+        <div class="card-header bg-white border-0 py-3">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h5 class="mb-0 fw-semibold">
+                        🧾 Recent Household Purchases
+                    </h5>
+
+                    <span class="text-muted small">
+                        Latest purchases
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body">
+
+            @if (Model.RecentPurchases == null ||
+                        Model.RecentPurchases.Count == 0)
+            {
+                <div class="text-center py-4">
+
+                    <i class="fas fa-receipt text-muted fs-2 mb-2"></i>
+
+                    <p class="text-muted mb-0">
+                        No recent household purchases.
+                    </p>
+
+                </div>
+            }
+            else
+            {
+
+                <!-- =================================================
+                     DESKTOP TABLE
+                ================================================== -->
+
+                <div class="purchase-table-wrapper">
+
+                    <table class="table table-hover align-middle mb-0 purchase-table">
 
                         <thead>
 
                             <tr>
 
-                                <th>
-                                    Product
-                                </th>
+                                <th>Product</th>
 
-                                <th>
-                                    Status
-                                </th>
+                                <th>Quantity</th>
 
-                                <th>
-                                    Expected Date
-                                </th>
+                                <th>Date</th>
 
-                                <th>
-                                    Time
-                                </th>
+                                <th>Unit Price</th>
 
-                                <th>
-                                    Priority
-                                </th>
-
-                                <th>
-                                    Action
-                                </th>
+                                <th>Total</th>
 
                             </tr>
 
                         </thead>
 
+
                         <tbody>
 
-                            @foreach (
-                                                    var item
-                                                    in Model.PurchaseRecommendations
-                                                    .OrderBy(
-                                                    x => x.DaysUntilPurchase))
+                            @foreach (var purchase in Model.RecentPurchases)
                             {
 
                                 <tr>
 
                                     <td>
-
                                         <strong>
-                                            @item.Product
+                                            @purchase.Product
                                         </strong>
-
-                                        <br />
-
-                                        <small class="text-muted">
-                                            @item.LatestQuantity units
-                                        </small>
-
                                     </td>
 
-
                                     <td>
-
-                                        @if (
-                                                                        item.DaysUntilPurchase <= 0)
-                                        {
-                                            <span class="badge bg-danger">
-                                                PURCHASE NOW
-                                            </span>
-                                        }
-                                        else if (
-                                        item.DaysUntilPurchase <= 3)
-                                        {
-                                            <span class="badge bg-warning text-dark">
-                                                DUE SOON
-                                            </span>
-                                        }
-                                        else if (
-                                        item.DaysUntilPurchase <= 7)
-                                        {
-                                            <span class="badge bg-info">
-                                                UPCOMING
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-success">
-                                                OK
-                                            </span>
-                                        }
-
+                                        @purchase.Quantity
                                     </td>
 
-
                                     <td>
-                                        @item.ExpectedPurchaseDate
+                                        @purchase.PurchaseDate
                                     </td>
 
-
                                     <td>
-
-                                        @if (
-                                                                        item.DaysUntilPurchase <= 0)
-                                        {
-                                            <strong class="text-danger">
-                                                Overdue
-                                            </strong>
-                                        }
-                                        else
-                                        {
-                                            <strong>
-                                                @item.DaysUntilPurchase days left
-                                            </strong>
-                                        }
-
+                                        @purchase.UnitPrice.ToString("0.00")
                                     </td>
 
-
                                     <td>
-
-                                        @if (
-                                                                        item.Priority == "HIGH")
-                                        {
-                                            <span class="text-danger">
-                                                ● High
-                                            </span>
-                                        }
-                                        else if (
-                                        item.Priority == "MEDIUM")
-                                        {
-                                            <span class="text-warning">
-                                                ● Medium
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-success">
-                                                ● Normal
-                                            </span>
-                                        }
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <a asp-controller="SmartTrack"
-                                           asp-action="Prediction"
-                                           class="btn btn-sm btn-outline-primary">
-
-                                            View
-
-                                        </a>
-
+                                        <strong>
+                                            @purchase.TotalPrice.ToString("0.00")
+                                        </strong>
                                     </td>
 
                                 </tr>
@@ -340,95 +1057,76 @@
                     </table>
 
                 </div>
-            }
-
-        </div>
-
-    </div>
 
 
-    <div class="row g-4">
+                <!-- =================================================
+                     MOBILE PURCHASE CARDS
+                ================================================== -->
 
-        <!-- =================================================
-             STOCK
-        ================================================== -->
+                <div class="mobile-purchase-list">
 
-        <div class="col-lg-6">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-header bg-white">
-
-                    <h5 class="mb-0">
-                        📦 Stock Getting Low
-                    </h5>
-
-                </div>
-
-                <div class="card-body">
-
-                    @foreach (
-                                        var item
-                                        in Model.StockItems
-                                        .OrderBy(
-                                        x => x.DaysUntilPurchase))
+                    @foreach (var purchase in Model.RecentPurchases)
                     {
 
-                        <div class="mb-3">
+                        <div class="mobile-purchase-item">
 
-                            <div class="d-flex
-                                            justify-content-between">
+                            <div class="mobile-purchase-product">
 
-                                <strong>
-                                    @item.Product
-                                </strong>
+                                @purchase.Product
 
-                                <span class="badge bg-@item.StatusClass">
+                            </div>
 
-                                    @item.StockStatus
 
+                            <div class="mobile-purchase-row">
+
+                                <span class="mobile-purchase-label">
+                                    Quantity
+                                </span>
+
+                                <span class="mobile-purchase-value">
+                                    @purchase.Quantity
                                 </span>
 
                             </div>
 
-                            <div class="progress mt-2"
-                                 style="height:8px;">
 
-                                @{
-                                    var width =
-                                    Math.Max(
-                                    5,
-                                    Math.Min(
-                                    100,
-                                    item.DaysUntilPurchase
-                                    * 10));
-                                }
+                            <div class="mobile-purchase-row">
 
-                                <div class="progress-bar
-                                                bg-@item.StatusClass"
-                                     style="width:@width%;">
-                                </div>
+                                <span class="mobile-purchase-label">
+                                    Date
+                                </span>
+
+                                <span class="mobile-purchase-value">
+                                    @purchase.PurchaseDate
+                                </span>
 
                             </div>
 
-                            <small class="text-muted">
 
-                                @if (
-                                                            item.DaysUntilPurchase <= 0)
-                                {
-                                    <span>
-                                        Purchase now
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span>
-                                        @item.DaysUntilPurchase
-                                        days remaining
-                                    </span>
-                                }
+                            <div class="mobile-purchase-row">
 
-                            </small>
+                                <span class="mobile-purchase-label">
+                                    Unit Price
+                                </span>
+
+                                <span class="mobile-purchase-value">
+                                    @purchase.UnitPrice.ToString("0.00")
+                                </span>
+
+                            </div>
+
+
+                            <div class="mobile-purchase-row">
+
+                                <span class="mobile-purchase-label">
+                                    Total
+                                </span>
+
+                                <span class="mobile-purchase-value mobile-purchase-total">
+                                    @purchase.TotalPrice.ToString("0.00")
+                                </span>
+
+                            </div>
 
                         </div>
 
@@ -436,162 +1134,44 @@
 
                 </div>
 
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             ALERTS
-        ================================================== -->
-
-        <div class="col-lg-6">
-
-            <div class="card shadow-sm border-0">
-
-                <div class="card-header bg-white">
-
-                    <h5 class="mb-0">
-                        🔔 Recent Alerts
-                    </h5>
-
-                </div>
-
-                <div class="card-body">
-
-                    @if (
-                                        Model.Notifications.Count == 0)
-                    {
-                        <p class="text-muted">
-                            No recent alerts.
-                        </p>
-                    }
-                    else
-                    {
-                        @foreach (
-                                            var notification
-                                            in Model.Notifications
-                                            .Take(5))
-                        {
-
-                            <div class="border-bottom
-                                                pb-3 mb-3">
-
-                                <strong>
-                                    @notification.ProductName
-                                </strong>
-
-                                <p class="mb-1">
-                                    @notification.Message
-                                </p>
-
-                                <small class="text-muted">
-                                    @notification.CreatedOn
-                                </small>
-
-                            </div>
-
-                        }
-                    }
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         RECENT PURCHASES
-    ====================================================== -->
-
-    <div class="card shadow-sm border-0 mt-4">
-
-        <div class="card-header bg-white">
-
-            <h5 class="mb-0">
-                🧾 Recent Household Purchases
-            </h5>
-
-        </div>
-
-        <div class="card-body">
-
-            <div class="table-responsive">
-
-                <table class="table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Product
-                            </th>
-
-                            <th>
-                                Quantity
-                            </th>
-
-                            <th>
-                                Date
-                            </th>
-
-                            <th>
-                                Unit Price
-                            </th>
-
-                            <th>
-                                Total
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @foreach (
-                                                var purchase
-                                                in Model.RecentPurchases)
-                        {
-
-                            <tr>
-
-                                <td>
-                                    @purchase.Product
-                                </td>
-
-                                <td>
-                                    @purchase.Quantity
-                                </td>
-
-                                <td>
-                                    @purchase.PurchaseDate
-                                </td>
-
-                                <td>
-                                    @purchase.UnitPrice.ToString("0.00")
-                                </td>
-
-                                <td>
-                                    @purchase.TotalPrice.ToString("0.00")
-                                </td>
-
-                            </tr>
-
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
+            }
 
         </div>
 
     </div>
 
 </div>
+
+
+<!-- =========================================================
+     ALERT DISMISS SCRIPT
+========================================================== -->
+
+<script>
+
+    function dismissAlert(alertId) {
+
+        const alertElement =
+            document.getElementById(alertId);
+
+        if (alertElement) {
+
+            alertElement.style.transition =
+                "opacity 0.25s ease, transform 0.25s ease";
+
+            alertElement.style.opacity = "0";
+
+            alertElement.style.transform =
+                "translateX(20px)";
+
+            setTimeout(function () {
+
+                alertElement.remove();
+
+            }, 250);
+
+        }
+
+    }
+
+</script>

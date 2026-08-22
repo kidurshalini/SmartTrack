@@ -1,0 +1,650 @@
+﻿@model SmartTrack.ViewModels.ShoppingListViewModel
+
+@{
+    ViewData["Title"] = "Shopping List";
+}
+
+<div class="container-fluid py-3 py-md-4">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="d-flex flex-column flex-sm-row
+                justify-content-between
+                align-items-start
+                align-items-sm-center
+                gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                🛒 Shopping List
+            </h2>
+
+            <p class="text-muted mb-0">
+                Automatically created from your purchase recommendations.
+            </p>
+        </div>
+
+        @if (Model.Status == "ACTIVE")
+        {
+            <span class="badge bg-success fs-6 px-3 py-2">
+                ACTIVE
+            </span>
+        }
+    </div>
+
+
+    <!-- =====================================================
+         SUMMARY
+    ====================================================== -->
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-12 col-sm-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        TOTAL ITEMS
+                    </small>
+
+                    <h3 class="fw-bold mb-0">
+                        @Model.TotalItems
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-sm-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        PURCHASED
+                    </small>
+
+                    <h3 class="fw-bold text-success mb-0">
+                        @Model.PurchasedItems
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-12 col-sm-4">
+
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        REMAINING
+                    </small>
+
+                    <h3 class="fw-bold text-danger mb-0">
+                        @Model.RemainingItems
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         EMPTY
+    ====================================================== -->
+
+    @if (Model.Items == null ||
+         Model.Items.Count == 0)
+    {
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body text-center py-5">
+
+                <i class="fas fa-shopping-cart
+                          fa-3x
+                          text-muted
+                          mb-3"></i>
+
+                <h5 class="fw-bold">
+                    Shopping List is Empty
+                </h5>
+
+                <p class="text-muted mb-3">
+                    No purchase recommendations have been
+                    added to your shopping list yet.
+                </p>
+
+                <a asp-controller="SmartTrackDashboard"
+                   asp-action="Recommendations"
+                   class="btn btn-success">
+
+                    <i class="fas fa-lightbulb me-2"></i>
+
+                    View Recommendations
+
+                </a>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <!-- =================================================
+             DESKTOP TABLE
+        ================================================== -->
+
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-header bg-white border-0 p-3 p-md-4">
+
+                <h5 class="fw-bold mb-1">
+                    Items to Purchase
+                </h5>
+
+                <small class="text-muted">
+                    Automatically generated from SmartTrack recommendations
+                </small>
+
+            </div>
+
+
+            <div class="card-body p-0">
+
+                <div class="d-none d-md-block">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover
+                                      align-middle
+                                      mb-0">
+
+                            <thead class="table-light">
+
+                                <tr>
+
+                                    <th class="px-4">
+                                        Product
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th>
+                                        Expected Date
+                                    </th>
+
+                                    <th>
+                                        Time
+                                    </th>
+
+                                    <th>
+                                        Priority
+                                    </th>
+
+                                    <th>
+                                        Quantity
+                                    </th>
+
+                                    <th class="text-end px-4">
+                                        Action
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                @foreach (var item in Model.Items)
+                                {
+                                    <tr class="@(item.IsPurchased
+                                        ? "table-success"
+                                        : "")">
+
+                                        <!-- PRODUCT -->
+
+                                        <td class="px-4">
+
+                                            <strong>
+                                                @item.Product
+                                            </strong>
+
+                                        </td>
+
+
+                                        <!-- STATUS -->
+
+                                        <td>
+
+                                            @if (item.IsPurchased)
+                                            {
+                                                <span class="badge bg-success">
+                                                    PURCHASED
+                                                </span>
+                                            }
+                                            else if (item.DaysUntilPurchase <= 0)
+                                            {
+                                                <span class="badge bg-danger">
+                                                    PURCHASE NOW
+                                                </span>
+                                            }
+                                            else if (item.DaysUntilPurchase <= 3)
+                                            {
+                                                <span class="badge bg-warning text-dark">
+                                                    DUE SOON
+                                                </span>
+                                            }
+                                            else if (item.DaysUntilPurchase <= 7)
+                                            {
+                                                <span class="badge bg-info">
+                                                    UPCOMING
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">
+                                                    OK
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        <!-- DATE -->
+
+                                        <td>
+
+                                            @if (item.ExpectedPurchaseDate.HasValue)
+                                            {
+                                                @item.ExpectedPurchaseDate.Value.ToString("dd/MM/yyyy")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    —
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        <!-- TIME -->
+
+                                        <td>
+
+                                            @if (item.IsPurchased)
+                                            {
+                                                <span class="text-success">
+                                                    Purchased
+                                                </span>
+                                            }
+                                            else if (item.DaysUntilPurchase <= 0)
+                                            {
+                                                <strong class="text-danger">
+                                                    Overdue
+                                                </strong>
+                                            }
+                                            else
+                                            {
+                                                <strong>
+                                                    @item.DaysUntilPurchase days left
+                                                </strong>
+                                            }
+
+                                        </td>
+
+
+                                        <!-- PRIORITY -->
+
+                                        <td>
+
+                                            @if (item.Priority == "HIGH")
+                                            {
+                                                <span class="text-danger fw-semibold">
+                                                    ● High
+                                                </span>
+                                            }
+                                            else if (item.Priority == "MEDIUM")
+                                            {
+                                                <span class="text-warning fw-semibold">
+                                                    ● Medium
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-success fw-semibold">
+                                                    ● Normal
+                                                </span>
+                                            }
+
+                                        </td>
+
+
+                                        <!-- QUANTITY -->
+
+                                        <td>
+
+                                            <strong>
+                                                @item.Quantity
+                                            </strong>
+
+                                        </td>
+
+
+                                        <!-- ACTION -->
+
+                                        <td class="text-end px-4">
+
+                                            @if (!item.IsPurchased)
+                                            {
+                                                <form asp-controller="ShoppingList"
+                                                      asp-action="MarkPurchased"
+                                                      method="post"
+                                                      class="d-inline">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <input type="hidden"
+                                                           name="id"
+                                                           value="@item.Id" />
+
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-success">
+
+                                                        <i class="fas fa-check me-1"></i>
+
+                                                        Purchased
+
+                                                    </button>
+
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-success">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </span>
+                                            }
+
+
+                                            <form asp-controller="ShoppingList"
+                                                  asp-action="RemoveItem"
+                                                  method="post"
+                                                  class="d-inline ms-1">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@item.Id" />
+
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger">
+
+                                                    <i class="fas fa-trash"></i>
+
+                                                </button>
+
+                                            </form>
+
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     MOBILE CARDS
+                ================================================== -->
+
+                <div class="d-md-none">
+
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="p-3 border-bottom">
+
+                            <div class="d-flex
+                                        justify-content-between
+                                        align-items-start
+                                        gap-2
+                                        mb-3">
+
+                                <div>
+
+                                    <h6 class="fw-bold mb-1">
+                                        @item.Product
+                                    </h6>
+
+                                    <small class="text-muted">
+                                        Quantity:
+                                        <strong>
+                                            @item.Quantity
+                                        </strong>
+                                    </small>
+
+                                </div>
+
+
+                                <div>
+
+                                    @if (item.IsPurchased)
+                                    {
+                                        <span class="badge bg-success">
+                                            PURCHASED
+                                        </span>
+                                    }
+                                    else if (item.DaysUntilPurchase <= 0)
+                                    {
+                                        <span class="badge bg-danger">
+                                            PURCHASE NOW
+                                        </span>
+                                    }
+                                    else if (item.DaysUntilPurchase <= 3)
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            DUE SOON
+                                        </span>
+                                    }
+                                    else if (item.DaysUntilPurchase <= 7)
+                                    {
+                                        <span class="badge bg-info">
+                                            UPCOMING
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">
+                                            OK
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row g-3 mb-3">
+
+                                <div class="col-6">
+
+                                    <small class="text-muted d-block">
+                                        Expected Date
+                                    </small>
+
+                                    <strong>
+
+                                        @if (item.ExpectedPurchaseDate.HasValue)
+                                        {
+                                            @item.ExpectedPurchaseDate.Value.ToString("dd/MM/yyyy")
+                                        }
+                                        else
+                                        {
+                                            <span>—</span>
+                                        }
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="col-6">
+
+                                    <small class="text-muted d-block">
+                                        Time
+                                    </small>
+
+                                    @if (item.IsPurchased)
+                                    {
+                                        <strong class="text-success">
+                                            Purchased
+                                        </strong>
+                                    }
+                                    else if (item.DaysUntilPurchase <= 0)
+                                    {
+                                        <strong class="text-danger">
+                                            Overdue
+                                        </strong>
+                                    }
+                                    else
+                                    {
+                                        <strong>
+                                            @item.DaysUntilPurchase days left
+                                        </strong>
+                                    }
+
+                                </div>
+
+
+                                <div class="col-6">
+
+                                    <small class="text-muted d-block">
+                                        Priority
+                                    </small>
+
+                                    @if (item.Priority == "HIGH")
+                                    {
+                                        <span class="text-danger fw-semibold">
+                                            ● High
+                                        </span>
+                                    }
+                                    else if (item.Priority == "MEDIUM")
+                                    {
+                                        <span class="text-warning fw-semibold">
+                                            ● Medium
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-success fw-semibold">
+                                            ● Normal
+                                        </span>
+                                    }
+
+                                </div>
+
+
+                                <div class="col-6">
+
+                                    <small class="text-muted d-block">
+                                        Status
+                                    </small>
+
+                                    <strong>
+                                        @item.RecommendationStatus
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ACTIONS -->
+
+                            <div class="d-flex gap-2">
+
+                                @if (!item.IsPurchased)
+                                {
+                                    <form asp-controller="ShoppingList"
+                                          asp-action="MarkPurchased"
+                                          method="post"
+                                          class="flex-grow-1">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@item.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-success w-100">
+
+                                            <i class="fas fa-check me-1"></i>
+
+                                            Mark Purchased
+
+                                        </button>
+
+                                    </form>
+                                }
+
+
+                                <form asp-controller="ShoppingList"
+                                      asp-action="RemoveItem"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@item.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-outline-danger">
+
+                                        <i class="fas fa-trash"></i>
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>

@@ -1,0 +1,386 @@
+﻿@model SmartTrack.ViewModels.SmartTrackPredictionViewModel
+
+@{
+    ViewData["Title"] = "Check Product";
+}
+
+<style>
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    .prediction-page {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .prediction-card {
+        width: 100%;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .prediction-header {
+        padding: 20px;
+    }
+
+    .prediction-body {
+        padding: 20px;
+    }
+
+    .prediction-input {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .prediction-result {
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .prediction-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .result-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    .result-item:last-child {
+        border-bottom: none;
+    }
+
+    @@media (max-width: 767.98px) {
+
+        .prediction-page {
+            padding: 12px 10px !important;
+        }
+
+        .prediction-card {
+            border-radius: 10px;
+        }
+
+        .prediction-header {
+            padding: 15px !important;
+        }
+
+        .prediction-body {
+            padding: 15px !important;
+        }
+
+        .prediction-header h3 {
+            font-size: 1.25rem;
+        }
+
+        .prediction-header p {
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .form-label {
+            font-size: 0.78rem;
+        }
+
+        .prediction-input {
+            min-height: 42px;
+            font-size: 0.82rem;
+        }
+
+        .prediction-btn {
+            width: 100%;
+            min-height: 44px;
+        }
+
+        .prediction-result {
+            padding: 15px;
+        }
+
+        .prediction-number {
+            font-size: 2rem;
+        }
+
+        .result-item {
+            font-size: 0.78rem;
+        }
+    }
+
+</style>
+
+
+<div class="container-fluid py-4 prediction-page">
+
+    <!-- =====================================================
+         PAGE HEADER
+    ====================================================== -->
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold mb-1">
+            <i class="fas fa-search text-primary me-2"></i>
+            Check Product
+        </h2>
+
+        <p class="text-muted mb-0">
+            Enter the current product information to predict
+            when the product will need to be purchased.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         VALIDATION / ERROR
+    ====================================================== -->
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+
+            <i class="fas fa-exclamation-circle me-2"></i>
+
+            Please check the information you entered.
+
+            <div asp-validation-summary="All"
+                 class="mt-2">
+            </div>
+
+        </div>
+    }
+
+
+    <!-- =====================================================
+         PREDICTION FORM
+    ====================================================== -->
+
+    <div class="card shadow-sm border-0 prediction-card">
+
+        <div class="card-header bg-white border-0 prediction-header">
+
+            <h4 class="fw-semibold mb-1">
+                Product Information
+            </h4>
+
+            <p class="text-muted small mb-0">
+                Provide the latest household usage information.
+            </p>
+
+        </div>
+
+
+        <div class="card-body prediction-body">
+
+            <form asp-controller="SmartTrackDashboard"
+                  asp-action="Prediction"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+
+                <!-- PRODUCT -->
+
+                <div class="mb-3">
+
+                    <label asp-for="ProductName"
+                           class="form-label fw-semibold">
+                        Product
+                    </label>
+
+                    <input asp-for="ProductName"
+                           class="form-control prediction-input"
+                           placeholder="Example: Milk" />
+
+                    <span asp-validation-for="ProductName"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+
+           
+
+                <!-- BUTTONS -->
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn btn-primary prediction-btn">
+
+                        <i class="fas fa-brain me-1"></i>
+
+                        Predict
+
+                    </button>
+
+
+                    <a asp-controller="SmartTrackDashboard"
+                       asp-action="Dashboard"
+                       class="btn btn-outline-secondary">
+
+                        <i class="fas fa-arrow-left me-1"></i>
+
+                        Back
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         PREDICTION RESULT
+    ====================================================== -->
+
+    @if (Model.HasPrediction)
+    {
+        <div class="card shadow-sm border-0 prediction-card prediction-result">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between
+                            align-items-start mb-3">
+
+                    <div>
+
+                        <h4 class="fw-bold mb-1">
+                            Prediction Result
+                        </h4>
+
+                        <p class="text-muted small mb-0">
+                            @Model.ProductName
+                        </p>
+
+                    </div>
+
+                    <span class="badge bg-@Model.StatusClass">
+                        @Model.StockStatus
+                    </span>
+
+                </div>
+
+
+                <!-- PREDICTED DAYS -->
+
+                <div class="text-center py-4">
+
+                    <div class="prediction-number
+                                text-@Model.StatusClass">
+
+                        @Model.PredictedDaysUntilPurchase
+                        <span class="fs-6">
+                            days
+                        </span>
+
+                    </div>
+
+                    <div class="text-muted mt-2">
+                        Predicted time until purchase
+                    </div>
+
+                </div>
+
+
+                <!-- DETAILS -->
+
+                <div class="result-item">
+
+                    <strong>
+                        Product
+                    </strong>
+
+                    <span class="float-end">
+                        @Model.ProductName
+                    </span>
+
+                </div>
+
+
+                <div class="result-item">
+
+                    <strong>
+                        Current Stock
+                    </strong>
+
+                    <span class="float-end">
+                        @Model.CurrentStock
+                    </span>
+
+                </div>
+
+
+                <div class="result-item">
+
+                    <strong>
+                        Average Daily Usage
+                    </strong>
+
+                    <span class="float-end">
+                        @Model.AverageDailyUsage
+                    </span>
+
+                </div>
+
+
+                <div class="result-item">
+
+                    <strong>
+                        Stock Status
+                    </strong>
+
+                    <span class="float-end">
+
+                        <span class="badge bg-@Model.StatusClass">
+                            @Model.StockStatus
+                        </span>
+
+                    </span>
+
+                </div>
+
+
+                <!-- RECOMMENDATION -->
+
+                <div class="alert alert-light border mt-4 mb-0">
+
+                    <strong>
+                        <i class="fas fa-lightbulb text-warning me-1"></i>
+                        Recommendation
+                    </strong>
+
+                    <p class="mb-0 mt-1">
+                        @Model.Recommendation
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}
